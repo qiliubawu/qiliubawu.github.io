@@ -3,159 +3,167 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>椭圆无限滚动轮播</title>
+<title>椭圆旋转轮播图</title>
 <style>
+:root{--post-spacing:1.78vw;--post-size:25vw;--mask-size:100vw}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:#0f0f1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;overflow:hidden}
+html,body{height:100%;font-family:-apple-system,sans-serif}
+body{background:#0f172a;overflow:hidden}
 
-.stage{width:900px;height:500px;position:relative}
+.title{position:absolute;left:50%;top:5%;transform:translate(-50%,0);text-align:center;z-index:10}
+.title p{font-size:2.5rem;font-weight:800;color:#e2e8f0}
+.title span{font-size:.9rem;color:#64748b;display:block;margin-top:6px}
 
-.item{position:absolute;width:220px;height:150px;border-radius:16px;overflow:hidden;left:50%;top:50%;margin-left:-110px;margin-top:-75px;box-shadow:0 8px 32px rgba(0,0,0,.5);cursor:pointer}
-.item img{width:100%;height:100%;object-fit:cover;display:block}
-.item .title{position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(0,rgba(0,0,0,.7),transparent);color:#fff;font-size:14px;font-weight:600}
+#banner{overflow:hidden;position:relative;width:100vw;height:calc(var(--post-size)/0.72);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
+  position:absolute;top:14%}
 
-.controls{display:flex;align-items:center;gap:20px;margin-top:24px}
-.arrow{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.5);font-size:22px;transition:.3s;user-select:none}
-.arrow:hover{background:rgba(255,255,255,.18);color:#fff}
-.dots{display:flex;gap:6px}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:.3s}
-.dot.active{background:#fff;width:24px;border-radius:4px}
+.img-list{display:flex;position:absolute;width:100%;height:100%;transform:translate(13.39vw,0);transition:left .5s ease;left:0}
 
-.info{position:fixed;bottom:20px;color:rgba(255,255,255,.1);font-size:12px;pointer-events:none}
+.img-box{height:100%;display:inline-block;margin-right:var(--post-spacing);position:relative;cursor:pointer;flex-shrink:0}
+.img-box .info{position:absolute;display:flex;flex-direction:column;justify-content:center;inset:0;background:rgba(23,23,23,.5);text-align:center;color:#fff9f1;opacity:0;transition:.3s}
+.img-box:hover .info{opacity:1}
+.info h3{font-size:1.4rem;font-weight:700}
+.info p{font-size:.7rem;margin-top:4px;color:#ccc}
+.img-box img{width:var(--post-size);height:100%;object-position:center;object-fit:cover}
+
+.btn-group{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);display:flex;gap:12px;z-index:20}
+.btn{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(15,23,42,.8);cursor:pointer;transition:.4s;display:flex;align-items:center;justify-content:center}
+.btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)}
+.btn svg{width:24px;height:24px;fill:rgba(255,255,255,.7)}
+.btn:hover svg{fill:#fff}
+.btn .right{transform:rotate(180deg)}
 </style>
 </head>
 <body>
-<div class="stage" id="stage"></div>
-<div class="controls">
-  <div class="arrow" onclick="prev()">‹</div>
-  <div class="dots" id="dots"></div>
-  <div class="arrow" onclick="next()">›</div>
+<div class="title">
+  <p>椭圆旋转轮播图</p>
+  <span>Elliptical Rotation Carousel · 点击按钮切换</span>
 </div>
-<p class="info">鼠标悬停暂停 · 点击高亮 · 箭头切换 · 拖拽/滚轮</p>
+
+<div id="banner">
+  <div class="img-list" id="imgList"></div>
+</div>
+
+<div class="btn-group">
+  <button class="btn" id="prevBtn">
+    <svg viewBox="0 0 1024 1024"><path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z"/></svg>
+  </button>
+  <button class="btn" id="nextBtn">
+    <svg class="right" viewBox="0 0 1024 1024"><path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z"/></svg>
+  </button>
+</div>
 
 <script>
-const data=[
-  {img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=340",title:"壮丽山峰"},
-  {img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=340",title:"静谧森林"},
-  {img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=340",title:"热带海滩"},
-  {img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=340",title:"晨光森林"},
-  {img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=340",title:"迷雾山谷"},
-  {img:"https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=500&h=340",title:"金色秋色"},
-  {img:"https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&h=340",title:"飞流瀑布"},
-  {img:"https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&h=340",title:"辽阔草原"},
+const imgs=[
+  {url:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400",title:"壮丽山峰",sub:"Mountains"},
+  {url:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400",title:"静谧森林",sub:"Forest"},
+  {url:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400",title:"热带海滩",sub:"Beach"},
+  {url:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400",title:"晨光森林",sub:"Sunlight"},
+  {url:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400",title:"迷雾山谷",sub:"Valley"},
+  {url:"https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=600&h=400",title:"金色秋色",sub:"Autumn"},
 ];
 
-const N=data.length;
-const stage=document.getElementById('stage');
-const dotsEl=document.getElementById('dots');
-const items=[];
-let angle=0,speed=0.05,hoveredIdx=-1,animId;
-
-// Tween system
-let targetAngle=0,tweening=false;
-
-function shortestAngle(from,to){
-  let diff=((to-from)%360+540)%360-180;
-  return from+diff;
-}
-
-function startTween(to){
-  targetAngle=shortestAngle(angle,to);
-  tweening=true;
-}
+const imgList=document.getElementById('imgList');
+const root=document.documentElement;
+const N=imgs.length;
+const postSpacing=Number(getComputedStyle(root).getPropertyValue('--post-spacing').replace('vw',''));
+const postSize=Number(getComputedStyle(root).getPropertyValue('--post-size').replace('vw',''));
+const imgBoxW=postSize+postSpacing;
+const totalShift=imgBoxW*N;
+let index=0,timer=null;
+const animTime=0.5;
 
 // Build cards
-data.forEach((d,i)=>{
-  const el=document.createElement('div');el.className='item';
-  el.innerHTML=`<img src="${d.img}" alt="${d.title}"><div class="title">${d.title}</div>`;
-  el.addEventListener('mouseenter',()=>{hoveredIdx=i});
-  el.addEventListener('mouseleave',()=>{hoveredIdx=-1});
-  stage.appendChild(el);
-  items.push(el);
+imgs.forEach(img=>{
+  const box=document.createElement('div');box.className='img-box';
+  box.innerHTML=`<div class="info"><h3>${img.title}</h3><p>${img.sub}</p></div><img src="${img.url}" alt="${img.title}">`;
+  imgList.appendChild(box);
 });
-dotsEl.innerHTML=data.map((_,i)=>`<div class="dot" onclick="goTo(${i})"></div>`).join('');
 
-function getFrontIdx(){
-  let fi=0,mz=-9999;
-  for(let i=0;i<N;i++){
-    const a=((angle+i*(360/N))%360)*Math.PI/180;
-    const z=Math.sin(a)*120;
-    if(z>mz){mz=z;fi=i}
-  }
-  return fi;
-}
+// Move last element to beginning of visual order
+let boxes=Array.from(imgList.querySelectorAll('.img-box'));
+boxes.unshift(boxes.pop());
+// Reset DOM order
+imgList.innerHTML='';
+boxes.forEach(b=>imgList.appendChild(b));
 
-function render(){
-  const dots=dotsEl.querySelectorAll('.dot');
-  const rx=320,ry=120;
+// Set last-img-box initial translateX
+const lastBox=imgList.lastElementChild;
+lastBox.style.transform=`translateX(-${totalShift}vw)`;
 
-  // Handle hover: tween to front
-  if(hoveredIdx>=0){
-    const frontIdx=getFrontIdx();
-    if(frontIdx!==hoveredIdx){
-      startTween(-hoveredIdx*(360/N));
+imgList.style.transition=animTime+'s ease';
+
+function clickFn(dir){
+  if(dir==='next'){
+    index--;
+    imgList.style.left=imgBoxW*index+'vw';
+    setTimeout(()=>{
+      imgList.style.transition='none';
+      if(Math.abs(index)===N){
+        index=0;
+        imgList.style.left=0;
+        Array.from(imgList.children).forEach(b=>{
+          b.style.transform=b===imgList.lastElementChild?`translateX(-${totalShift}vw)`:'none';
+        });
+      }else{
+        const first=imgList.firstElementChild;
+        if(first===lastBox){
+          lastBox.style.transition='none';
+          lastBox.style.transform='translateX(0px)';
+        }else if(index>=0){
+          first.style.transform='none';
+        }else{
+          first.style.transform=`translateX(${totalShift}vw)`;
+        }
+      }
+      boxes=Array.from(imgList.children);
+      boxes.push(boxes.shift());
+      imgList.innerHTML='';
+      boxes.forEach(b=>imgList.appendChild(b));
+    },animTime*1000);
+  }else{
+    index++;
+    // Move last to first
+    boxes=Array.from(imgList.children);
+    boxes.unshift(boxes.pop());
+    imgList.innerHTML='';
+    boxes.forEach(b=>imgList.appendChild(b));
+    const first=imgList.firstElementChild;
+    if(first===lastBox&&index!==0){
+      first.style.transform=`translateX(-${totalShift*2}vw)`;
+    }else if(index<0){
+      first.style.transform='none';
+    }else{
+      first.style.transform=`translateX(-${totalShift}vw)`;
+    }
+    imgList.style.left=imgBoxW*index+'vw';
+    lastBox.style.transition='none';
+    if(Math.abs(index)===N){
+      index=0;
+      setTimeout(()=>{
+        imgList.style.transition='none';
+        imgList.style.left=0;
+        Array.from(imgList.children).forEach(b=>{
+          b.style.transform=b===lastBox?`translateX(-${totalShift}vw)`:'none';
+        });
+      },animTime*1000);
     }
   }
-
-  // Tween animation
-  if(tweening){
-    angle+=(targetAngle-angle)*0.12;
-    if(Math.abs(targetAngle-angle)<0.1){
-      angle=targetAngle;
-      tweening=false;
-    }
-  }
-
-  for(let i=0;i<N;i++){
-    const a=((angle+i*(360/N))%360)*Math.PI/180;
-    const x=Math.cos(a)*rx;
-    const z=Math.sin(a)*ry;
-    const scale=0.5+(z+ry)/(2*ry)*0.6;
-    const opacity=0.3+(z+ry)/(2*ry)*0.7;
-
-    items[i].style.transform=`translate(${x}px,${-z*0.4}px) scale(${scale})`;
-    items[i].style.opacity=opacity;
-    items[i].style.zIndex=Math.floor((z+ry)*10);
-  }
-
-  const frontIdx=getFrontIdx();
-  dots.forEach((d,i)=>d.classList.toggle('active',i===frontIdx));
+  imgList.style.transition=animTime+'s ease';
 }
 
-function loop(){
-  if(!tweening && hoveredIdx<0) angle+=speed;
-  render();
-  animId=requestAnimationFrame(loop);
+function throttle(fn,delay){
+  return function(){
+    if(timer)return;
+    fn.apply(this,arguments);
+    timer=setTimeout(()=>{timer=null},delay);
+  };
 }
 
-function prev(){
-  hoveredIdx=-1;
-  const fi=getFrontIdx();
-  const ti=(fi-1+N)%N;
-  startTween(-ti*(360/N));
-}
-function next(){
-  hoveredIdx=-1;
-  const fi=getFrontIdx();
-  const ti=(fi+1)%N;
-  startTween(-ti*(360/N));
-}
-function goTo(i){
-  hoveredIdx=-1;
-  startTween(-i*(360/N));
-}
-
-// Drag
-let dragging=false,sx=0,sa=0;
-stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;hoveredIdx=-1;tweening=false});
-stage.addEventListener('pointermove',e=>{if(!dragging)return;angle=sa+(e.clientX-sx)*0.2;render()});
-stage.addEventListener('pointerup',()=>{dragging=false});
-
-// Wheel
-stage.addEventListener('wheel',e=>{e.preventDefault();tweening=false;angle-=e.deltaY*0.03;render()},{passive:false});
-
-loop();
+document.getElementById('nextBtn').onclick=throttle(()=>clickFn('next'),animTime*1000);
+document.getElementById('prevBtn').onclick=throttle(()=>clickFn('last'),animTime*1000);
 </script>
 </body>
 </html>

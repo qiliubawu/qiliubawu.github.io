@@ -9,12 +9,13 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f5;color:#333;min-width:320px}
 
 /* Top nav bar */
-.top-nav{background:#ff5000;color:#fff;height:44px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:100}
-.top-nav .search-box{display:flex;align-items:center;background:#fff;border-radius:20px;overflow:hidden;width:92%;max-width:600px;height:32px}
+.top-nav{background:#ff5000;color:#fff;height:44px;display:flex;align-items:center;padding:0 12px;position:sticky;top:0;z-index:100;gap:8px}
+.top-nav .search-box{display:flex;align-items:center;background:#fff;border-radius:20px;overflow:hidden;flex:1;max-width:500px;height:32px}
 .top-nav .search-box input{flex:1;border:none;outline:none;padding:0 14px;font-size:14px;color:#333}
 .top-nav .search-box input::placeholder{color:#bbb}
 .top-nav .search-box button{background:#ff5000;color:#fff;border:none;padding:0 18px;height:32px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.top-nav .logo{font-size:18px;font-weight:800;margin-right:10px;display:none}
+.top-nav .logo{display:flex;align-items:center;gap:6px;color:#fff;font-size:22px;font-weight:800;margin-right:8px;flex-shrink:0;text-decoration:none}
+.top-nav .logo svg{width:28px;height:28px}
 
 /* Banner */
 .banner{margin:8px 10px;border-radius:12px;overflow:hidden;position:relative;height:140px;background:#e8e8e8}
@@ -106,6 +107,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <body>
 
 <header class="top-nav">
+  <a class="logo" href="#" onclick="event.preventDefault()">
+    <svg viewBox="0 0 40 40" fill="none"><rect x="5" y="5" width="14" height="14" rx="4" fill="#fff"/><rect x="21" y="5" width="14" height="14" rx="4" fill="#fff" opacity=".9"/><rect x="5" y="21" width="14" height="14" rx="4" fill="#fff" opacity=".85"/><rect x="21" y="21" width="14" height="14" rx="4" fill="#fff" opacity=".75"/><path d="M12 12h0M28 12h0M12 28h0M28 28h0" stroke="#ff5000" stroke-width="2.5" stroke-linecap="round"/></svg>
+    ZenMart
+  </a>
   <div class="search-box">
     <input id="searchInput" placeholder="搜索你想要的商品" oninput="renderProducts()">
     <button>搜索</button>

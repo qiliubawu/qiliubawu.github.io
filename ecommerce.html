@@ -9,13 +9,18 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f5;color:#333;min-width:320px}
 
 /* Top nav bar */
-.top-nav{background:#ff5000;color:#fff;height:44px;display:flex;align-items:center;padding:0 12px;position:sticky;top:0;z-index:100;gap:8px}
-.top-nav .search-box{display:flex;align-items:center;background:#fff;border-radius:20px;overflow:hidden;flex:1;max-width:500px;height:32px}
+.top-nav{background:#ff5000;color:#fff;height:48px;display:flex;align-items:center;padding:0 16px;position:sticky;top:0;z-index:100}
+.top-nav .search-box{display:flex;align-items:center;background:#fff;border-radius:20px;overflow:hidden;flex:1;max-width:560px;height:34px;margin:0 auto}
 .top-nav .search-box input{flex:1;border:none;outline:none;padding:0 14px;font-size:14px;color:#333}
 .top-nav .search-box input::placeholder{color:#bbb}
-.top-nav .search-box button{background:#ff5000;color:#fff;border:none;padding:0 18px;height:32px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.top-nav .logo{display:flex;align-items:center;gap:6px;color:#fff;font-size:22px;font-weight:800;margin-right:8px;flex-shrink:0;text-decoration:none}
-.top-nav .logo svg{width:28px;height:28px}
+.top-nav .search-box button{background:#ff5000;color:#fff;border:none;padding:0 20px;height:34px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.top-nav .logo{display:flex;align-items:center;gap:6px;color:#fff;font-size:18px;font-weight:800;text-decoration:none;flex-shrink:0}
+.top-nav .logo svg{width:26px;height:26px}
+.top-nav .nav-right{display:flex;align-items:center;gap:18px;flex-shrink:0;font-size:13px}
+.top-nav .nav-right a{color:#fff;text-decoration:none;white-space:nowrap;transition:.2s}
+.top-nav .nav-right a:hover{opacity:.8}
+.top-nav .nav-right .cart-link{position:relative}
+.top-nav .nav-right .cart-link .cnt{position:absolute;top:-6px;right:-12px;background:#fff;color:#ff5000;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;line-height:16px;min-width:16px;text-align:center}
 
 /* Banner */
 .banner{margin:8px 10px;border-radius:12px;overflow:hidden;position:relative;height:140px;background:#e8e8e8}
@@ -115,6 +120,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
     <input id="searchInput" placeholder="搜索你想要的商品" oninput="renderProducts()">
     <button>搜索</button>
   </div>
+  <div class="nav-right">
+    <a href="#" onclick="event.preventDefault()">用户中心</a>
+    <a class="cart-link" href="#" onclick="event.preventDefault();toggleCart()">购物车<span class="cnt" id="cartCountSmall">0</span></a>
+    <a href="#" onclick="event.preventDefault()">帮助中心</a>
+  </div>
 </header>
 
 <div class="banner" id="bannerDiv">
@@ -131,9 +141,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 
 <div id="page-orders" class="order-page"><div id="orderList"></div></div>
 
-<div class="cart-float" onclick="toggleCart()">
-  🛒<span class="badge" id="cartCount">0</span>
-</div>
 
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-panel" id="cartPanel">
@@ -236,7 +243,9 @@ function qtyChange(id,d) {
   if(i.qty<=0){removeCart(id);return} updateCart();
 }
 function updateCart() {
-  document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  const el = document.getElementById('cartCountSmall');
+  if(el) el.textContent = count;
   const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
   document.getElementById('cartTotal').textContent = '¥'+total;
   const list = document.getElementById('cartList');

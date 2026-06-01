@@ -23,18 +23,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .top-nav .nav-right .cart-link .cnt{position:absolute;top:-6px;right:-12px;background:#fff;color:#ff5000;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;line-height:16px;min-width:16px;text-align:center}
 
 /* Banner */
-.banner{margin:8px 10px;border-radius:12px;overflow:hidden;position:relative;height:140px;background:#e8e8e8}
-.banner img{width:100%;height:100%;object-fit:cover}
-.banner .dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
-.banner .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}
-.banner .dot.active{background:#fff;width:16px;border-radius:3px}
+.banner{margin:0;overflow:hidden;position:relative;height:160px;background:#f0f0f0;cursor:pointer}
+@media(min-width:640px){.banner{height:240px}}
+@media(min-width:900px){.banner{height:320px;margin:12px;border-radius:16px}}
+.banner img{width:100%;height:100%;object-fit:cover;transition:opacity .5s}
+.banner .dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.banner .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:.3s}
+.banner .dot.active{background:#fff;width:20px;border-radius:4px}
+.banner .arrow{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;background:rgba(0,0,0,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;color:#fff;font-size:18px;transition:.2s;display:none}
+@media(min-width:640px){.banner .arrow{display:flex}}
+.banner .arrow:hover{background:rgba(0,0,0,.3)}
+.banner .arrow.left{left:12px}
+.banner .arrow.right{right:12px}
 
 /* Categories */
-.cats{display:flex;justify-content:space-around;padding:12px 10px;background:#fff;margin:0 10px 8px;border-radius:12px;flex-wrap:wrap}
-.cat-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:.2s;font-size:12px;color:#666}
+.cats{margin:12px 10px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px 4px}
+@media(min-width:640px){.cats{grid-template-columns:repeat(10,1fr);margin:16px 12px;gap:12px 6px}}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:2px;border-radius:8px;transition:.2s;font-size:11px;color:#666;text-align:center}
+@media(min-width:640px){.cat-item{font-size:12px;gap:8px}}
 .cat-item:hover,.cat-item.active{color:#ff5000}
-.cat-item .icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
-.cat-item .icon img{width:100%;height:100%;object-fit:cover}
+.cat-item .icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;transition:.2s}
+@media(min-width:640px){.cat-item .icon{width:56px;height:56px;font-size:26px}}
+.cat-item:hover .icon,.cat-item.active .icon{transform:scale(1.08)}
 
 /* Section header */
 .sec-header{display:flex;justify-content:space-between;align-items:center;padding:14px 10px 8px}
@@ -128,7 +138,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 </header>
 
 <div class="banner" id="bannerDiv">
+  <div class="arrow left" onclick="bannerPrev()">‹</div>
   <div id="bannerImgs"></div>
+  <div class="arrow right" onclick="bannerNext()">›</div>
   <div class="dots" id="bannerDots"></div>
 </div>
 
@@ -159,48 +171,68 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 const products = [
   {id:1,title:"Apple AirPods Pro 二代 主动降噪无线蓝牙耳机",cat:"数码",price:1799,op:2399,img:"https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&h=400&fit=crop",shop:"Apple旗舰店",tag:"tmall",sold:"10万+"},
   {id:2,title:"华为 Mate 60 Pro 麒麟芯片 卫星通话 512GB",cat:"数码",price:6999,op:null,img:"https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=400&fit=crop",shop:"华为官方旗舰店",tag:"tmall",sold:"5万+"},
-  {id:3,title:"Sony WH-1000XM5 头戴式降噪耳机 30小时续航",cat:"数码",price:2499,op:2999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",shop:"Sony旗舰店",tag:"tmall",sold:"2万+"},
-  {id:4,title:"网易严选 人体工学椅 3D扶手 全网透气",cat:"家居",price:1299,op:1999,img:"https://images.unsplash.com/photo-1592078615290-033ee584e267?w=400&h=400&fit=crop",shop:"网易严选旗舰店",tag:"tb",sold:"1.5万+"},
-  {id:5,title:"北欧简约落地灯 客厅卧室书房 LED护眼",cat:"家居",price:299,op:499,img:"https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=400&h=400&fit=crop",shop:"宜家家居",tag:"tb",sold:"8千+"},
-  {id:6,title:"Nike Air Zoom Pegasus 40 男款跑步鞋 透气缓震",cat:"运动",price:899,op:1299,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",shop:"Nike官方旗舰店",tag:"tmall",sold:"3万+"},
-  {id:7,title:"Adidas Ultra Boost 跑鞋 女款 夏季透气",cat:"运动",price:799,op:1099,img:"https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&h=400&fit=crop",shop:"Adidas旗舰店",tag:"tmall",sold:"2万+"},
-  {id:8,title:"Lululemon Align 高腰瑜伽裤 裸感面料",cat:"运动",price:750,op:null,img:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop",shop:"Lululemon旗舰店",tag:"new",sold:"5千+"},
-  {id:9,title:"加拿大鹅 Expedition 派克大衣 男款",cat:"服饰",price:12900,op:null,img:"https://images.unsplash.com/photo-1604644401890-0bd678c83788?w=400&h=400&fit=crop",shop:"Canada Goose旗舰店",tag:"tmall",sold:"2千+"},
-  {id:10,title:"优衣库 AIRism 科技防晒衣 UPF50+ 男女款",cat:"服饰",price:199,op:299,img:"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop",shop:"优衣库旗舰店",tag:"tb",sold:"20万+"},
-  {id:11,title:"SK-II 神仙水 护肤精华露 230ml 日本进口",cat:"美妆",price:1540,op:null,img:"https://images.unsplash.com/photo-1570194065650-d99fb4f1b609?w=400&h=400&fit=crop",shop:"SK-II官方旗舰店",tag:"tmall",sold:"3万+"},
-  {id:12,title:"Dyson 戴森 V15 无线吸尘器 激光探测",cat:"家居",price:4990,op:5990,img:"https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop",shop:"Dyson旗舰店",tag:"tmall",sold:"1万+"},
+  {id:3,title:"Sony WH-1000XM5 头戴式降噪耳机",cat:"数码",price:2499,op:2999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",shop:"Sony旗舰店",tag:"tmall",sold:"2万+"},
+  {id:4,title:"夏季法式碎花连衣裙 收腰显瘦",cat:"女装",price:189,op:399,img:"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=400&fit=crop",shop:"韩都衣舍旗舰店",tag:"tb",sold:"8万+"},
+  {id:5,title:"冰丝阔腿裤 夏季薄款高腰垂感",cat:"女装",price:129,op:259,img:"https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=400&fit=crop",shop:"茵曼旗舰店",tag:"tb",sold:"5万+"},
+  {id:6,title:"优衣库 AIRism 科技防晒衣 UPF50+",cat:"男装",price:199,op:299,img:"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop",shop:"优衣库旗舰店",tag:"tb",sold:"20万+"},
+  {id:7,title:"纯棉短袖T恤 男士宽松潮流印花",cat:"男装",price:89,op:169,img:"https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=400&fit=crop",shop:"森马官方店",tag:"tb",sold:"15万+"},
+  {id:8,title:"Nike Air Zoom Pegasus 40 跑步鞋",cat:"鞋靴",price:899,op:1299,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",shop:"Nike旗舰店",tag:"tmall",sold:"3万+"},
+  {id:9,title:"Adidas Ultra Boost 女款跑鞋",cat:"鞋靴",price:799,op:1099,img:"https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&h=400&fit=crop",shop:"Adidas旗舰店",tag:"tmall",sold:"2万+"},
+  {id:10,title:"SK-II 神仙水 护肤精华露 230ml",cat:"美妆",price:1540,op:null,img:"https://images.unsplash.com/photo-1570194065650-d99fb4f1b609?w=400&h=400&fit=crop",shop:"SK-II旗舰店",tag:"tmall",sold:"3万+"},
+  {id:11,title:"Dyson 戴森 V15 无线吸尘器",cat:"家电",price:4990,op:5990,img:"https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop",shop:"Dyson旗舰店",tag:"tmall",sold:"1万+"},
+  {id:12,title:"Dyson 空气净化暖风扇 HP09",cat:"家电",price:5690,op:null,img:"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=400&fit=crop",shop:"Dyson旗舰店",tag:"tmall",sold:"5千+"},
+  {id:13,title:"网易严选 人体工学椅 全网透气",cat:"家居",price:1299,op:1999,img:"https://images.unsplash.com/photo-1592078615290-033ee584e267?w=400&h=400&fit=crop",shop:"网易严选旗舰店",tag:"tb",sold:"1.5万+"},
+  {id:14,title:"北欧简约落地灯 LED护眼",cat:"家居",price:299,op:499,img:"https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=400&h=400&fit=crop",shop:"宜家家居",tag:"tb",sold:"8千+"},
+  {id:15,title:"Lululemon Align 高腰瑜伽裤",cat:"运动",price:750,op:null,img:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop",shop:"Lululemon旗舰店",tag:"new",sold:"5千+"},
+  {id:16,title:"宝宝纯棉连体衣 新生儿礼盒",cat:"母婴",price:159,op:299,img:"https://images.unsplash.com/photo-1522771930-78848d9293e8?w=400&h=400&fit=crop",shop:"全棉时代旗舰店",tag:"tmall",sold:"2万+"},
+  {id:17,title:"三只松鼠坚果大礼包 每日坚果",cat:"食品",price:139,op:199,img:"https://images.unsplash.com/photo-1601004890429-58b7fd3d5e37?w=400&h=400&fit=crop",shop:"三只松鼠旗舰店",tag:"tb",sold:"30万+"},
+  {id:18,title:"空刻意面 番茄肉酱意面 5盒装",cat:"食品",price:69,op:99,img:"https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=400&fit=crop",shop:"空刻旗舰店",tag:"new",sold:"10万+"},
 ];
 
-// Banner images from Unsplash
+// Banner images
 const banners = [
-  "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1607082348824-0a96f2a175e3?w=1200&h=480&fit=crop",
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=480&fit=crop",
+  "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1200&h=480&fit=crop",
+  "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1200&h=480&fit=crop",
 ];
-let bannerIdx = 0;
+let bannerIdx = 0, bannerTimer = null;
+function showBanner(i) {
+  bannerIdx = i;
+  document.getElementById('bannerImgs').innerHTML = `<img src="${banners[i]}" alt="">`;
+  document.querySelectorAll('#bannerDots .dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+function bannerPrev() { showBanner((bannerIdx-1+banners.length)%banners.length); resetBannerTimer(); }
+function bannerNext() { showBanner((bannerIdx+1)%banners.length); resetBannerTimer(); }
+function resetBannerTimer() { clearInterval(bannerTimer); bannerTimer = setInterval(bannerNext,4000); }
 function initBanner() {
-  const c = document.getElementById('bannerImgs');
-  const d = document.getElementById('bannerDots');
-  d.innerHTML = banners.map((_,i)=>`<div class="dot ${i===0?'active':''}"></div>`).join('');
-  c.innerHTML = `<img src="${banners[0]}" alt="">`;
-  setInterval(()=>{
-    bannerIdx = (bannerIdx+1) % banners.length;
-    c.innerHTML = `<img src="${banners[bannerIdx]}" alt="">`;
-    d.querySelectorAll('.dot').forEach((dt,i)=>dt.classList.toggle('active',i===bannerIdx));
-  },3500);
+  document.getElementById('bannerDots').innerHTML = banners.map((_,i)=>`<div class="dot ${i===0?'active':''}" onclick="showBanner(${i});resetBannerTimer()"></div>`).join('');
+  showBanner(0);
+  bannerTimer = setInterval(bannerNext,4000);
 }
 
-const cats = ["数码","家居","运动","服饰","美妆"];
+// Categories
+const cats = [
+  {name:"女装",color:"#ff4081",bg:"#fce4ec"},
+  {name:"男装",color:"#3f51b5",bg:"#e8eaf6"},
+  {name:"鞋靴",color:"#ff6f00",bg:"#fff3e0"},
+  {name:"数码",color:"#00bcd4",bg:"#e0f7fa"},
+  {name:"家电",color:"#4caf50",bg:"#e8f5e9"},
+  {name:"美妆",color:"#e91e63",bg:"#fce4ec"},
+  {name:"运动",color:"#ff5722",bg:"#fbe9e7"},
+  {name:"母婴",color:"#9c27b0",bg:"#f3e5f5"},
+  {name:"家居",color:"#795548",bg:"#efebe9"},
+  {name:"食品",color:"#ff9800",bg:"#fff3e0"},
+];
 let activeCat = "全部";
 function renderCats() {
   const bar = document.getElementById('catBar');
-  bar.innerHTML = `
-    <div class="cat-item ${activeCat==='全部'?'active':''}" onclick="activeCat='全部';renderCats();renderProducts()">
-      <div class="icon" style="background:#fff0e6">🔥</div>推荐</div>`+
-    cats.map(c=>`
-    <div class="cat-item ${activeCat===c?'active':''}" onclick="activeCat=c;renderCats();renderProducts()">
-      <div class="icon" style="background:#f5f5f5"></div>${c}</div>
-    `).join('');
+  bar.innerHTML = cats.map(c=>`
+    <div class="cat-item ${activeCat===c.name?'active':''}" onclick="activeCat='${c.name}';renderCats();renderProducts()">
+      <div class="icon" style="background:${c.bg};color:${c.color}">${c.name[0]}</div>
+      ${c.name}
+    </div>
+  `).join('');
 }
 
 let cart = [];

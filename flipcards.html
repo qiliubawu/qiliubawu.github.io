@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D 卡片翻转</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;width:100%;perspective:1200px}
+.card{height:280px;position:relative;cursor:pointer}
+.card:hover .inner{transform:rotateY(180deg)}
+.inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.front{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#fff}
+.front .emoji{font-size:52px;margin-bottom:16px}
+.front h3{font-size:20px;font-weight:700;margin-bottom:6px}
+.front p{font-size:12px;color:rgba(255,255,255,.4)}
+.back{transform:rotateY(180deg);background:rgba(255,255,255,.95);color:#1a1a2e;border:1px solid rgba(0,0,0,.05)}
+.back h4{font-size:16px;font-weight:700;margin-bottom:10px}
+.back .prog{width:100%;height:6px;background:#e5e5e5;border-radius:3px;margin:8px 0;overflow:hidden}
+.back .prog .fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#667eea,#764ba2);width:0;transition:width 1s .3s ease}
+.card:hover .back .fill:nth-child(1){width:85%}
+.card:hover .back .fill:nth-child(2){width:92%}
+.card:hover .back .fill:nth-child(3){width:78%}
+.back .skill{font-size:11px;color:#666;text-align:left;width:100%}
+.info{position:fixed;bottom:20px;color:rgba(255,255,255,.3);font-size:12px}
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="card"><div class="inner">
+    <div class="front"><div class="emoji">🎨</div><h3>UI 设计</h3><p>Figma · 设计系统 · 交互原型</p></div>
+    <div class="back"><h4>掌握技能</h4><div class="skill">Figma 组件库</div><div class="prog"><div class="fill"></div></div><div class="skill">响应式布局</div><div class="prog"><div class="fill"></div></div><div class="skill">动效设计</div><div class="prog"><div class="fill"></div></div></div>
+  </div></div>
+  <div class="card"><div class="inner">
+    <div class="front"><div class="emoji">⚛️</div><h3>前端开发</h3><p>React · TypeScript · Tailwind</p></div>
+    <div class="back"><h4>掌握技能</h4><div class="skill">React Hooks</div><div class="prog"><div class="fill"></div></div><div class="skill">TypeScript</div><div class="prog"><div class="fill"></div></div><div class="skill">CSS 动画</div><div class="prog"><div class="fill"></div></div></div>
+  </div></div>
+  <div class="card"><div class="inner">
+    <div class="front"><div class="emoji">📊</div><h3>数据可视化</h3><p>Canvas · SVG · D3.js</p></div>
+    <div class="back"><h4>掌握技能</h4><div class="skill">Canvas 2D</div><div class="prog"><div class="fill"></div></div><div class="skill">SVG 动画</div><div class="prog"><div class="fill"></div></div><div class="skill">WebGL</div><div class="prog"><div class="fill"></div></div></div>
+  </div></div>
+  <div class="card"><div class="inner">
+    <div class="front"><div class="emoji">🛠️</div><h3>工程化</h3><p>Vite · Webpack · CI/CD</p></div>
+    <div class="back"><h4>掌握技能</h4><div class="skill">Vite 配置</div><div class="prog"><div class="fill"></div></div><div class="skill">Git 工作流</div><div class="prog"><div class="fill"></div></div><div class="skill">自动化部署</div><div class="prog"><div class="fill"></div></div></div>
+  </div></div>
+</div>
+<p class="info">悬停卡片查看详情 · 3D CSS 翻转</p>
+</body>
+</html>

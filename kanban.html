@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拖拽看板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,sans-serif;padding:20px}
+h1{font-size:22px;margin-bottom:20px;text-align:center;font-weight:800}
+h1 span{background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.board{display:flex;gap:16px;overflow-x:auto;padding-bottom:20px;max-width:1200px;margin:0 auto}
+.col{flex:0 0 280px;background:rgba(30,41,59,.6);border:1px solid rgba(255,255,255,.04);border-radius:16px;padding:16px}
+.col h3{padding-bottom:12px;font-size:14px;font-weight:700;color:#94a3b8;display:flex;justify-content:space-between}
+.col h3 .count{font-size:12px;font-weight:400;color:#475569}
+.col.drag-over{border-color:rgba(102,126,234,.4);background:rgba(30,41,59,.8)}
+.task{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:10px;cursor:grab;transition:.2s;user-select:none}
+.task:active{cursor:grabbing;transform:scale(1.02)}
+.task .tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:600;margin-bottom:8px}
+.tag-design{background:rgba(102,126,234,.15);color:#667eea}
+.tag-dev{background:rgba(6,182,212,.15);color:#06b6d4}
+.tag-bug{background:rgba(239,68,68,.15);color:#ef4444}
+.task .title{font-size:14px;font-weight:600;margin-bottom:4px}
+.task .desc{font-size:11px;color:#64748b;line-height:1.5}
+.task.dragging{opacity:.4}
+.info{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.2);font-size:12px}
+</style>
+</head>
+<body>
+<h1><span>Kanban</span> 拖拽看板</h1>
+<div class="board" id="board">
+  <div class="col" data-col="todo">
+    <h3>待处理<span class="count">3</span></h3>
+    <div class="task" draggable="true" data-id="1"><div class="tag tag-design">设计</div><div class="title">首页 Banner 重设计</div><div class="desc">更新轮播图样式,改为视差滚动效果</div></div>
+    <div class="task" draggable="true" data-id="2"><div class="tag tag-dev">开发</div><div class="title">商品搜索接口联调</div><div class="desc">对接后端 Elasticsearch 搜索服务</div></div>
+    <div class="task" draggable="true" data-id="3"><div class="tag tag-bug">缺陷</div><div class="title">购物车数量异常</div><div class="desc">iOS Safari 下加减按钮偶尔失效</div></div>
+  </div>
+  <div class="col" data-col="doing">
+    <h3>进行中<span class="count">2</span></h3>
+    <div class="task" draggable="true" data-id="4"><div class="tag tag-dev">开发</div><div class="title">用户中心页面</div><div class="desc">订单列表、收藏夹、地址管理</div></div>
+    <div class="task" draggable="true" data-id="5"><div class="tag tag-design">设计</div><div class="title">移动端适配方案</div><div class="desc">确定断点和组件响应式规则</div></div>
+  </div>
+  <div class="col" data-col="done">
+    <h3>已完成<span class="count">2</span></h3>
+    <div class="task" draggable="true" data-id="6"><div class="tag tag-dev">开发</div><div class="title">登录注册页面</div><div class="desc">邮箱/手机/微信三种登录方式</div></div>
+    <div class="task" draggable="true" data-id="7"><div class="tag tag-design">设计</div><div class="title">品牌色系确定</div><div class="desc">主色 #ff5000 淘宝橙 + 辅助色</div></div>
+  </div>
+</div>
+<p class="info">拖拽卡片到不同列 · 原生 Drag & Drop API</p>
+
+<script>
+const cols=document.querySelectorAll('.col');
+let dragTask=null;
+document.querySelectorAll('.task').forEach(t=>{
+  t.addEventListener('dragstart',e=>{dragTask=t;t.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+  t.addEventListener('dragend',()=>{dragTask=null;t.classList.remove('dragging')});
+});
+cols.forEach(c=>{
+  c.addEventListener('dragover',e=>{e.preventDefault();c.classList.add('drag-over')});
+  c.addEventListener('dragleave',()=>c.classList.remove('drag-over'));
+  c.addEventListener('drop',e=>{e.preventDefault();c.classList.remove('drag-over');if(dragTask)c.appendChild(dragTask);updateCounts()});
+});
+function updateCounts(){cols.forEach(c=>{const n=c.querySelectorAll('.task').length;c.querySelector('.count').textContent=n})}
+</script>
+</body>
+</html>

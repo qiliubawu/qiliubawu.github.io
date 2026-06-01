@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>渐变生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+h1{font-size:22px;margin-bottom:24px;text-align:center}
+h1 span{background:linear-gradient(135deg,#f59e0b,#ef4444,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.preview{width:100%;max-width:500px;height:200px;border-radius:20px;margin-bottom:24px;box-shadow:0 8px 40px rgba(0,0,0,.3);transition:.3s;border:2px solid rgba(255,255,255,.06)}
+.controls{display:flex;flex-direction:column;gap:16px;width:100%;max-width:500px}
+.row{display:flex;gap:12px;align-items:center}
+.row label{font-size:12px;color:#94a3b8;width:40px;flex-shrink:0}
+.row input[type=color]{width:48px;height:36px;border:2px solid rgba(255,255,255,.1);border-radius:10px;cursor:pointer;background:none}
+.row select{background:rgba(30,41,59,.8);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#e2e8f0;padding:8px 12px;font-size:13px;outline:none;flex:1;margin-left:40px}
+.row input[type=range]{flex:1;accent-color:#8b5cf6}
+.row .val{font-size:12px;color:#8b5cf6;width:36px;text-align:right;font-weight:600}
+.css-box{width:100%;max-width:500px;background:rgba(30,41,59,.6);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px;margin-top:20px;display:flex;align-items:center;gap:12px}
+.css-box code{flex:1;font-size:11px;font-family:'SF Mono',monospace;color:#94a3b8;word-break:break-all;user-select:all}
+.css-box button{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);color:#a78bfa;padding:8px 18px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.2s}
+.css-box button:hover{background:rgba(139,92,246,.25)}
+.css-box .copied{color:#22c55e}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;width:100%;max-width:500px}
+.presets button{border:2px solid rgba(255,255,255,.06);border-radius:20px;padding:6px 14px;font-size:11px;cursor:pointer;color:#94a3b8;background:rgba(30,41,59,.5);transition:.2s}
+.presets button:hover{border-color:rgba(139,92,246,.3);color:#c4b5fd}
+</style>
+</head>
+<body>
+<h1>渐变生成器<span> Gradient Generator</span></h1>
+<div class="preview" id="preview"></div>
+<div class="controls">
+  <div class="row"><label>颜色1</label><input type="color" id="c1" value="#667eea"></div>
+  <div class="row"><label>颜色2</label><input type="color" id="c2" value="#764ba2"></div>
+  <div class="row"><select id="dir"><option value="to right">→ 向右</option><option value="to bottom">↓ 向下</option><option value="to top">↑ 向上</option><option value="to left">← 向左</option><option value="to bottom right">↘ 右下</option><option value="135deg">↗ 135°</option><option value="45deg">↗ 45°</option></select></div>
+  <div class="row"><label>角度</label><input type="range" id="angle" min="0" max="360" value="135" oninput="document.getElementById('angleVal').textContent=this.value+'°';update()"><span class="val" id="angleVal">135°</span></div>
+</div>
+<div class="css-box">
+  <code id="cssCode"></code>
+  <button id="copyBtn" onclick="copyCSS()">复制</button>
+</div>
+<div class="presets">
+  <button onclick="applyPreset('#667eea','#764ba2','to right')">紫色梦幻</button>
+  <button onclick="applyPreset('#f59e0b','#ef4444','135deg')">日落暖橙</button>
+  <button onclick="applyPreset('#06b6d4','#3b82f6','to bottom')">海洋蓝调</button>
+  <button onclick="applyPreset('#22c55e','#10b981','45deg')">翡翠绿意</button>
+  <button onclick="applyPreset('#f43f5e','#ec4899','to right')">玫瑰浪漫</button>
+</div>
+
+<script>
+function update(){
+  const c1=document.getElementById('c1').value,c2=document.getElementById('c2').value,dir=document.getElementById('dir').value;
+  const css=`linear-gradient(${dir}, ${c1}, ${c2})`;
+  document.getElementById('preview').style.background=css;
+  document.getElementById('cssCode').textContent=`background: ${css};`;
+}
+function applyPreset(c1,c2,dir){
+  document.getElementById('c1').value=c1;document.getElementById('c2').value=c2;document.getElementById('dir').value=dir;update();
+}
+function copyCSS(){
+  navigator.clipboard.writeText(document.getElementById('cssCode').textContent);
+  const btn=document.getElementById('copyBtn');btn.textContent='已复制!';btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent='复制';btn.classList.remove('copied')},1500);
+}
+update();
+</script>
+</body>
+</html>

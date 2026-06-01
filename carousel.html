@@ -11,7 +11,7 @@ body{background:#0f0f1a;display:flex;flex-direction:column;align-items:center;ju
 
 .stage{width:900px;height:500px;position:relative}
 
-.item{position:absolute;width:220px;height:150px;border-radius:16px;overflow:hidden;left:50%;top:50%;margin-left:-110px;margin-top:-75px;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none}
+.item{position:absolute;width:220px;height:150px;border-radius:16px;overflow:hidden;left:50%;top:50%;margin-left:-110px;margin-top:-75px;box-shadow:0 8px 32px rgba(0,0,0,.5);cursor:pointer}
 .item img{width:100%;height:100%;object-fit:cover;display:block}
 .item .title{position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(0,rgba(0,0,0,.7),transparent);color:#fff;font-size:14px;font-weight:600}
 
@@ -32,7 +32,7 @@ body{background:#0f0f1a;display:flex;flex-direction:column;align-items:center;ju
   <div class="dots" id="dots"></div>
   <div class="arrow" onclick="next()">›</div>
 </div>
-<p class="info">拖拽 · 滚轮 · 箭头 · 圆点</p>
+<p class="info">鼠标悬停暂停 · 点击高亮 · 箭头切换 · 拖拽/滚轮</p>
 
 <script>
 const data=[
@@ -49,21 +49,44 @@ const data=[
 const N=data.length;
 const stage=document.getElementById('stage');
 const dotsEl=document.getElementById('dots');
-let angle=0,speed=0.05,animId;
+const items=[];
+let angle=0,speed=0.05,hoveredIdx=-1,animId;
 
-// Build
+// Build cards
 data.forEach((d,i)=>{
   const el=document.createElement('div');el.className='item';
   el.innerHTML=`<img src="${d.img}" alt="${d.title}"><div class="title">${d.title}</div>`;
+  el.addEventListener('mouseenter',()=>{hoveredIdx=i});
+  el.addEventListener('mouseleave',()=>{hoveredIdx=-1});
   stage.appendChild(el);
+  items.push(el);
 });
 dotsEl.innerHTML=data.map((_,i)=>`<div class="dot" onclick="goTo(${i})"></div>`).join('');
 
+function getFrontIdx(){
+  let fi=0,mz=-9999;
+  for(let i=0;i<N;i++){
+    const a=((angle+i*(360/N))%360)*Math.PI/180;
+    const z=Math.sin(a)*120;
+    if(z>mz){mz=z;fi=i}
+  }
+  return fi;
+}
+
 function render(){
-  const items=stage.querySelectorAll('.item');
   const dots=dotsEl.querySelectorAll('.dot');
   const rx=320,ry=120;
-  let frontIdx=0,maxZ=-9999;
+  
+  // If hovering, snap the hovered item to frontmost position
+  let displayAngle=angle;
+  if(hoveredIdx>=0){
+    const frontIdx=getFrontIdx();
+    if(frontIdx!==hoveredIdx){
+      // Rotate to bring hovered item to front
+      const targetAngle=-hoveredIdx*(360/N);
+      angle+=(targetAngle-angle)*0.15;
+    }
+  }
 
   for(let i=0;i<N;i++){
     const a=((angle+i*(360/N))%360)*Math.PI/180;
@@ -75,25 +98,37 @@ function render(){
     items[i].style.transform=`translate(${x}px,${-z*0.4}px) scale(${scale})`;
     items[i].style.opacity=opacity;
     items[i].style.zIndex=Math.floor((z+ry)*10);
-
-    if(z>maxZ){maxZ=z;frontIdx=i}
   }
+
+  const frontIdx=getFrontIdx();
   dots.forEach((d,i)=>d.classList.toggle('active',i===frontIdx));
 }
 
 function loop(){
-  angle+=speed;
+  if(hoveredIdx<0) angle+=speed;
   render();
   animId=requestAnimationFrame(loop);
 }
 
-function prev(){speed=-0.4;setTimeout(()=>speed=0.05,500)}
-function next(){speed=0.4;setTimeout(()=>speed=0.05,500)}
-function goTo(i){angle=-i*(360/N);render()}
+function snapTo(target) {
+  angle=target;render();
+}
+
+function prev(){
+  const fi=getFrontIdx();
+  const ti=(fi-1+N)%N;
+  snapTo(-ti*(360/N));
+}
+function next(){
+  const fi=getFrontIdx();
+  const ti=(fi+1)%N;
+  snapTo(-ti*(360/N));
+}
+function goTo(i){snapTo(-i*(360/N))}
 
 // Drag
 let dragging=false,sx=0,sa=0;
-stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;hoveredIdx=-1});
 stage.addEventListener('pointermove',e=>{if(!dragging)return;angle=sa+(e.clientX-sx)*0.2;render()});
 stage.addEventListener('pointerup',()=>{dragging=false});
 

@@ -6,99 +6,109 @@
 <title>椭圆无限滚动轮播</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:radial-gradient(ellipse at center,#1a1a2e 0%,#0a0a14 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;overflow:hidden}
+html,body{height:100%}
+body{background:#0f0f1a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;overflow:hidden}
 
-.wrap{position:relative;width:100%;max-width:700px;height:360px;margin:0 80px}
-.stage{position:absolute;inset:0;overflow:hidden}
-.item{position:absolute;width:200px;height:130px;border-radius:14px;overflow:hidden;left:50%;top:50%;margin-left:-100px;margin-top:-65px;transition:opacity .35s;cursor:pointer;pointer-events:auto;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.stage{width:900px;height:500px;position:relative;perspective:1200px}
+.carousel{position:absolute;inset:0;transform-style:preserve-3d}
+
+.item{position:absolute;width:220px;height:150px;border-radius:16px;overflow:hidden;left:50%;top:50%;margin-left:-110px;margin-top:-75px;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:all .1s linear;pointer-events:auto}
 .item img{width:100%;height:100%;object-fit:cover;display:block}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;color:rgba(255,255,255,.6);font-size:22px;transition:.3s}.arrow:hover{background:rgba(255,255,255,.15);color:#fff}.arrow.left{left:-50px}.arrow.right{right:-50px}
-.dots{display:flex;justify-content:center;gap:8px;margin-top:16px}.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:.3s}.dots .d.active{background:rgba(255,255,255,.55);width:22px;border-radius:4px}
-.title{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.6);white-space:nowrap;pointer-events:none;z-index:5;padding:4px 14px;background:rgba(0,0,0,.3);border-radius:20px}
-.info{position:fixed;bottom:20px;color:rgba(255,255,255,.12);font-size:12px}
+.item .title{position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(0,rgba(0,0,0,.7),transparent);color:#fff;font-size:14px;font-weight:600}
+
+.controls{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:20px;z-index:100}
+.arrow{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.5);font-size:20px;transition:.3s}
+.arrow:hover{background:rgba(255,255,255,.15);color:#fff}
+.dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);cursor:pointer;transition:.3s}
+.dot.active{background:#fff;width:24px;border-radius:4px}
+
+.info{position:fixed;bottom:20px;color:rgba(255,255,255,.1);font-size:12px;pointer-events:none}
 </style>
 </head>
 <body>
-<div style="display:flex;flex-direction:column;align-items:center">
-  <div class="wrap">
-    <div class="arrow left" onclick="prev()">‹</div>
-    <div class="stage" id="stage"></div>
-    <div class="arrow right" onclick="next()">›</div>
+<div class="stage" id="stage">
+  <div class="carousel" id="carousel"></div>
+  <div class="controls">
+    <div class="arrow" onclick="prev()">‹</div>
+    <div class="dots" id="dots"></div>
+    <div class="arrow" onclick="next()">›</div>
   </div>
-  <div class="dots" id="dots"></div>
 </div>
 <p class="info">椭圆 3D 无限滚动 · 拖拽/滚轮/箭头/点击圆点</p>
 
 <script>
-const imgs=[
-  {url:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=320",title:"壮丽山峰"},
-  {url:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=320",title:"静谧森林"},
-  {url:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=320",title:"热带海滩"},
-  {url:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=320",title:"晨光森林"},
-  {url:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=320",title:"迷雾山谷"},
-  {url:"https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=500&h=320",title:"金色秋色"},
-  {url:"https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&h=320",title:"飞流瀑布"},
-  {url:"https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&h=320",title:"辽阔草原"},
+const data=[
+  {img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=340",title:"壮丽山峰"},
+  {img:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=340",title:"静谧森林"},
+  {img:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=340",title:"热带海滩"},
+  {img:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=340",title:"晨光森林"},
+  {img:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=340",title:"迷雾山谷"},
+  {img:"https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=500&h=340",title:"金色秋色"},
+  {img:"https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&h=340",title:"飞流瀑布"},
+  {img:"https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500&h=340",title:"辽阔草原"},
 ];
 
-const N=imgs.length;
-const stage=document.getElementById('stage');
+const N=data.length;
+const carousel=document.getElementById('carousel');
 const dotsEl=document.getElementById('dots');
-let angle=0,autoDir=1,timer=null;
+let angle=0,speed=0.3,animId;
 
-// Build cards
-imgs.forEach((img,i)=>{
-  const card=document.createElement('div');card.className='item';
-  card.innerHTML=`<img src="${img.url}" alt="${img.title}"><span class="title">${img.title}</span>`;
-  card.onclick=()=>goTo(i);
-  stage.appendChild(card);
+// Build
+data.forEach((d,i)=>{
+  const el=document.createElement('div');el.className='item';
+  el.innerHTML=`<img src="${d.img}" alt="${d.title}"><div class="title">${d.title}</div>`;
+  el.onclick=()=>goTo(i);
+  carousel.appendChild(el);
 });
-dotsEl.innerHTML=imgs.map((_,i)=>`<div class="d" onclick="goTo(${i})"></div>`).join('');
+dotsEl.innerHTML=data.map((_,i)=>`<div class="dot" onclick="goTo(${i})"></div>`).join('');
 
 function render(){
-  const cards=stage.querySelectorAll('.item');
-  const dots=document.querySelectorAll('.d');
-  const rx=240,ry=80;
-  let frontIdx=0,maxDepth=-1;
+  const items=carousel.querySelectorAll('.item');
+  const dots=dotsEl.querySelectorAll('.dot');
+  const rx=320,ry=120;
+  let frontIdx=0,maxZ=-9999;
 
   for(let i=0;i<N;i++){
     const a=((angle+i*(360/N))%360)*Math.PI/180;
     const x=Math.cos(a)*rx;
     const z=Math.sin(a)*ry;
-    const depth=(z+ry)/(2*ry);
-    const scale=0.45+depth*0.85;
-    const opacity=.25+depth*.75;
-    const yOff=-z*.3;
+    const scale=0.5+(z+ry)/(2*ry)*0.6;
+    const opacity=0.3+(z+ry)/(2*ry)*0.7;
 
-    cards[i].style.transform=`translate(${x}px,${yOff}px) scale(${scale})`;
-    cards[i].style.opacity=opacity;
-    cards[i].style.zIndex=Math.round(depth*100);
+    items[i].style.transform=`translate(${x}px,${-z*0.4}px) scale(${scale})`;
+    items[i].style.opacity=opacity;
+    items[i].style.zIndex=Math.floor((z+ry)*10);
 
-    if(depth>maxDepth){maxDepth=depth;frontIdx=i}
+    if(z>maxZ){maxZ=z;frontIdx=i}
   }
   dots.forEach((d,i)=>d.classList.toggle('active',i===frontIdx));
 }
 
-function animate(){
-  angle+=.25*autoDir;
+function loop(){
+  angle+=speed;
   render();
-  timer=requestAnimationFrame(animate);
+  animId=requestAnimationFrame(loop);
 }
 
-function prev(){autoDir=-1;setTimeout(()=>{autoDir=1},800)}
-function next(){autoDir=1}
-function goTo(i){angle=-i*(360/N);render();dotsEl.querySelectorAll('.d').forEach((d,j)=>d.classList.toggle('active',j===i))}
+function prev(){speed=-0.8;setTimeout(()=>speed=0.3,600)}
+function next(){speed=0.8;setTimeout(()=>speed=0.3,600)}
+function goTo(i){
+  angle=-i*(360/N);
+  render();
+}
 
 // Drag
-let down=false,sx=0,sa=0;
-stage.parentElement.addEventListener('pointerdown',e=>{down=true;sx=e.clientX;sa=angle});
-document.addEventListener('pointermove',e=>{if(!down)return;angle=sa+(sx-e.clientX)*.25;render()});
-document.addEventListener('pointerup',()=>{down=false});
+let dragging=false,sx=0,sa=0;
+const stage=document.getElementById('stage');
+stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{if(!dragging)return;angle=sa+(e.clientX-sx)*0.15;render()});
+stage.addEventListener('pointerup',()=>{dragging=false});
 
 // Wheel
-stage.addEventListener('wheel',e=>{e.preventDefault();angle-=e.deltaY*.07;render()},{passive:false});
+stage.addEventListener('wheel',e=>{e.preventDefault();angle-=e.deltaY*0.05;render()},{passive:false});
 
-render();animate();
+loop();
 </script>
 </body>
 </html>

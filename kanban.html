@@ -7,9 +7,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,sans-serif;padding:20px}
-h1{font-size:22px;margin-bottom:20px;text-align:center;font-weight:800}
-h1 span{background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.board{display:flex;gap:16px;overflow-x:auto;padding-bottom:20px;max-width:1200px;margin:0 auto}
+h1{font-size:22px;margin-bottom:20px;text-align:center;font-weight:800;color:#e2e8f0}
+.board{display:flex;gap:16px;overflow-x:auto;padding-bottom:20px;max-width:920px;margin:0 auto}
 .col{flex:0 0 280px;background:rgba(30,41,59,.6);border:1px solid rgba(255,255,255,.04);border-radius:16px;padding:16px}
 .col h3{padding-bottom:12px;font-size:14px;font-weight:700;color:#94a3b8;display:flex;justify-content:space-between}
 .col h3 .count{font-size:12px;font-weight:400;color:#475569}
@@ -27,7 +26,7 @@ h1 span{background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-cl
 </style>
 </head>
 <body>
-<h1><span>Kanban</span> 拖拽看板</h1>
+<h1>Kanban 拖拽看板</h1>
 <div class="board" id="board">
   <div class="col" data-col="todo">
     <h3>待处理<span class="count">3</span></h3>

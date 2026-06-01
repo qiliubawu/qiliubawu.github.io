@@ -6,7 +6,7 @@
 <title>3D 卡片翻转</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;padding:20px}
+body{background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;width:100%;perspective:1200px}
 .card{height:280px;position:relative;cursor:pointer}
 .card:hover .inner{transform:rotateY(180deg)}
@@ -19,7 +19,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh
 .back{transform:rotateY(180deg);background:rgba(255,255,255,.95);color:#1a1a2e;border:1px solid rgba(0,0,0,.05)}
 .back h4{font-size:16px;font-weight:700;margin-bottom:10px}
 .back .prog{width:100%;height:6px;background:#e5e5e5;border-radius:3px;margin:8px 0;overflow:hidden}
-.back .prog .fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#667eea,#764ba2);width:0;transition:width 1s .3s ease}
+.back .prog .fill{height:100%;border-radius:3px;background:#3b82f6;width:0;transition:width 1s .3s ease}
 .card:hover .back .fill:nth-child(1){width:85%}
 .card:hover .back .fill:nth-child(2){width:92%}
 .card:hover .back .fill:nth-child(3){width:78%}

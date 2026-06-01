@@ -52,6 +52,19 @@ const dotsEl=document.getElementById('dots');
 const items=[];
 let angle=0,speed=0.05,hoveredIdx=-1,animId;
 
+// Tween system
+let targetAngle=0,tweening=false;
+
+function shortestAngle(from,to){
+  let diff=((to-from)%360+540)%360-180;
+  return from+diff;
+}
+
+function startTween(to){
+  targetAngle=shortestAngle(angle,to);
+  tweening=true;
+}
+
 // Build cards
 data.forEach((d,i)=>{
   const el=document.createElement('div');el.className='item';
@@ -76,15 +89,21 @@ function getFrontIdx(){
 function render(){
   const dots=dotsEl.querySelectorAll('.dot');
   const rx=320,ry=120;
-  
-  // If hovering, snap the hovered item to frontmost position
-  let displayAngle=angle;
+
+  // Handle hover: tween to front
   if(hoveredIdx>=0){
     const frontIdx=getFrontIdx();
     if(frontIdx!==hoveredIdx){
-      // Rotate to bring hovered item to front
-      const targetAngle=-hoveredIdx*(360/N);
-      angle+=(targetAngle-angle)*0.15;
+      startTween(-hoveredIdx*(360/N));
+    }
+  }
+
+  // Tween animation
+  if(tweening){
+    angle+=(targetAngle-angle)*0.12;
+    if(Math.abs(targetAngle-angle)<0.1){
+      angle=targetAngle;
+      tweening=false;
     }
   }
 
@@ -105,35 +124,36 @@ function render(){
 }
 
 function loop(){
-  if(hoveredIdx<0) angle+=speed;
+  if(!tweening && hoveredIdx<0) angle+=speed;
   render();
   animId=requestAnimationFrame(loop);
 }
 
-function snapTo(target) {
-  angle=target;render();
-}
-
 function prev(){
+  hoveredIdx=-1;
   const fi=getFrontIdx();
   const ti=(fi-1+N)%N;
-  snapTo(-ti*(360/N));
+  startTween(-ti*(360/N));
 }
 function next(){
+  hoveredIdx=-1;
   const fi=getFrontIdx();
   const ti=(fi+1)%N;
-  snapTo(-ti*(360/N));
+  startTween(-ti*(360/N));
 }
-function goTo(i){snapTo(-i*(360/N))}
+function goTo(i){
+  hoveredIdx=-1;
+  startTween(-i*(360/N));
+}
 
 // Drag
 let dragging=false,sx=0,sa=0;
-stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;hoveredIdx=-1});
+stage.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sa=angle;hoveredIdx=-1;tweening=false});
 stage.addEventListener('pointermove',e=>{if(!dragging)return;angle=sa+(e.clientX-sx)*0.2;render()});
 stage.addEventListener('pointerup',()=>{dragging=false});
 
 // Wheel
-stage.addEventListener('wheel',e=>{e.preventDefault();angle-=e.deltaY*0.03;render()},{passive:false});
+stage.addEventListener('wheel',e=>{e.preventDefault();tweening=false;angle-=e.deltaY*0.03;render()},{passive:false});
 
 loop();
 </script>

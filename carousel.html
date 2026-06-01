@@ -52,7 +52,7 @@ const data=[
 const N=data.length;
 const carousel=document.getElementById('carousel');
 const dotsEl=document.getElementById('dots');
-let angle=0,speed=0.3,animId;
+let angle=0,speed=0.12,animId;
 
 // Build
 data.forEach((d,i)=>{
@@ -91,8 +91,8 @@ function loop(){
   animId=requestAnimationFrame(loop);
 }
 
-function prev(){speed=-0.8;setTimeout(()=>speed=0.3,600)}
-function next(){speed=0.8;setTimeout(()=>speed=0.3,600)}
+function prev(){speed=-0.5;setTimeout(()=>speed=0.12,600)}
+function next(){speed=0.5;setTimeout(()=>speed=0.12,600)}
 function goTo(i){
   angle=-i*(360/N);
   render();

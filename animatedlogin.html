@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated Login</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #1a1a2e; overflow: hidden; height: 100vh; }
+
+#login-page { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
+
+.left-panel {
+  position: relative; display: flex; flex-direction: column; justify-content: space-between;
+  background: linear-gradient(135deg, #d4d0dc 0%, #c8c4d0 50%, #bbb7c5 100%);
+  padding: 40px 48px; overflow: hidden;
+}
+.left-panel .logo { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #fff; z-index: 10; position: relative; }
+.left-panel .logo svg { width: 28px; height: 28px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); padding: 4px; border-radius: 6px; }
+.characters-wrapper { position: relative; z-index: 10; display: flex; align-items: flex-end; justify-content: center; height: 420px; }
+.left-panel .footer-links { display: flex; gap: 28px; font-size: 13px; color: rgba(80,70,90,0.7); z-index: 10; position: relative; }
+.left-panel .footer-links a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.left-panel .footer-links a:hover { color: #333; }
+.left-panel::after { content: ""; position: absolute; top: 20%; right: 15%; width: 260px; height: 260px; background: rgba(180,170,200,0.25); border-radius: 50%; filter: blur(80px); }
+.left-panel::before { content: ""; position: absolute; bottom: 15%; left: 10%; width: 350px; height: 350px; background: rgba(200,195,210,0.2); border-radius: 50%; filter: blur(100px); }
+
+.right-panel { display: flex; align-items: center; justify-content: center; background: #fff; padding: 40px; }
+.form-container { width: 100%; max-width: 400px; }
+.sparkle-icon { display: flex; justify-content: center; margin-bottom: 24px; }
+.sparkle-icon svg { width: 32px; height: 32px; }
+.form-header { text-align: center; margin-bottom: 36px; }
+.form-header h1 { font-size: 28px; font-weight: 700; color: #1a1a2e; letter-spacing: -0.5px; margin-bottom: 6px; }
+.form-header p { font-size: 14px; color: #888; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: #333; margin-bottom: 8px; }
+.form-group .input-wrapper { position: relative; }
+.form-group input { width: 100%; height: 48px; border: none; border-bottom: 1.5px solid #e0e0e0; padding: 0 40px 0 0; font-size: 15px; font-family: inherit; color: #1a1a2e; background: transparent; outline: none; transition: border-color 0.3s; }
+.form-group input:focus { border-bottom-color: #5b21b6; }
+.form-group input::placeholder { color: #ccc; }
+.form-group input[type="password"]:not(:placeholder-shown) { letter-spacing: 2px; }
+.toggle-password { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 6px; transition: color 0.2s; }
+.toggle-password:hover { color: #333; }
+.form-options { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.remember-me { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; cursor: pointer; }
+.remember-me input[type="checkbox"] { width: 16px; height: 16px; accent-color: #5b21b6; cursor: pointer; }
+.forgot-link { font-size: 13px; color: #5b21b6; text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
+.forgot-link:hover { opacity: 0.8; }
+
+.btn-login, .btn-google { position: relative; width: 100%; height: 50px; border-radius: 25px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; overflow: hidden; transition: all 0.3s; }
+.btn-login { border: 1.5px solid #1a1a2e; background: #1a1a2e; color: #fff; margin-bottom: 14px; }
+.btn-google { border: 1.5px solid #e0e0e0; background: #f5f5f5; color: #333; }
+.btn-login:disabled, .btn-google:disabled { opacity: 0.7; cursor: not-allowed; }
+.btn-login .btn-text, .btn-google .btn-text { display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; }
+.btn-login .btn-hover-content, .btn-google .btn-hover-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; background: #5b21b6; color: #fff; opacity: 0; transition: all 0.3s; border-radius: 25px; }
+.btn-login:hover .btn-text, .btn-google:hover .btn-text { transform: translateX(40px); opacity: 0; }
+.btn-login:hover .btn-hover-content, .btn-google:hover .btn-hover-content { opacity: 1; }
+.google-icon { width: 18px; height: 18px; }
+.signup-link { text-align: center; font-size: 13px; color: #888; margin-top: 32px; }
+.signup-link a { color: #1a1a2e; font-weight: 600; text-decoration: none; }
+.signup-link a:hover { text-decoration: underline; }
+
+.error-msg { display: none; padding: 10px 14px; font-size: 13px; color: #dc2626; background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); border-radius: 10px; margin-bottom: 16px; }
+.error-msg.show { display: block; }
+.form-group input.error { border-bottom-color: #dc2626; }
+.form-group label.error-label { color: #dc2626; }
+
+.char-scene { position: relative; width: 550px; height: 400px; overflow: hidden; }
+
+.character { position: absolute; bottom: -2px; border-bottom-width: 4px; border-bottom-style: solid; transform-origin: bottom center; will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.1s ease-out, height 0.6s ease-in-out; }
+.character.looking { transition: transform 0.6s ease-out, height 0.6s ease-in-out; }
+
+.char-purple { left: 70px; width: 180px; height: 400px; border-radius: 10px 10px 0 0; background: #6C3FF5; border-bottom-color: #6C3FF5; z-index: 1; }
+.char-black { left: 240px; width: 120px; height: 310px; border-radius: 8px 8px 0 0; background: #2D2D2D; border-bottom-color: #2D2D2D; z-index: 2; }
+.char-orange { left: 0; width: 240px; height: 200px; border-radius: 120px 120px 0 0; background: #FF9B6B; border-bottom-color: #FF9B6B; z-index: 3; }
+.char-yellow { left: 310px; width: 140px; height: 230px; border-radius: 70px 70px 0 0; background: #E8D754; border-bottom-color: #E8D754; z-index: 4; }
+
+.eyes { position: absolute; display: flex; transition: all 0.6s ease-out; }
+.eyes.quick { transition: all 0.2s ease-out; }
+.eyeball { border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; transition: height 0.15s ease; overflow: hidden; }
+.pupil { border-radius: 50%; background: #2D2D2D; transition: transform 0.1s ease-out; }
+.bare-pupil { width: 12px; height: 12px; border-radius: 50%; background: #2D2D2D; transition: transform 0.7s ease-in-out; }
+
+.yellow-mouth, .orange-mouth { position: absolute; transition: all 0.2s ease-out; }
+.yellow-mouth { width: 80px; height: 4px; background: #2D2D2D; border-radius: 999px; }
+.orange-mouth { width: 28px; height: 14px; border: 3px solid #2D2D2D; border-top: none; border-radius: 0 0 14px 14px; opacity: 0; transition: opacity 0.7s ease-in-out; }
+.orange-mouth.visible { opacity: 1; }
+
+@keyframes shakeHead {
+  0%,100% { translate: 0 0; }
+  10% { translate: -9px 0; } 20% { translate: 7px 0; } 30% { translate: -6px 0; }
+  40% { translate: 5px 0; } 50% { translate: -4px 0; } 60% { translate: 3px 0; }
+  70% { translate: -2px 0; } 80% { translate: 1px 0; } 90% { translate: -0.5px 0; }
+}
+.shaking { animation: shakeHead 0.8s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+
+@media (max-width: 900px) {
+  #login-page { grid-template-columns: 1fr; }
+  .left-panel { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="login-page">
+  <div class="left-panel">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M12 2L15 9H9L12 2Z"/><path d="M12 22L9 15H15L12 22Z"/><path d="M2 12L9 9V15L2 12Z"/><path d="M22 12L15 15V9L22 12Z"/>
+      </svg>
+      <span>Login</span>
+    </div>
+    <div class="characters-wrapper" id="characters"></div>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="right-panel">
+    <div class="form-container">
+      <div class="sparkle-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L13.5 9H10.5L12 2Z" fill="#1a1a2e"/><path d="M12 22L10.5 15H13.5L12 22Z" fill="#1a1a2e"/><path d="M2 12L9 10.5V13.5L2 12Z" fill="#1a1a2e"/><path d="M22 12L15 13.5V10.5L22 12Z" fill="#1a1a2e"/></svg>
+      </div>
+      <div class="form-header"><h1>Welcome back!</h1><p>Please enter your details</p></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email" id="email-label">Email</label>
+          <div class="input-wrapper">
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="off">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password" id="pw-label">Password</label>
+          <div class="input-wrapper">
+            <input id="password" type="password" placeholder="********">
+            <button type="button" class="toggle-password" id="toggle-pw">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-options">
+          <label class="remember-me"><input type="checkbox" checked> Remember for 30 days</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <div class="error-msg" id="error-msg"></div>
+        <button type="submit" class="btn-login" id="btn-login">
+          <span class="btn-text">Log In</span>
+          <div class="btn-hover-content">
+            <span>Log In</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </div>
+        </button>
+        <button type="button" class="btn-google" id="btn-google">
+          <span class="btn-text">
+            <svg class="google-icon" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 001 12c0 1.94.46 3.77 1.18 5.07l3.66-2.84v-.14z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Log in with Google
+          </span>
+          <div class="btn-hover-content">
+            <span>Log in with Google</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </div>
+        </button>
+      </form>
+      <div class="signup-link">Don't have an account? <a href="#">Sign Up</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let mouseX = 0, mouseY = 0;
+  let isTyping = false, isPwFocused = false, showPw = false, pwLen = 0;
+  let purpleBlink = false, blackBlink = false, lookingAtEachOther = false, purplePeeking = false;
+  let purpleShaking = false, blackShaking = false;
+
+  const purpleEl = document.querySelector('.char-purple');
+  const blackEl = document.querySelector('.char-black');
+  const orangeEl = document.querySelector('.char-orange');
+  const yellowEl = document.querySelector('.char-yellow');
+
+  // --- Build character scene ---
+  function buildPurple() {
+    const d = document.createElement('div');
+    d.innerHTML = ` <div class="eyes" data-char="purple" style="gap:32px; left:45px; top:40px; transition: all 0.6s ease-out;">
+      <div class="eyeball" style="width:18px;height:18px"><div class="pupil" style="width:7px;height:7px"></div></div>
+      <div class="eyeball" style="width:18px;height:18px"><div class="pupil" style="width:7px;height:7px"></div></div></div>`;
+    return d;
+  }
+  function buildBlack() {
+    const d = document.createElement('div');
+    d.innerHTML = ` <div class="eyes" data-char="black" style="gap:24px; left:26px; top:32px; transition: all 0.6s ease-out;">
+      <div class="eyeball" style="width:16px;height:16px"><div class="pupil" style="width:6px;height:6px"></div></div>
+      <div class="eyeball" style="width:16px;height:16px"><div class="pupil" style="width:6px;height:6px"></div></div></div>`;
+    return d;
+  }
+  function buildOrange() {
+    const d = document.createElement('div');
+    d.innerHTML = ` <div class="eyes quick" data-char="orange" style="gap:32px; left:82px; top:90px;">
+      <div class="bare-pupil"></div><div class="bare-pupil"></div></div>
+      <div class="orange-mouth" data-char="orange" style="left:106px; top:118px;"></div>`;
+    return d;
+  }
+  function buildYellow() {
+    const d = document.createElement('div');
+    d.innerHTML = ` <div class="eyes quick" data-char="yellow" style="gap:24px; left:52px; top:40px;">
+      <div class="bare-pupil"></div><div class="bare-pupil"></div></div>
+      <div class="yellow-mouth" data-char="yellow" style="left:40px; top:88px;"></div>`;
+    return d;
+  }
+
+  function makeChar(className, buildFn) {
+    const el = document.createElement('div');
+    el.className = 'character ' + className;
+    el.appendChild(buildFn());
+    return el;
+  }
+
+  const scene = document.createElement('div');
+  scene.className = 'char-scene';
+  scene.appendChild(makeChar('char-purple', buildPurple));
+  scene.appendChild(makeChar('char-black', buildBlack));
+  scene.appendChild(makeChar('char-orange', buildOrange));
+  scene.appendChild(makeChar('char-yellow', buildYellow));
+  document.getElementById('characters').appendChild(scene);
+
+  // --- Calculate eye pupil position ---
+  function calcPos(el, maxDist) {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    const dx = mouseX - cx, dy = mouseY - cy;
+    const dist = Math.min(Math.sqrt(dx*dx+dy*dy), maxDist);
+    const angle = Math.atan2(dy, dx);
+    return { x: Math.cos(angle)*dist, y: Math.sin(angle)*dist };
+  }
+
+  // --- Calculate character body skew ---
+  function calcSkew(el) {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/3;
+    const dx = mouseX - cx;
+    return { faceX: Math.max(-15,Math.min(15,dx/20)), faceY: 0, bodySkew: Math.max(-6,Math.min(6,-dx/120)) };
+  }
+
+  // --- Update all eyes ---
+  function updateEyes() {
+    const isLookingAway = isPwFocused && !showPw;
+    const isHidingPw = pwLen > 0 && !showPw;
+
+    document.querySelectorAll('.eyeball .pupil').forEach(p => {
+      const eyeball = p.parentElement;
+      const eyes = eyeball.parentElement;
+      const char = eyes.dataset.char;
+      const maxDist = char === 'black' ? 4 : 5;
+
+      let fx, fy;
+      if (isLookingAway) { fx = -5; fy = -5; }
+      else if (pwLen > 0 && showPw) {
+        if (char === 'purple') { fx = purplePeeking ? 4 : -4; fy = purplePeeking ? 5 : -4; }
+        else if (char === 'black') { fx = -4; fy = -4; }
+      }
+      else if (lookingAtEachOther && char === 'purple') { fx = 3; fy = 4; }
+      else if (lookingAtEachOther && char === 'black') { fx = 0; fy = -4; }
+
+      if (fx !== undefined) {
+        p.style.transform = `translate(${fx}px,${fy}px)`;
+      } else {
+        const pos = calcPos(eyeball, maxDist);
+        p.style.transform = `translate(${pos.x}px,${pos.y}px)`;
+      }
+
+      // Blink
+      if ((char === 'purple' && purpleBlink) || (char === 'black' && blackBlink)) {
+        eyeball.style.height = '2px';
+      } else {
+        eyeball.style.height = char === 'black' ? '16px' : '18px';
+      }
+    });
+
+    // Bare pupils (orange, yellow)
+    document.querySelectorAll('.bare-pupil').forEach(p => {
+      const eyes = p.parentElement;
+      const char = eyes.dataset.char;
+      const maxDist = 5;
+      let fx, fy;
+      if (isLookingAway) { fx = -5; fy = -5; }
+      else if (pwLen > 0 && showPw) { fx = -5; fy = -4; }
+
+      if (fx !== undefined) {
+        p.style.transform = `translate(${fx}px,${fy}px)`;
+      } else {
+        const pos = calcPos(p, maxDist);
+        p.style.transform = `translate(${pos.x}px,${pos.y}px)`;
+      }
+    });
+
+    // Body transforms
+    function setBodyTransform(el, skew) {
+      if (isLookingAway) {
+        if (el.classList.contains('char-purple')) el.style.transform = 'skewX(-14deg) translateX(-20px) translateZ(0)';
+        else if (el.classList.contains('char-black')) el.style.transform = 'skewX(12deg) translateX(-10px) translateZ(0)';
+      } else if (pwLen > 0 && showPw) {
+        el.style.transform = 'skewX(0deg) translateZ(0)';
+      } else if (isHidingPw || isTyping) {
+        const pSkew = calcSkew(el);
+        if (el.classList.contains('char-purple')) el.style.transform = `skewX(${(pSkew.bodySkew||0)-12}deg) translateX(40px) translateZ(0)`;
+        else if (el.classList.contains('char-black')) el.style.transform = `skewX(${(calcSkew(el).bodySkew||0)*1.5+10}deg) translateX(20px) translateZ(0)`;
+      } else if (lookingAtEachOther && el.classList.contains('char-purple')) {
+        const s = calcSkew(el);
+        el.style.transform = `skewX(${s.bodySkew||0}deg) translateZ(0)`;
+      } else {
+        const s = calcSkew(el);
+        if (el.classList.contains('char-black')) {
+          el.style.transform = `skewX(${(s.bodySkew||0)*1.5}deg) translateZ(0)`;
+        } else {
+          el.style.transform = `skewX(${s.bodySkew||0}deg) translateZ(0)`;
+        }
+      }
+    }
+
+    document.querySelectorAll('.character').forEach(el => {
+      if (isLookingAway || isPwFocused || isTyping) {
+        el.classList.add('looking');
+      } else {
+        el.classList.remove('looking');
+      }
+      setBodyTransform(el);
+    });
+
+    // Eye positions
+    function setEyesPos(eyesEl, defaultLeft, defaultTop) {
+      const char = eyesEl.dataset.char;
+      if (isLookingAway) {
+        if (char === 'purple') eyesEl.style.cssText += 'left:20px; top:25px;';
+        else if (char === 'black') eyesEl.style.cssText += 'left:10px; top:20px;';
+        else if (char === 'orange') eyesEl.style.cssText += 'left:50px; top:75px;';
+        else if (char === 'yellow') eyesEl.style.cssText += 'left:20px; top:30px;';
+      } else if (pwLen > 0 && showPw) {
+        if (char === 'purple') eyesEl.style.cssText += 'left:20px; top:35px;';
+        else if (char === 'black') eyesEl.style.cssText += 'left:10px; top:28px;';
+        else if (char === 'orange') eyesEl.style.cssText += 'left:50px; top:85px;';
+        else if (char === 'yellow') eyesEl.style.cssText += 'left:20px; top:35px;';
+      } else if (lookingAtEachOther && char === 'purple') {
+        eyesEl.style.cssText += 'left:55px; top:65px;';
+      } else if (lookingAtEachOther && char === 'black') {
+        eyesEl.style.cssText += 'left:32px; top:12px;';
+      } else if (!eyesEl.classList.contains('quick')) {
+        const skew = calcSkew(document.querySelector('.char-' + char));
+        eyesEl.style.cssText += `left:${defaultLeft+skew.faceX}px; top:${defaultTop+skew.faceY}px;`;
+      }
+    }
+
+    setEyesPos(document.querySelector('.eyes[data-char="purple"]'), 45, 40);
+    setEyesPos(document.querySelector('.eyes[data-char="black"]'), 26, 32);
+
+    // Mouth positions
+    const orangeMouth = document.querySelector('.orange-mouth');
+    const yellowMouth = document.querySelector('.yellow-mouth');
+
+    if (pwLen > 0 && showPw) orangeMouth.classList.add('visible');
+    else orangeMouth.classList.remove('visible');
+
+    if (isLookingAway) {
+      if (yellowMouth) yellowMouth.style.cssText += 'left:15px; top:78px;';
+      if (orangeMouth) orangeMouth.style.cssText += 'left:96px; top:108px;';
+    } else if (pwLen > 0 && showPw) {
+      if (yellowMouth) yellowMouth.style.cssText += 'left:10px; top:88px;';
+      if (orangeMouth) orangeMouth.style.cssText += 'left:106px; top:118px;';
+    }
+  }
+
+  // --- Shake animation ---
+  function shakeHeads() {
+    purpleEl.classList.add('shaking'); blackEl.classList.add('shaking');
+    document.querySelectorAll('.eyes[data-char="purple"], .eyes[data-char="black"]').forEach(e => e.classList.add('shaking'));
+    document.querySelector('.yellow-mouth')?.classList.add('shaking');
+    document.querySelector('.orange-mouth')?.classList.add('shaking');
+    setTimeout(() => {
+      purpleEl.classList.remove('shaking'); blackEl.classList.remove('shaking');
+      document.querySelectorAll('.eyes[data-char="purple"], .eyes[data-char="black"], .yellow-mouth, .orange-mouth').forEach(e => e.classList.remove('shaking'));
+    }, 800);
+  }
+
+  // --- Blink loops ---
+  function blinkLoop(char) {
+    setTimeout(() => {
+      if (char === 'purple') purpleBlink = true;
+      else blackBlink = true;
+      updateEyes();
+      setTimeout(() => {
+        if (char === 'purple') purpleBlink = false;
+        else blackBlink = false;
+        updateEyes();
+        blinkLoop(char);
+      }, 150);
+    }, Math.random() * 4000 + 3000);
+  }
+  blinkLoop('purple'); blinkLoop('black');
+
+  // --- Peek loop ---
+  function peekLoop() {
+    if (pwLen > 0 && showPw) {
+      setTimeout(() => {
+        purplePeeking = true; updateEyes();
+        setTimeout(() => { purplePeeking = false; updateEyes(); peekLoop(); }, 800);
+      }, Math.random() * 3000 + 2000);
+    } else {
+      setTimeout(peekLoop, 1000);
+    }
+  }
+  peekLoop();
+
+  // --- Mouse tracking ---
+  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; updateEyes(); });
+
+  // --- Form logic ---
+  const emailInput = document.getElementById('email');
+  const pwInput = document.getElementById('password');
+  const togglePwBtn = document.getElementById('toggle-pw');
+  const errorMsg = document.getElementById('error-msg');
+  const emailLabel = document.getElementById('email-label');
+  const pwLabel = document.getElementById('pw-label');
+  const btnLogin = document.getElementById('btn-login');
+
+  emailInput.addEventListener('focus', () => { isTyping = true; updateEyes(); });
+  emailInput.addEventListener('blur', () => { isTyping = false; updateEyes(); });
+  emailInput.addEventListener('input', () => { clearErrors(); });
+
+  pwInput.addEventListener('focus', () => { isPwFocused = true; updateEyes(); });
+  pwInput.addEventListener('blur', () => { isPwFocused = false; updateEyes(); });
+  pwInput.addEventListener('input', () => { pwLen = pwInput.value.length; clearErrors(); updateEyes(); });
+
+  function clearErrors() {
+    errorMsg.classList.remove('show');
+    emailInput.classList.remove('error'); pwInput.classList.remove('error');
+    emailLabel.classList.remove('error-label'); pwLabel.classList.remove('error-label');
+  }
+
+  togglePwBtn.addEventListener('click', () => {
+    showPw = !showPw;
+    pwInput.type = showPw ? 'text' : 'password';
+    togglePwBtn.innerHTML = showPw ?
+      `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>` :
+      `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    updateEyes();
+  });
+
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault(); clearErrors();
+    const email = emailInput.value.trim();
+
+    if (!email || !EMAIL_REGEX.test(email)) {
+      emailInput.classList.add('error'); emailLabel.classList.add('error-label');
+      errorMsg.textContent = 'Please enter a valid email address.'; errorMsg.classList.add('show');
+      shakeHeads();
+      return;
+    }
+    if (!pwInput.value || pwInput.value.length < 6) {
+      pwInput.classList.add('error'); pwLabel.classList.add('error-label');
+      errorMsg.textContent = 'Password must be at least 6 characters.'; errorMsg.classList.add('show');
+      shakeHeads();
+      return;
+    }
+
+    btnLogin.disabled = true;
+    btnLogin.querySelector('.btn-text').textContent = 'Signing in...';
+    btnLogin.querySelector('.btn-hover-content span').textContent = 'Signing in...';
+    await new Promise(r => setTimeout(r, 1500));
+    btnLogin.disabled = false;
+    btnLogin.querySelector('.btn-text').textContent = 'Log In';
+    btnLogin.querySelector('.btn-hover-content span').textContent = 'Log In';
+    pwInput.classList.add('error'); pwLabel.classList.add('error-label');
+    errorMsg.textContent = 'Invalid email or password. Please try again.'; errorMsg.classList.add('show');
+    shakeHeads();
+  });
+
+  // Initial render
+  updateEyes();
+})();
+</script>
+</body>
+</html>

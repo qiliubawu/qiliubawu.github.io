@@ -6,85 +6,68 @@
 <title>方向感应名片</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;overflow:hidden}
+body{background:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;overflow:hidden}
 
 .scene{perspective:1000px;display:flex;gap:40px;flex-wrap:wrap;justify-content:center;padding:20px}
 
 .card-wrap{width:340px;height:200px;perspective:800px}
 .card{position:relative;width:100%;height:100%;border-radius:20px;transform-style:preserve-3d;transition:transform .1s ease-out;cursor:pointer}
 
-/* Layer 1 - Deep background */
 .card .bg-layer{position:absolute;inset:0;border-radius:20px;overflow:hidden}
-.card .bg-layer::before{content:'';position:absolute;inset:-40px;background:radial-gradient(circle at var(--mx) var(--my),rgba(99,102,241,.3),transparent 60%);transition:opacity .3s}
+.card .bg-layer::before{content:'';position:absolute;inset:-40px;background:radial-gradient(circle at var(--mx) var(--my),rgba(99,102,241,.12),transparent 60%);transition:opacity .3s}
 
-/* Glass card body */
 .card .glass{position:absolute;inset:6px;border-radius:16px;
-  background:linear-gradient(135deg,rgba(30,27,75,.85),rgba(15,23,42,.9));
-  border:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(8px);
-  padding:28px 32px;
-  display:flex;flex-direction:column;justify-content:space-between;
-  transform:translateZ(20px)}
+  background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  border:1px solid rgba(0,0,0,.06);
+  padding:28px 32px;display:flex;flex-direction:column;justify-content:space-between;transform:translateZ(20px)}
 
-/* Glare */
 .card .glare{position:absolute;inset:6px;border-radius:16px;
-  background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.08),transparent 50%);
-  pointer-events:none;z-index:3;opacity:.6}
+  background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.9),transparent 50%);
+  pointer-events:none;z-index:3;opacity:.5}
 
-/* Shine line */
 .card .shine{position:absolute;inset:6px;border-radius:16px;pointer-events:none;z-index:4;overflow:hidden}
 .card .shine::after{content:'';position:absolute;top:var(--my);left:var(--mx);width:200px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+  background:linear-gradient(90deg,transparent,rgba(99,102,241,.2),transparent);
   transform:translate(-50%,-50%) rotate(var(--ra));opacity:0;transition:opacity .3s}
 .card:hover .shine::after{opacity:1}
 
-/* Content */
-.card .name{font-size:24px;font-weight:800;color:#e2e8f0;position:relative;z-index:5}
+.card .name{font-size:24px;font-weight:800;color:#1e293b;position:relative;z-index:5}
 .card .role{font-size:13px;color:#818cf8;font-weight:600;margin-top:2px;letter-spacing:1px;z-index:5}
 .card .info-row{display:flex;gap:20px;z-index:5}
 .card .info-item{font-size:11px;color:#94a3b8}
-.card .info-item strong{display:block;color:#cbd5e1;font-size:13px;margin-bottom:2px}
+.card .info-item strong{display:block;color:#334155;font-size:13px;margin-bottom:2px}
 .card .avatar{position:absolute;right:28px;top:28px;width:52px;height:52px;border-radius:16px;
   background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;
   font-size:22px;font-weight:800;color:#fff;z-index:5;transform:translateZ(30px);
-  box-shadow:0 4px 20px rgba(99,102,241,.4)}
+  box-shadow:0 4px 20px rgba(99,102,241,.3)}
 
-/* Card 2 - different theme */
-.card2 .glass{background:linear-gradient(135deg,rgba(45,20,20,.85),rgba(30,15,15,.9))}
+.card2 .glass{background:linear-gradient(135deg,#fff7ed,#fff1f2);border-color:rgba(0,0,0,.05)}
 .card2 .role{color:#f97316}
-.card2 .avatar{background:linear-gradient(135deg,#f97316,#ef4444)}
-.card2 .bg-layer::before{background:radial-gradient(circle at var(--mx) var(--my),rgba(249,115,22,.25),transparent 60%)}
-.card2 .shine::after{background:linear-gradient(90deg,transparent,rgba(249,115,22,.25),transparent)}
+.card2 .avatar{background:linear-gradient(135deg,#f97316,#ef4444);box-shadow:0 4px 20px rgba(249,115,22,.3)}
+.card2 .bg-layer::before{background:radial-gradient(circle at var(--mx) var(--my),rgba(249,115,22,.1),transparent 60%)}
+.card2 .shine::after{background:linear-gradient(90deg,transparent,rgba(249,115,22,.15),transparent)}
 
-/* Card 3 */
-.card3 .glass{background:linear-gradient(135deg,rgba(15,35,25,.85),rgba(10,25,18,.9))}
+.card3 .glass{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border-color:rgba(0,0,0,.05)}
 .card3 .role{color:#22c55e}
-.card3 .avatar{background:linear-gradient(135deg,#22c55e,#10b981)}
-.card3 .bg-layer::before{background:radial-gradient(circle at var(--mx) var(--my),rgba(34,197,94,.25),transparent 60%)}
-.card3 .shine::after{background:linear-gradient(90deg,transparent,rgba(34,197,94,.25),transparent)}
+.card3 .avatar{background:linear-gradient(135deg,#22c55e,#10b981);box-shadow:0 4px 20px rgba(34,197,94,.3)}
+.card3 .bg-layer::before{background:radial-gradient(circle at var(--mx) var(--my),rgba(34,197,94,.1),transparent 60%)}
+.card3 .shine::after{background:linear-gradient(90deg,transparent,rgba(34,197,94,.15),transparent)}
 
-/* Shadow */
 .card-shadow{position:absolute;bottom:0;left:10%;width:80%;height:30px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent 70%);
+  background:radial-gradient(ellipse,rgba(0,0,0,.15),transparent 70%);
   filter:blur(8px);transition:transform .1s ease-out;z-index:-1}
 
-.info{position:fixed;bottom:20px;color:rgba(255,255,255,.15);font-size:12px;pointer-events:none}
+.info{position:fixed;bottom:20px;color:rgba(0,0,0,.15);font-size:12px;pointer-events:none}
 </style>
 </head>
 <body>
 <div class="scene">
-  <!-- Card 1 -->
   <div>
     <div class="card-wrap" ref="card1">
       <div class="card card1" onmousemove="tilt(this,event)" onmouseleave="resetTilt(this)">
-        <div class="bg-layer"></div>
-        <div class="glare"></div>
-        <div class="shine"></div>
+        <div class="bg-layer"></div><div class="glare"></div><div class="shine"></div>
         <div class="glass">
-          <div>
-            <div class="name">赵紫旭</div>
-            <div class="role">前端开发工程师</div>
-          </div>
+          <div><div class="name">赵紫旭</div><div class="role">前端开发工程师</div></div>
           <div class="info-row">
             <div class="info-item"><strong>宁波财经学院</strong>计算机科学</div>
             <div class="info-item"><strong>React · Vue</strong>技术栈</div>
@@ -95,19 +78,12 @@ body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-
     </div>
     <div class="card-shadow" id="s1"></div>
   </div>
-
-  <!-- Card 2 -->
   <div>
     <div class="card-wrap" ref="card2">
       <div class="card card2" onmousemove="tilt(this,event)" onmouseleave="resetTilt(this)">
-        <div class="bg-layer"></div>
-        <div class="glare"></div>
-        <div class="shine"></div>
+        <div class="bg-layer"></div><div class="glare"></div><div class="shine"></div>
         <div class="glass">
-          <div>
-            <div class="name">产品经理</div>
-            <div class="role">Product Manager</div>
-          </div>
+          <div><div class="name">产品经理</div><div class="role">Product Manager</div></div>
           <div class="info-row">
             <div class="info-item"><strong>产品规划</strong>需求分析</div>
             <div class="info-item"><strong>数据驱动</strong>A/B测试</div>
@@ -118,19 +94,12 @@ body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-
     </div>
     <div class="card-shadow" id="s2"></div>
   </div>
-
-  <!-- Card 3 -->
   <div>
     <div class="card-wrap" ref="card3">
       <div class="card card3" onmousemove="tilt(this,event)" onmouseleave="resetTilt(this)">
-        <div class="bg-layer"></div>
-        <div class="glare"></div>
-        <div class="shine"></div>
+        <div class="bg-layer"></div><div class="glare"></div><div class="shine"></div>
         <div class="glass">
-          <div>
-            <div class="name">UI 设计师</div>
-            <div class="role">UI/UX Designer</div>
-          </div>
+          <div><div class="name">UI 设计师</div><div class="role">UI/UX Designer</div></div>
           <div class="info-row">
             <div class="info-item"><strong>Figma</strong>设计系统</div>
             <div class="info-item"><strong>动效设计</strong>交互原型</div>
@@ -142,22 +111,16 @@ body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-
     <div class="card-shadow" id="s3"></div>
   </div>
 </div>
-<p class="info">鼠标在卡片上移动 · 方向感应 3D 倾斜</p>
-
+<p class="info">鼠标方向感应 3D 倾斜</p>
 <script>
 function tilt(card,e){
   const rect=card.getBoundingClientRect();
-  const x=e.clientX-rect.left;
-  const y=e.clientY-rect.top;
-  const px=(x/rect.width*100)+'%';
-  const py=(y/rect.height*100)+'%';
-  const rx=(y/rect.height-.5)*30;
-  const ry=(x/rect.width-.5)*-30;
+  const x=e.clientX-rect.left,y=e.clientY-rect.top;
+  const px=(x/rect.width*100)+'%',py=(y/rect.height*100)+'%';
+  const rx=(y/rect.height-.5)*30,ry=(x/rect.width-.5)*-30;
   card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
-  card.style.setProperty('--mx',px);
-  card.style.setProperty('--my',py);
+  card.style.setProperty('--mx',px);card.style.setProperty('--my',py);
   card.style.setProperty('--ra',Math.atan2(y-rect.height/2,x-rect.width/2)*180/Math.PI+'deg');
-  // Shadow
   const si=card.closest('.card-wrap')?.getAttribute('ref');
   const s=si?document.getElementById('s'+si.slice(-1)):null;
   if(s)s.style.transform=`translateX(${ry*.7}px) translateY(${rx*.5}px)`;

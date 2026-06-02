@@ -1,174 +1,354 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>椭圆无限滚动轮播</title>
-<style>
-:root{--post-spacing:1.78vw;--post-size:25vw;--mask-size:100vw}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:-apple-system,sans-serif}
-body{background:#0f172a;overflow:hidden}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>椭圆无限滚动轮播</title>
+    <style>
+:root {
+  --post-spacing: 1.78vw;
+  --post-size: 25vw;
+  --mask-size: 100vw;
+}
 
-.title{position:absolute;left:50%;top:5%;transform:translate(-50%,0);text-align:center;z-index:10}
-.title p{font-size:2.2rem;font-weight:800;color:#e2e8f0}
-.title span{font-size:.85rem;color:#64748b;display:block;margin-top:6px}
+* {
+  padding: 0;
+  margin: 0;
+  font-family: Arial, -apple-system, sans-serif;
+  font-size: 62.5%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
 
-#banner{overflow:hidden;position:relative;width:100vw;height:calc(var(--post-size)/0.72);
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
-  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
-  position:absolute;top:12%}
+body {
+  background: #0f172a;
+}
 
-.img-list{display:flex;position:absolute;width:100%;height:calc(var(--post-size)/0.72);
-  transform:translate(13.39vw,0);transition:left .5s ease;left:0}
+.title {
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  -webkit-transform: translate(-50%, -5%);
+          transform: translate(-50%, -5%);
+}
 
-.img-box{height:100%;display:inline-block;margin-right:var(--post-spacing);position:relative;cursor:pointer;flex-shrink:0}
-.img-box .info{position:absolute;display:flex;flex-direction:column;justify-content:center;inset:0;background:rgba(23,23,23,.5);text-align:center;color:#fff9f1;opacity:0;transition:.3s}
-.img-box:hover .info{opacity:1}
-.info h3{font-size:1.3rem;font-weight:700}
-.info p{font-size:.75rem;margin-top:4px;color:#ccc}
-.img-box img{width:var(--post-size);height:100%;object-position:center;object-fit:cover}
+.title p {
+  font-size: 4rem;
+  font-weight: 800;
+  white-space: nowrap;
+  color: #e2e8f0;
+}
 
-.btn-group{height:15vh;position:absolute;left:50%;bottom:5%;transform:translate(-50%,0);
-  opacity:1;transition:1s;display:flex;gap:12px}
-.btn{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
-  background:rgba(15,23,42,.8);cursor:pointer;transition:.4s;
-  display:flex;align-items:center;justify-content:center}
-.btn:hover{transform:scale(1.2);background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)}
-.btn svg{width:24px;height:24px;fill:rgba(255,255,255,.7)}
-.btn:hover svg{fill:#fff}
-.btn .right{transform:rotate(180deg)}
-</style>
+#banner {
+  overflow: hidden;
+  position: relative;
+  width: 100vw;
+  height: calc(var(--post-size) / 0.72);
+  -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDQwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDE0NDAgNTAwIiBpZD0iaiI+CiAgPHBhdGggZmlsbD0icmdiKDIwMCwyMDAsMjAwKSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAwczI3NS4wNCAxMDAgNzIwIDEwMFMxNDQwIDAgMTQ0MCAwdjUwMHMtMjc1LjA0LTEwMC03MjAtMTAwUzAgNTAwIDAgNTAwVjB6Ii8+Cjwvc3ZnPgo=);
+          mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDQwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDE0NDAgNTAwIiBpZD0iaiI+CiAgPHBhdGggZmlsbD0icmdiKDIwMCwyMDAsMjAwKSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMCAwczI3NS4wNCAxMDAgNzIwIDEwMFMxNDQwIDAgMTQ0MCAwdjUwMHMtMjc1LjA0LTEwMC03MjAtMTAwUzAgNTAwIDAgNTAwVjB6Ii8+Cjwvc3ZnPgo=);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+          mask-position: center;
+  -webkit-mask-size: var(--mask-size);
+          mask-size: var(--mask-size);
+  position: absolute;
+  top: 10%;
+}
+
+#banner .img-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  position: absolute;
+  width: 100%;
+  float: left;
+  height: calc(var(--post-size) / 0.72);
+  -webkit-transform: translate(13.39vw, 0);
+          transform: translate(13.39vw, 0);
+  -webkit-animation: admission 1.5s;
+          animation: admission 1.5s;
+}
+
+#banner .img-wrapper .img-box {
+  height: 100%;
+  display: inline-block;
+  margin-right: var(--post-spacing);
+  position: relative;
+  cursor: pointer;
+}
+
+#banner .img-wrapper .img-box .info {
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(23, 23, 23, 0.5);
+  text-align: center;
+  color: #fff9f1;
+  font-size: 4rem;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+#banner .img-wrapper .img-box:hover .info {
+  opacity: 1;
+}
+
+#banner .img-wrapper .img-box img {
+  width: var(--post-size);
+  height: 100%;
+  -o-object-position: center;
+     object-position: center;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+#banner .img-wrapper .img-box:last-child {
+  -webkit-transform: translate(-160.68vw, 0);
+          transform: translate(-160.68vw, 0);
+}
+
+.btn-group {
+  height: 15vh;
+  position: absolute;
+  left: 50%;
+  bottom: 0%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  -webkit-transition: 1s;
+  transition: 1s;
+  opacity: 1;
+}
+
+.btn-group .btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.25);
+  background-color: rgba(15,23,42,.8);
+  margin: 10px;
+  cursor: pointer;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.btn-group .btn:hover {
+  -webkit-transform: scale(1.2);
+          transform: scale(1.2);
+  background-color: rgba(255,255,255,.15);
+}
+
+.btn-group .btn:hover .icon {
+  fill: #fff;
+}
+
+.btn-group .btn .icon {
+  width: 30px;
+  height: 30px;
+  fill: rgba(255,255,255,.7);
+}
+
+.btn-group .btn .right {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+.img-list {
+  left: 0;
+}
+
+@-webkit-keyframes admission {
+  0% {
+    -webkit-transform: translate(140vw, 0);
+            transform: translate(140vw, 0);
+  }
+  100% {
+    -webkit-transform: translate(13.39vw, 0);
+            transform: translate(13.39vw, 0);
+  }
+}
+
+@keyframes admission {
+  0% {
+    -webkit-transform: translate(140vw, 0);
+            transform: translate(140vw, 0);
+  }
+  100% {
+    -webkit-transform: translate(13.39vw, 0);
+            transform: translate(13.39vw, 0);
+  }
+}
+    </style>
 </head>
 <body>
-<div class="title"><p>椭圆无限滚动轮播</p><span>横向无缝循环 · 点击按钮切换</span></div>
+    <div class="title">
+        <p>椭圆无限滚动轮播</p>
+    </div>
+    <div id="banner">
+        <div class="img-list img-wrapper">
+            <div class="img-box">
+                <div class="info">
+                    <h3>壮丽山峰</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400" alt="">
+            </div>
+            <div class="img-box">
+                <div class="info">
+                    <h3>静谧森林</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400" alt="">
+            </div>
+            <div class="img-box">
+                <div class="info">
+                    <h3>热带海滩</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400" alt="">
+            </div>
+            <div class="img-box">
+                <div class="info">
+                    <h3>晨光森林</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400" alt="">
+            </div>
+            <div class="img-box">
+                <div class="info">
+                    <h3>迷雾山谷</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400" alt="">
+            </div>
+            <div class="img-box" id="last-img-box">
+                <div class="info">
+                    <h3>金色秋色</h3>
+                </div>
+                <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=600&h=400" alt="">
+            </div>
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="last btn">
+            <svg class="icon left" viewBox="0 0 1024 1024" width="128" height="128">
+                <path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z" fill="" />
+            </svg>
+        </button>
+        <button class="next btn">
+            <svg class="icon right" viewBox="0 0 1024 1024" width="128" height="128">
+                <path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z" fill="" />
+            </svg>
+        </button>
+    </div>
+    <script>
+        const imgListOne = document.querySelector('.img-list')
+        let imgBoxList = Array.prototype.slice.call(document.querySelectorAll('.img-list .img-box'))
+        const imgBoxCount = imgBoxList.length
+        const root = document.documentElement;
+        const btnGroup = document.querySelector('.btn-group')
+        const lastBtn = document.querySelector('.last')
+        const nextBtn = document.querySelector('.next')
+        const lastImgBox = document.getElementById('last-img-box')
 
-<div id="banner">
-  <div class="img-list" id="imgList"></div>
-</div>
+        const postSpacing = Number(getComputedStyle(root).getPropertyValue('--post-spacing').replace("vw", ""));
+        const postSize = Number(getComputedStyle(root).getPropertyValue('--post-size').replace("vw", ""));
 
-<div class="btn-group">
-  <button class="btn" id="lastBtn">
-    <svg viewBox="0 0 1024 1024"><path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z"/></svg>
-  </button>
-  <button class="btn" id="nextBtn">
-    <svg class="right" viewBox="0 0 1024 1024"><path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z"/></svg>
-  </button>
-</div>
+        let imgListLength = (postSize + postSpacing) * imgBoxCount
+        const imgBoxLength = postSize + postSpacing
 
-<script>
-const imgs=[
-  {url:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400",title:"壮丽山峰",sub:"Mountains"},
-  {url:"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400",title:"静谧森林",sub:"Forest"},
-  {url:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400",title:"热带海滩",sub:"Beach"},
-  {url:"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400",title:"晨光森林",sub:"Sunlight"},
-  {url:"https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400",title:"迷雾山谷",sub:"Valley"},
-  {url:"https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=600&h=400",title:"金色秋色",sub:"Autumn"},
-];
+        let index = 0
+        let timer = null
+        let animationTime = 0.5
 
-const imgList=document.getElementById('imgList');
-const root=document.documentElement;
-const N=imgs.length;
-const postSpacing=Number(getComputedStyle(root).getPropertyValue('--post-spacing').replace('vw',''));
-const postSize=Number(getComputedStyle(root).getPropertyValue('--post-size').replace('vw',''));
-const imgBoxW=postSize+postSpacing;
-const totalShift=imgBoxW*N;
+        imgBoxList.unshift(imgBoxList.pop())
+        imgListOne.style.transition = animationTime + 's ease'
+        setTimeout(function () {
+            btnGroup.style.opacity = '1'
+            btnGroup.style.bottom = '5%'
+        }, animationTime * 1000)
 
-let index=0,timer=null;
-const animationTime=0.5;
-
-// Build cards
-imgs.forEach((img,i)=>{
-  const box=document.createElement('div');
-  box.className='img-box';
-  if(i===N-1)box.id='last-img-box';
-  box.innerHTML=`<div class="info"><h3>${img.title}</h3><p>${img.sub}</p></div><img src="${img.url}" alt="${img.title}">`;
-  imgList.appendChild(box);
-});
-
-let imgBoxList=Array.prototype.slice.call(document.querySelectorAll('.img-list .img-box'));
-const lastImgBox=document.getElementById('last-img-box');
-
-// Init: move last to first
-imgBoxList.unshift(imgBoxList.pop());
-imgList.innerHTML='';
-imgBoxList.forEach(b=>imgList.appendChild(b));
-
-// Set initial transform for last-img-box
-lastImgBox.style.transform=`translateX(-${totalShift}vw)`;
-
-imgList.style.transition=animationTime+'s ease';
-
-function clickFun(flag){
-  if(flag==='next'){
-    index--;
-    imgList.style.left=imgBoxW*index+'vw';
-    setTimeout(function(){
-      imgList.style.transition='none';
-      if(Math.abs(index)===N){
-        index=0;
-        imgList.style.left=0;
-        imgBoxList.forEach(item=>{
-          if(item.id==='last-img-box'){
-            item.style.transform=`translateX(-${totalShift}vw)`;
-          }else{
-            item.style.transform='none';
-          }
-        });
-      }else{
-        if(imgBoxList[0].id==='last-img-box'){
-          lastImgBox.style.transition='none';
-          lastImgBox.style.transform='translateX(0px)';
-        }else if(index>=0){
-          imgBoxList[0].style.transform='none';
-        }else{
-          imgBoxList[0].style.transform=`translateX(${totalShift}vw)`;
+        function cilckFun(flag) {
+            if (flag == 'next') {
+                index--
+                imgListOne.style.left = imgBoxLength * index + "vw";
+                setTimeout(function () {
+                    imgListOne.style.transition = 'none'
+                    if (Math.abs(index) == imgBoxCount) {
+                        index = 0
+                        imgListOne.style.left = 0
+                        imgBoxList.forEach(item => {
+                            if (item.id == 'last-img-box') {
+                                item.style.transform = 'translateX(-160.68vw)'
+                            } else {
+                                item.style.transform = 'none'
+                            }
+                        });
+                    } else {
+                        if (imgBoxList[0].id == 'last-img-box') {
+                            lastImgBox.style.transition = 'none'
+                            lastImgBox.style.transform = 'translateX(0px)'
+                        } else if (index >= 0) {
+                            imgBoxList[0].style.transform = 'none'
+                        } else {
+                            imgBoxList[0].style.transform = 'translateX(160.68vw)'
+                        }
+                    }
+                    imgBoxList.push(imgBoxList.shift())
+                }, animationTime * 1000)
+            } else {
+                index++
+                imgBoxList.unshift(imgBoxList.pop())
+                if (imgBoxList[0].id == 'last-img-box' && index != 0) {
+                    imgBoxList[0].style.transform = 'translateX(-321.36vw)'
+                } else if (index < 0) {
+                    imgBoxList[0].style.transform = 'none'
+                } else {
+                    imgBoxList[0].style.transform = 'translateX(-160.68vw)'
+                }
+                imgListOne.style.left = imgBoxLength * index + "vw";
+                lastImgBox.style.transition = 'none'
+                if (Math.abs(index) == imgBoxCount) {
+                    index = 0
+                    setTimeout(function () {
+                        imgListOne.style.transition = 'none'
+                        imgListOne.style.left = 0
+                        imgBoxList.forEach(item => {
+                            if (item.id == 'last-img-box') {
+                                item.style.transform = 'translateX(-160.68vw)'
+                            } else {
+                                item.style.transform = 'none'
+                            }
+                        });
+                    }, animationTime * 1000)
+                }
+            }
+            imgListOne.style.transition = animationTime + 's ease'
         }
-      }
-      imgBoxList.push(imgBoxList.shift());
-    },animationTime*1000);
-  }else{
-    index++;
-    imgBoxList.unshift(imgBoxList.pop());
-    imgList.innerHTML='';
-    imgBoxList.forEach(b=>imgList.appendChild(b));
-    if(imgBoxList[0].id==='last-img-box'&&index!==0){
-      imgBoxList[0].style.transform=`translateX(-${totalShift*2}vw)`;
-    }else if(index<0){
-      imgBoxList[0].style.transform='none';
-    }else{
-      imgBoxList[0].style.transform=`translateX(-${totalShift}vw)`;
-    }
-    imgList.style.left=imgBoxW*index+'vw';
-    lastImgBox.style.transition='none';
-    if(Math.abs(index)===N){
-      index=0;
-      setTimeout(function(){
-        imgList.style.transition='none';
-        imgList.style.left=0;
-        imgBoxList.forEach(item=>{
-          if(item.id==='last-img-box'){
-            item.style.transform=`translateX(-${totalShift}vw)`;
-          }else{
-            item.style.transform='none';
-          }
-        });
-      },animationTime*1000);
-    }
-  }
-  imgList.style.transition=animationTime+'s ease';
-}
 
-function throttle(fn,delay){
-  return function(){
-    if(timer)return;
-    fn.apply(this,arguments);
-    timer=setTimeout(()=>{timer=null},delay);
-  };
-}
+        function throttle(fn, delay) {
+            return function () {
+                if (timer) { return }
+                fn.apply(this, arguments)
+                timer = setTimeout(() => { timer = null }, delay)
+            }
+        }
 
-document.getElementById('nextBtn').onclick=throttle(()=>clickFun('next'),animationTime*1000);
-document.getElementById('lastBtn').onclick=throttle(()=>clickFun('last'),animationTime*1000);
-</script>
+        nextBtn.onclick = throttle(() => cilckFun('next'), animationTime * 1000);
+        lastBtn.onclick = throttle(() => cilckFun('last'), animationTime * 1000);
+    </script>
 </body>
 </html>

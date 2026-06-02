@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>椭圆旋转轮播图</title>
+<title>椭圆无限滚动轮播</title>
 <style>
 :root{--post-spacing:1.78vw;--post-size:25vw;--mask-size:100vw}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -11,43 +11,44 @@ html,body{height:100%;font-family:-apple-system,sans-serif}
 body{background:#0f172a;overflow:hidden}
 
 .title{position:absolute;left:50%;top:5%;transform:translate(-50%,0);text-align:center;z-index:10}
-.title p{font-size:2.5rem;font-weight:800;color:#e2e8f0}
-.title span{font-size:.9rem;color:#64748b;display:block;margin-top:6px}
+.title p{font-size:2.2rem;font-weight:800;color:#e2e8f0}
+.title span{font-size:.85rem;color:#64748b;display:block;margin-top:6px}
 
 #banner{overflow:hidden;position:relative;width:100vw;height:calc(var(--post-size)/0.72);
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='500'%3E%3Cpath fill='black' fill-rule='evenodd' d='M0 0s275 100 720 100S1440 0 1440 0v500s-275-100-720-100S0 500 0 500V0z'/%3E%3C/svg%3E") no-repeat center/var(--mask-size);
-  position:absolute;top:14%}
+  position:absolute;top:12%}
 
-.img-list{display:flex;position:absolute;width:100%;height:100%;transform:translate(13.39vw,0);transition:left .5s ease;left:0}
+.img-list{display:flex;position:absolute;width:100%;height:calc(var(--post-size)/0.72);
+  transform:translate(13.39vw,0);transition:left .5s ease;left:0}
 
 .img-box{height:100%;display:inline-block;margin-right:var(--post-spacing);position:relative;cursor:pointer;flex-shrink:0}
 .img-box .info{position:absolute;display:flex;flex-direction:column;justify-content:center;inset:0;background:rgba(23,23,23,.5);text-align:center;color:#fff9f1;opacity:0;transition:.3s}
 .img-box:hover .info{opacity:1}
-.info h3{font-size:1.4rem;font-weight:700}
-.info p{font-size:.7rem;margin-top:4px;color:#ccc}
+.info h3{font-size:1.3rem;font-weight:700}
+.info p{font-size:.75rem;margin-top:4px;color:#ccc}
 .img-box img{width:var(--post-size);height:100%;object-position:center;object-fit:cover}
 
-.btn-group{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);display:flex;gap:12px;z-index:20}
-.btn{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(15,23,42,.8);cursor:pointer;transition:.4s;display:flex;align-items:center;justify-content:center}
-.btn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)}
+.btn-group{height:15vh;position:absolute;left:50%;bottom:5%;transform:translate(-50%,0);
+  opacity:1;transition:1s;display:flex;gap:12px}
+.btn{width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
+  background:rgba(15,23,42,.8);cursor:pointer;transition:.4s;
+  display:flex;align-items:center;justify-content:center}
+.btn:hover{transform:scale(1.2);background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)}
 .btn svg{width:24px;height:24px;fill:rgba(255,255,255,.7)}
 .btn:hover svg{fill:#fff}
 .btn .right{transform:rotate(180deg)}
 </style>
 </head>
 <body>
-<div class="title">
-  <p>椭圆旋转轮播图</p>
-  <span>Elliptical Rotation Carousel · 点击按钮切换</span>
-</div>
+<div class="title"><p>椭圆无限滚动轮播</p><span>横向无缝循环 · 点击按钮切换</span></div>
 
 <div id="banner">
   <div class="img-list" id="imgList"></div>
 </div>
 
 <div class="btn-group">
-  <button class="btn" id="prevBtn">
+  <button class="btn" id="lastBtn">
     <svg viewBox="0 0 1024 1024"><path d="M862.485 481.154H234.126l203.3-203.3c12.497-12.497 12.497-32.758 0-45.255s-32.758-12.497-45.255 0L135.397 489.373c-12.497 12.497-12.497 32.758 0 45.254l256.774 256.775c6.249 6.248 14.438 9.372 22.627 9.372s16.379-3.124 22.627-9.372c12.497-12.497 12.497-32.759 0-45.255l-203.3-203.301h628.36c17.036 0 30.846-13.81 30.846-30.846s-13.81-30.846-30.846-30.846z"/></svg>
   </button>
   <button class="btn" id="nextBtn">
@@ -72,86 +73,90 @@ const postSpacing=Number(getComputedStyle(root).getPropertyValue('--post-spacing
 const postSize=Number(getComputedStyle(root).getPropertyValue('--post-size').replace('vw',''));
 const imgBoxW=postSize+postSpacing;
 const totalShift=imgBoxW*N;
+
 let index=0,timer=null;
-const animTime=0.5;
+const animationTime=0.5;
 
 // Build cards
-imgs.forEach(img=>{
-  const box=document.createElement('div');box.className='img-box';
+imgs.forEach((img,i)=>{
+  const box=document.createElement('div');
+  box.className='img-box';
+  if(i===N-1)box.id='last-img-box';
   box.innerHTML=`<div class="info"><h3>${img.title}</h3><p>${img.sub}</p></div><img src="${img.url}" alt="${img.title}">`;
   imgList.appendChild(box);
 });
 
-// Move last element to beginning of visual order
-let boxes=Array.from(imgList.querySelectorAll('.img-box'));
-boxes.unshift(boxes.pop());
-// Reset DOM order
+let imgBoxList=Array.prototype.slice.call(document.querySelectorAll('.img-list .img-box'));
+const lastImgBox=document.getElementById('last-img-box');
+
+// Init: move last to first
+imgBoxList.unshift(imgBoxList.pop());
 imgList.innerHTML='';
-boxes.forEach(b=>imgList.appendChild(b));
+imgBoxList.forEach(b=>imgList.appendChild(b));
 
-// Set last-img-box initial translateX
-const lastBox=imgList.lastElementChild;
-lastBox.style.transform=`translateX(-${totalShift}vw)`;
+// Set initial transform for last-img-box
+lastImgBox.style.transform=`translateX(-${totalShift}vw)`;
 
-imgList.style.transition=animTime+'s ease';
+imgList.style.transition=animationTime+'s ease';
 
-function clickFn(dir){
-  if(dir==='next'){
+function clickFun(flag){
+  if(flag==='next'){
     index--;
     imgList.style.left=imgBoxW*index+'vw';
-    setTimeout(()=>{
+    setTimeout(function(){
       imgList.style.transition='none';
       if(Math.abs(index)===N){
         index=0;
         imgList.style.left=0;
-        Array.from(imgList.children).forEach(b=>{
-          b.style.transform=b===imgList.lastElementChild?`translateX(-${totalShift}vw)`:'none';
+        imgBoxList.forEach(item=>{
+          if(item.id==='last-img-box'){
+            item.style.transform=`translateX(-${totalShift}vw)`;
+          }else{
+            item.style.transform='none';
+          }
         });
       }else{
-        const first=imgList.firstElementChild;
-        if(first===lastBox){
-          lastBox.style.transition='none';
-          lastBox.style.transform='translateX(0px)';
+        if(imgBoxList[0].id==='last-img-box'){
+          lastImgBox.style.transition='none';
+          lastImgBox.style.transform='translateX(0px)';
         }else if(index>=0){
-          first.style.transform='none';
+          imgBoxList[0].style.transform='none';
         }else{
-          first.style.transform=`translateX(${totalShift}vw)`;
+          imgBoxList[0].style.transform=`translateX(${totalShift}vw)`;
         }
       }
-      boxes=Array.from(imgList.children);
-      boxes.push(boxes.shift());
-      imgList.innerHTML='';
-      boxes.forEach(b=>imgList.appendChild(b));
-    },animTime*1000);
+      imgBoxList.push(imgBoxList.shift());
+    },animationTime*1000);
   }else{
     index++;
-    // Move last to first
-    boxes=Array.from(imgList.children);
-    boxes.unshift(boxes.pop());
+    imgBoxList.unshift(imgBoxList.pop());
     imgList.innerHTML='';
-    boxes.forEach(b=>imgList.appendChild(b));
-    const first=imgList.firstElementChild;
-    if(first===lastBox&&index!==0){
-      first.style.transform=`translateX(-${totalShift*2}vw)`;
+    imgBoxList.forEach(b=>imgList.appendChild(b));
+    if(imgBoxList[0].id==='last-img-box'&&index!==0){
+      imgBoxList[0].style.transform=`translateX(-${totalShift*2}vw)`;
     }else if(index<0){
-      first.style.transform='none';
+      imgBoxList[0].style.transform='none';
     }else{
-      first.style.transform=`translateX(-${totalShift}vw)`;
+      imgBoxList[0].style.transform=`translateX(-${totalShift}vw)`;
     }
     imgList.style.left=imgBoxW*index+'vw';
-    lastBox.style.transition='none';
+    lastImgBox.style.transition='none';
     if(Math.abs(index)===N){
       index=0;
-      setTimeout(()=>{
+      setTimeout(function(){
         imgList.style.transition='none';
         imgList.style.left=0;
-        Array.from(imgList.children).forEach(b=>{
-          b.style.transform=b===lastBox?`translateX(-${totalShift}vw)`:'none';
+        imgBoxList.forEach(item=>{
+          if(item.id==='last-img-box'){
+            item.style.transform=`translateX(-${totalShift}vw)`;
+          }else{
+            item.style.transform='none';
+          }
         });
-      },animTime*1000);
+      },animationTime*1000);
     }
   }
-  imgList.style.transition=animTime+'s ease';
+  imgList.style.transition=animationTime+'s ease';
 }
 
 function throttle(fn,delay){
@@ -162,8 +167,8 @@ function throttle(fn,delay){
   };
 }
 
-document.getElementById('nextBtn').onclick=throttle(()=>clickFn('next'),animTime*1000);
-document.getElementById('prevBtn').onclick=throttle(()=>clickFn('last'),animTime*1000);
+document.getElementById('nextBtn').onclick=throttle(()=>clickFun('next'),animationTime*1000);
+document.getElementById('lastBtn').onclick=throttle(()=>clickFun('last'),animationTime*1000);
 </script>
 </body>
 </html>

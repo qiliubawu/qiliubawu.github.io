@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>十二生肖 · 非遗图鉴 | 东方星象罗盘</title>
+<meta name="description" content="以故宫博物院十二生肖与十二地支记载为据，用纯 HTML + DIV + CSS 打造的国潮新中式生肖图鉴：干支星盘、十二兽图鉴、十二时辰长卷、非遗艺术展厅、生辰速查。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="page">
+
+<!-- ==================== 顶部导航 ==================== -->
+<nav class="nav">
+  <div class="brand"><span class="seal-sm">肖</span>十二生肖 · 非遗图鉴</div>
+  <div class="links">
+    <a href="#compass">干支星盘</a>
+    <a href="#beasts">十二兽图鉴</a>
+    <a href="#shichen">十二时辰</a>
+    <a href="#gallery">非遗展厅</a>
+    <a href="#lookup">生辰速查</a>
+  </div>
+  <!-- 纯 CSS 主题开关：勾选后由 JS 切 class（依赖 :has 的降级方案） -->
+  <label class="theme-sw" id="themeSw" title="切换昼夜主题" aria-label="切换昼夜主题">
+    <span class="ico sun">日</span>
+    <span class="knob">☯</span>
+    <span class="ico moon">月</span>
+  </label>
+</nav>
+
+<!-- ==================== 首屏：天干地支星盘 ==================== -->
+<header class="hero" id="compass">
+  <div class="hero-stage">
+    <div class="ring-outer"></div>
+    <div class="ring-inner"></div>
+
+    <div class="hero-core meander">
+      <div class="ttl">十二生肖</div>
+      <div class="sub">ZODIAC</div>
+      <div class="en">十二地支 · 十二时辰</div>
+    </div>
+
+    <!-- 12 个生肖节点：--i 决定环形角度（slot 定位 / node 自转，两层分离） -->
+    <div class="compass">
+      <div class="zodiac-slot" style="--i:0"><div class="zodiac-node"><span class="glyph">鼠</span><span class="branch">子</span></div></div>
+      <div class="zodiac-slot" style="--i:1"><div class="zodiac-node"><span class="glyph">牛</span><span class="branch">丑</span></div></div>
+      <div class="zodiac-slot" style="--i:2"><div class="zodiac-node"><span class="glyph">虎</span><span class="branch">寅</span></div></div>
+      <div class="zodiac-slot" style="--i:3"><div class="zodiac-node"><span class="glyph">兔</span><span class="branch">卯</span></div></div>
+      <div class="zodiac-slot" style="--i:4"><div class="zodiac-node"><span class="glyph">龙</span><span class="branch">辰</span></div></div>
+      <div class="zodiac-slot" style="--i:5"><div class="zodiac-node"><span class="glyph">蛇</span><span class="branch">巳</span></div></div>
+      <div class="zodiac-slot" style="--i:6"><div class="zodiac-node"><span class="glyph">马</span><span class="branch">午</span></div></div>
+      <div class="zodiac-slot" style="--i:7"><div class="zodiac-node"><span class="glyph">羊</span><span class="branch">未</span></div></div>
+      <div class="zodiac-slot" style="--i:8"><div class="zodiac-node"><span class="glyph">猴</span><span class="branch">申</span></div></div>
+      <div class="zodiac-slot" style="--i:9"><div class="zodiac-node"><span class="glyph">鸡</span><span class="branch">酉</span></div></div>
+      <div class="zodiac-slot" style="--i:10"><div class="zodiac-node"><span class="glyph">狗</span><span class="branch">戌</span></div></div>
+      <div class="zodiac-slot" style="--i:11"><div class="zodiac-node"><span class="glyph">猪</span><span class="branch">亥</span></div></div>
+    </div>
+  </div>
+
+  <div class="hero-poem">
+    <span>子鼠开天 丑牛辟地 寅虎镇山</span>
+    <span>卯兔衔月 辰龙布雨 巳蛇盘珠</span>
+    <span>午马奔云 未羊衔穗 申猴摘星</span>
+    <span>酉鸡司晨 戌犬守夜 亥猪盈仓</span>
+  </div>
+
+  <div class="hero-scroll">
+    <span>向 下 展 卷</span>
+    <span class="bar"></span>
+  </div>
+</header>
+
+<!-- ==================== 模块一：十二兽图鉴 ==================== -->
+<section id="beasts">
+  <div class="wrap">
+    <div class="sec-title"><span class="seal">兽</span><span class="cn">十二兽图鉴</span><span class="line"></span></div>
+    <p class="sec-sub">古人称十二生肖为「十二兽」「十二神」，与十二地支一一相配。悬停每张卡片，翻转可见其起源典故与所主时辰。</p>
+
+    <div class="zodiac-grid">
+
+      <!-- 鼠 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">01 / 十二</span><span class="seal">子</span>
+          <span class="beast">鼠</span>
+          <span class="name">子鼠</span>
+          <span class="meta">SHU · 子时 23:00–01:00</span>
+          <span class="elem">水 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">鼠</span>
+          <div class="bk-ttl">子鼠 · 夜半</div>
+          <div class="bk-time">子时 23:00 – 01:00</div>
+          <p class="bk-desc">鼠居生肖之首，民间传说其踏牛背而争先。子时正值夜半，天地混沌初开，鼠于此时最为活跃，故配「子」。故宫藏品中鼠纹多寓「多子多福、仓廪丰实」。</p>
+          <div class="bk-traits"><span>机敏</span><span>灵巧</span><span>善谋</span><span>聚财</span></div>
+        </div>
+      </div></div>
+
+      <!-- 牛 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">02 / 十二</span><span class="seal">丑</span>
+          <span class="beast">牛</span>
+          <span class="name">丑牛</span>
+          <span class="meta">NIU · 丑时 01:00–03:00</span>
+          <span class="elem">土 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">牛</span>
+          <div class="bk-ttl">丑牛 · 鸡鸣</div>
+          <div class="bk-time">丑时 01:00 – 03:00</div>
+          <p class="bk-desc">牛为农耕之本，古称「太牢」之牲。丑时农家起身喂牛备耕，牛反刍最勤，故以牛配「丑」。《周礼》载牛牲祭祀，历代帝王以牛耕象征社稷安定。</p>
+          <div class="bk-traits"><span>勤勉</span><span>敦厚</span><span>坚韧</span><span>负重</span></div>
+        </div>
+      </div></div>
+
+      <!-- 虎 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">03 / 十二</span><span class="seal">寅</span>
+          <span class="beast">虎</span>
+          <span class="name">寅虎</span>
+          <span class="meta">HU · 寅时 03:00–05:00</span>
+          <span class="elem">木 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">虎</span>
+          <div class="bk-ttl">寅虎 · 平旦</div>
+          <div class="bk-time">寅时 03:00 – 05:00</div>
+          <p class="bk-desc">寅时为昼夜交替、猛兽最凶之时，虎啸山林、威震四方，故以虎配「寅」。虎符为古代调兵信物，民间视虎为镇宅辟邪之神，端午绘虎、童戴虎帽皆取此意。</p>
+          <div class="bk-traits"><span>威猛</span><span>果敢</span><span>镇邪</span><span>统御</span></div>
+        </div>
+      </div></div>
+
+      <!-- 兔 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">04 / 十二</span><span class="seal">卯</span>
+          <span class="beast">兔</span>
+          <span class="name">卯兔</span>
+          <span class="meta">TU · 卯时 05:00–07:00</span>
+          <span class="elem">木 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">兔</span>
+          <div class="bk-ttl">卯兔 · 日出</div>
+          <div class="bk-time">卯时 05:00 – 07:00</div>
+          <p class="bk-desc">卯时日出东方，月宫玉兔捣药之说源远流长。兔衔灵芝、玉兔望月为明清瓷器常见纹样，取「长生」与「祥瑞」之义。卯亦指草木破土萌发之象。</p>
+          <div class="bk-traits"><span>温润</span><span>敏捷</span><span>仁和</span><span>长寿</span></div>
+        </div>
+      </div></div>
+
+      <!-- 龙 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">05 / 十二</span><span class="seal">辰</span>
+          <span class="beast">龙</span>
+          <span class="name">辰龙</span>
+          <span class="meta">LONG · 辰时 07:00–09:00</span>
+          <span class="elem">土 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">龙</span>
+          <div class="bk-ttl">辰龙 · 食时</div>
+          <div class="bk-time">辰时 07:00 – 09:00</div>
+          <p class="bk-desc">辰时云雾弥漫、行云布雨，神龙隐现，故配「辰」。龙为九五之尊的象征，故宫太和殿九龙壁、藻井蟠龙皆为其极则。生肖中唯龙属虚灵，寄寓民族图腾。</p>
+          <div class="bk-traits"><span>尊贵</span><span>进取</span><span>变化</span><span>祥瑞</span></div>
+        </div>
+      </div></div>
+
+      <!-- 蛇 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">06 / 十二</span><span class="seal">巳</span>
+          <span class="beast">蛇</span>
+          <span class="name">巳蛇</span>
+          <span class="meta">SHE · 巳时 09:00–11:00</span>
+          <span class="elem">火 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">蛇</span>
+          <div class="bk-ttl">巳蛇 · 隅中</div>
+          <div class="bk-time">巳时 09:00 – 11:00</div>
+          <p class="bk-desc">巳时雾气消散、日上中天，蛇出洞觅食，故配「巳」。上古以蛇为龙之原型，伏羲女娲人首蛇身；民间称蛇为「小龙」，忌直呼其名，视为家宅守护之灵。</p>
+          <div class="bk-traits"><span>灵动</span><span>睿智</span><span>蛰伏</span><span>守护</span></div>
+        </div>
+      </div></div>
+
+      <!-- 马 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">07 / 十二</span><span class="seal">午</span>
+          <span class="beast">马</span>
+          <span class="name">午马</span>
+          <span class="meta">MA · 午时 11:00–13:00</span>
+          <span class="elem">火 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">马</span>
+          <div class="bk-ttl">午马 · 日中</div>
+          <div class="bk-time">午时 11:00 – 13:00</div>
+          <p class="bk-desc">午时日正当中、烈阳高照，马亦刚烈属阳，故配「午」。唐太宗昭陵六骏、韩干《照夜白》皆为马画名迹。马寓「马到成功」，为进取与功业的象征。</p>
+          <div class="bk-traits"><span>奔放</span><span>刚健</span><span>致远</span><span>功名</span></div>
+        </div>
+      </div></div>
+
+      <!-- 羊 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">08 / 十二</span><span class="seal">未</span>
+          <span class="beast">羊</span>
+          <span class="name">未羊</span>
+          <span class="meta">YANG · 未时 13:00–15:00</span>
+          <span class="elem">土 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">羊</span>
+          <div class="bk-ttl">未羊 · 日昳</div>
+          <div class="bk-time">未时 13:00 – 15:00</div>
+          <p class="bk-desc">未时日头偏西、牧草丰茂，正是放羊之时，故配「未」。羊通「祥」，汉瓦当「长宜子孙」多缀羊纹；三阳开泰以「羊」谐「阳」，为岁首吉语。</p>
+          <div class="bk-traits"><span>温良</span><span>和顺</span><span>知礼</span><span>吉祥</span></div>
+        </div>
+      </div></div>
+
+      <!-- 猴 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">09 / 十二</span><span class="seal">申</span>
+          <span class="beast">猴</span>
+          <span class="name">申猴</span>
+          <span class="meta">HOU · 申时 15:00–17:00</span>
+          <span class="elem">金 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">猴</span>
+          <div class="bk-ttl">申猴 · 哺时</div>
+          <div class="bk-time">申时 15:00 – 17:00</div>
+          <p class="bk-desc">申时日落西山，猿猴啼鸣归巢，故配「申」。猴通「侯」，绘猴骑鹿为「马上封侯」，是民间最喜闻乐见的功名祝颂纹样。申亦主「伸」，寓舒展通达。</p>
+          <div class="bk-traits"><span>聪慧</span><span>机变</span><span>活泼</span><span>封侯</span></div>
+        </div>
+      </div></div>
+
+      <!-- 鸡 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">10 / 十二</span><span class="seal">酉</span>
+          <span class="beast">鸡</span>
+          <span class="name">酉鸡</span>
+          <span class="meta">JI · 酉时 17:00–19:00</span>
+          <span class="elem">金 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">鸡</span>
+          <div class="bk-ttl">酉鸡 · 日入</div>
+          <div class="bk-time">酉时 17:00 – 19:00</div>
+          <p class="bk-desc">酉时夜幕降临，鸡始归窝，故配「酉」。鸡有五德：文、武、勇、仁、信，古人视为德禽。鸡谐「吉」，与「大」「利」合绘即成「大吉大利」。</p>
+          <div class="bk-traits"><span>守时</span><span>信义</span><span>勇武</span><span>纳吉</span></div>
+        </div>
+      </div></div>
+
+      <!-- 狗 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">11 / 十二</span><span class="seal">戌</span>
+          <span class="beast">狗</span>
+          <span class="name">戌狗</span>
+          <span class="meta">GOU · 戌时 19:00–21:00</span>
+          <span class="elem">土 · 阳</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">狗</span>
+          <div class="bk-ttl">戌狗 · 黄昏</div>
+          <div class="bk-time">戌时 19:00 – 21:00</div>
+          <p class="bk-desc">戌时暮色四合，犬守门护院、警惕最甚，故配「戌」。狗为「六畜」中司守者，《诗经》有「无使尨也吠」之句。民间以犬为忠义之表，寓家宅安宁。</p>
+          <div class="bk-traits"><span>忠诚</span><span>警觉</span><span>守信</span><span>守宅</span></div>
+        </div>
+      </div></div>
+
+      <!-- 猪 -->
+      <div class="card-wrap"><div class="card-inner">
+        <div class="card-face card-front">
+          <span class="idx">12 / 十二</span><span class="seal">亥</span>
+          <span class="beast">猪</span>
+          <span class="name">亥猪</span>
+          <span class="meta">ZHU · 亥时 21:00–23:00</span>
+          <span class="elem">水 · 阴</span>
+        </div>
+        <div class="card-face card-back">
+          <span class="bk-motif">猪</span>
+          <div class="bk-ttl">亥猪 · 人定</div>
+          <div class="bk-time">亥时 21:00 – 23:00</div>
+          <p class="bk-desc">亥时夜深人静、万籁俱寂，猪睡得最沉最香，故配「亥」。猪为「六畜」之首，象征财富丰足；汉墓常见玉猪握，寓「握有财富、生生不息」。</p>
+          <div class="bk-traits"><span>憨厚</span><span>福气</span><span>富足</span><span>安然</span></div>
+        </div>
+      </div></div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 模块二：十二时辰昼夜长卷 ==================== -->
+<section id="shichen">
+  <div class="wrap">
+    <div class="sec-title"><span class="seal">时</span><span class="cn">十二时辰长卷</span><span class="line"></span></div>
+    <p class="sec-sub">古人以十二地支纪一日之时，每一时辰配一生肖、应一事象。横向拖拽展卷，可览自子至亥的昼夜流转。</p>
+  </div>
+
+  <div class="wrap" style="padding:0">
+    <div class="shichen-scroll">
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">23:00 – 01:00</div>
+        <div class="br">子<small>鼠</small></div>
+        <div class="nm">夜半</div>
+        <p class="txt">天地混沌初开，鼠于暗处最活跃。古人此时安寝，以待明日。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">01:00 – 03:00</div>
+        <div class="br">丑<small>牛</small></div>
+        <div class="nm">鸡鸣</div>
+        <p class="txt">农家起身喂牛，牛反刍最勤。鸡鸣之声渐起，长夜将阑。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">03:00 – 05:00</div>
+        <div class="br">寅<small>虎</small></div>
+        <div class="nm">平旦</div>
+        <p class="txt">昼夜交替，猛兽最凶，虎啸山林。天色将明未明，寒气最重。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">05:00 – 07:00</div>
+        <div class="br">卯<small>兔</small></div>
+        <div class="nm">日出</div>
+        <p class="txt">旭日东升，月宫玉兔隐去。官吏点卯、百姓启户，一日之始。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">07:00 – 09:00</div>
+        <div class="br">辰<small>龙</small></div>
+        <div class="nm">食时</div>
+        <p class="txt">云雾弥漫、行云布雨，神龙隐现其间。人家晨炊，是谓食时。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">09:00 – 11:00</div>
+        <div class="br">巳<small>蛇</small></div>
+        <div class="nm">隅中</div>
+        <p class="txt">雾气散尽、日上中天，蛇出洞觅食。市集渐盛，百工兴作。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">11:00 – 13:00</div>
+        <div class="br">午<small>马</small></div>
+        <div class="nm">日中</div>
+        <p class="txt">烈阳当顶，阳气至极而阴生。马亦刚烈属阳，故配午。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">13:00 – 15:00</div>
+        <div class="br">未<small>羊</small></div>
+        <div class="nm">日昳</div>
+        <p class="txt">日头偏西，牧草丰茂，正是放羊之时。人亦小憩，以避暑气。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">15:00 – 17:00</div>
+        <div class="br">申<small>猴</small></div>
+        <div class="nm">哺时</div>
+        <p class="txt">日落西山，猿猴啼鸣归巢。人家进第二餐，是谓哺时。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">17:00 – 19:00</div>
+        <div class="br">酉<small>鸡</small></div>
+        <div class="nm">日入</div>
+        <p class="txt">夜幕降临，鸡始归窝。农人荷锄而归，炊烟四起。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">19:00 – 21:00</div>
+        <div class="br">戌<small>狗</small></div>
+        <div class="nm">黄昏</div>
+        <p class="txt">暮色四合，犬守门护院、警惕最甚。人定之前，闭户安歇。</p>
+      </div>
+
+      <div class="shichen-item"><div class="dot"></div>
+        <div class="hr">21:00 – 23:00</div>
+        <div class="br">亥<small>猪</small></div>
+        <div class="nm">人定</div>
+        <p class="txt">夜深人静，猪睡得最沉。万籁俱寂，一昼夜至此圆满。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 模块三：非遗生肖艺术展厅 ==================== -->
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-title"><span class="seal">艺</span><span class="cn">非遗生肖艺术展厅</span><span class="line"></span></div>
+    <p class="sec-sub">剪纸、年画、邮票、青铜兽首——生肖作为民俗母题，在各类非遗技艺中流转千年。悬停展板即可展开细览。</p>
+
+    <div class="gallery-accordion">
+
+      <div class="art-panel">
+        <div class="veil"></div>
+        <div class="glyph">剪</div>
+        <div class="spine">剪纸 · 窗花</div>
+        <div class="cap">
+          <div class="t">剪纸 · 十二生肖窗花</div>
+          <p class="d">以红纸为底、剪刻成生肖形象，贴于窗棂取「迎春纳福」之意。陕北、蔚县剪纸尤以生肖题材见长，线条镂空、透光成影，是春节最鲜活的民俗符号。</p>
+          <span class="tag">国家级非遗</span>
+        </div>
+      </div>
+
+      <div class="art-panel">
+        <div class="veil"></div>
+        <div class="glyph">画</div>
+        <div class="spine">年画 · 门神</div>
+        <div class="cap">
+          <div class="t">年画 · 生肖门神</div>
+          <p class="d">杨柳青、桃花坞年画常以生肖入图，套色木版印刷，色彩浓艳。鼠娶亲、猴献桃等题材诙谐有趣，寄托岁首祈福、驱邪迎祥的朴素愿望。</p>
+          <span class="tag">木版套印</span>
+        </div>
+      </div>
+
+      <div class="art-panel">
+        <div class="veil"></div>
+        <div class="glyph">邮</div>
+        <div class="spine">邮票 · 方寸</div>
+        <div class="cap">
+          <div class="t">邮票 · 庚申首轮生肖票</div>
+          <p class="d">1980 年庚申猴票为中国首枚生肖邮票，黄永玉绘制，此后年年发行、成系列传承。方寸之间融国画、雕刻、印刷三艺，被誉「国家名片」。</p>
+          <span class="tag">生肖系列</span>
+        </div>
+      </div>
+
+      <div class="art-panel">
+        <div class="veil"></div>
+        <div class="glyph">铜</div>
+        <div class="spine">青铜 · 兽首</div>
+        <div class="cap">
+          <div class="t">青铜 · 圆明园兽首</div>
+          <p class="d">清乾隆年间海晏堂十二生肖水力钟喷泉，十二兽首人身为铜铸，按时辰轮流喷水报时。后流散海外，其中七尊已归国，成为文物流失与回归的时代见证。</p>
+          <span class="tag">海晏堂遗珍</span>
+        </div>
+      </div>
+
+      <div class="art-panel">
+        <div class="veil"></div>
+        <div class="glyph">瓷</div>
+        <div class="spine">瓷器 · 生肖</div>
+        <div class="cap">
+          <div class="t">瓷器 · 生肖俑与青花</div>
+          <p class="d">唐代十二生肖俑为镇墓明器，兽首人身、著袍执笏，按地支方位列置。明清青花、粉彩亦多绘生肖纹样，与吉祥花卉组合成「岁岁平安」图式。</p>
+          <span class="tag">唐三彩遗风</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 模块四：生辰属相速查 ==================== -->
+<section id="lookup">
+  <div class="wrap">
+    <div class="sec-title"><span class="seal">查</span><span class="cn">生辰属相速查</span><span class="line"></span></div>
+    <p class="sec-sub">生肖以干支纪年为准，十二载一轮回。下列对照表可速查出生年份所对应的属相与干支，另有新春祈福签以供抽取。</p>
+
+    <div class="lookup">
+      <!-- 纯 CSS 标签页：radio 必须与 .tab-body 同级，~ 兄弟选择器才能命中 -->
+      <input type="radio" name="tab" id="tab-a" checked>
+      <input type="radio" name="tab" id="tab-b">
+      <input type="radio" name="tab" id="tab-c">
+
+      <div class="tabs">
+        <label for="tab-a">生肖纪年对照</label>
+        <label for="tab-b">十二地支速查</label>
+        <label for="tab-c">新春祈福签</label>
+      </div>
+
+      <div class="tab-body">
+        <!-- 面板一：年份对照 -->
+        <div class="tab-panel p-a">
+          <div class="year-grid">
+            <div class="year-cell"><span class="y">2020</span><span class="z">鼠</span><span class="gz">庚子</span></div>
+            <div class="year-cell"><span class="y">2021</span><span class="z">牛</span><span class="gz">辛丑</span></div>
+            <div class="year-cell"><span class="y">2022</span><span class="z">虎</span><span class="gz">壬寅</span></div>
+            <div class="year-cell"><span class="y">2023</span><span class="z">兔</span><span class="gz">癸卯</span></div>
+            <div class="year-cell"><span class="y">2024</span><span class="z">龙</span><span class="gz">甲辰</span></div>
+            <div class="year-cell"><span class="y">2025</span><span class="z">蛇</span><span class="gz">乙巳</span></div>
+            <div class="year-cell"><span class="y">2026</span><span class="z">马</span><span class="gz">丙午</span></div>
+            <div class="year-cell"><span class="y">2027</span><span class="z">羊</span><span class="gz">丁未</span></div>
+            <div class="year-cell"><span class="y">2028</span><span class="z">猴</span><span class="gz">戊申</span></div>
+            <div class="year-cell"><span class="y">2029</span><span class="z">鸡</span><span class="gz">己酉</span></div>
+            <div class="year-cell"><span class="y">2030</span><span class="z">狗</span><span class="gz">庚戌</span></div>
+            <div class="year-cell"><span class="y">2031</span><span class="z">猪</span><span class="gz">辛亥</span></div>
+            <div class="year-cell"><span class="y">2019</span><span class="z">猪</span><span class="gz">己亥</span></div>
+            <div class="year-cell"><span class="y">2018</span><span class="z">狗</span><span class="gz">戊戌</span></div>
+            <div class="year-cell"><span class="y">2017</span><span class="z">鸡</span><span class="gz">丁酉</span></div>
+            <div class="year-cell"><span class="y">2016</span><span class="z">猴</span><span class="gz">丙申</span></div>
+            <div class="year-cell"><span class="y">2015</span><span class="z">羊</span><span class="gz">乙未</span></div>
+            <div class="year-cell"><span class="y">2014</span><span class="z">马</span><span class="gz">甲午</span></div>
+            <div class="year-cell"><span class="y">2013</span><span class="z">蛇</span><span class="gz">癸巳</span></div>
+            <div class="year-cell"><span class="y">2012</span><span class="z">龙</span><span class="gz">壬辰</span></div>
+            <div class="year-cell"><span class="y">2011</span><span class="z">兔</span><span class="gz">辛卯</span></div>
+            <div class="year-cell"><span class="y">2010</span><span class="z">虎</span><span class="gz">庚寅</span></div>
+            <div class="year-cell"><span class="y">2009</span><span class="z">牛</span><span class="gz">己丑</span></div>
+            <div class="year-cell"><span class="y">2008</span><span class="z">鼠</span><span class="gz">戊子</span></div>
+          </div>
+        </div>
+
+        <!-- 面板二：地支五行 -->
+        <div class="tab-panel p-b">
+          <div class="year-grid">
+            <div class="year-cell"><span class="y">子</span><span class="z">鼠</span><span class="gz">水 · 阳</span></div>
+            <div class="year-cell"><span class="y">丑</span><span class="z">牛</span><span class="gz">土 · 阴</span></div>
+            <div class="year-cell"><span class="y">寅</span><span class="z">虎</span><span class="gz">木 · 阳</span></div>
+            <div class="year-cell"><span class="y">卯</span><span class="z">兔</span><span class="gz">木 · 阴</span></div>
+            <div class="year-cell"><span class="y">辰</span><span class="z">龙</span><span class="gz">土 · 阳</span></div>
+            <div class="year-cell"><span class="y">巳</span><span class="z">蛇</span><span class="gz">火 · 阴</span></div>
+            <div class="year-cell"><span class="y">午</span><span class="z">马</span><span class="gz">火 · 阳</span></div>
+            <div class="year-cell"><span class="y">未</span><span class="z">羊</span><span class="gz">土 · 阴</span></div>
+            <div class="year-cell"><span class="y">申</span><span class="z">猴</span><span class="gz">金 · 阳</span></div>
+            <div class="year-cell"><span class="y">酉</span><span class="z">鸡</span><span class="gz">金 · 阴</span></div>
+            <div class="year-cell"><span class="y">戌</span><span class="z">狗</span><span class="gz">土 · 阳</span></div>
+            <div class="year-cell"><span class="y">亥</span><span class="z">猪</span><span class="gz">水 · 阴</span></div>
+          </div>
+        </div>
+
+        <!-- 面板三：祈福签 -->
+        <div class="tab-panel p-c">
+          <div class="fortune">
+            <div class="slip"><span class="seal">吉</span>
+              <div class="luck">上 上 签</div>
+              <div class="char">龙</div>
+              <p class="verse">云从龙起九霄开，<br>时来运转步玉阶。</p>
+            </div>
+            <div class="slip"><span class="seal">安</span>
+              <div class="luck">上 吉 签</div>
+              <div class="char">牛</div>
+              <p class="verse">耕得春田千亩绿，<br>厚德载物自丰盈。</p>
+            </div>
+            <div class="slip"><span class="seal">福</span>
+              <div class="luck">中 吉 签</div>
+              <div class="char">兔</div>
+              <p class="verse">玉兔衔芝来献瑞，<br>静守心田福自生。</p>
+            </div>
+            <div class="slip"><span class="seal">达</span>
+              <div class="luck">上 吉 签</div>
+              <div class="char">马</div>
+              <p class="verse">骏马追风千里志，<br>扬鞭自可到云津。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 页脚 ==================== -->
+<footer class="foot">
+  <div class="cz">子 丑 寅 卯 辰 巳 午 未 申 酉 戌 亥</div>
+  <div class="meta">十二生肖 · 非遗图鉴 &nbsp;|&nbsp; 纯 HTML + DIV + CSS 构建 &nbsp;|&nbsp; 图文释义参考故宫博物院公开文物资料</div>
+</footer>
+
+</div>
+
+<script>
+/* 极少量 JS：仅用于主题切换（:has 兼容性兜底）与首屏入场 */
+(function () {
+  "use strict";
+
+  /* ---- 昼夜主题切换 ---- */
+  var sw = document.getElementById("themeSw");
+  var root = document.documentElement;
+  var KEY = "zodiac-theme";
+
+  function apply(mode) {
+    root.classList.toggle("paper", mode === "paper");
+  }
+
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved) apply(saved);
+  } catch (e) { /* 隐私模式忽略 */ }
+
+  sw.addEventListener("click", function () {
+    var next = root.classList.contains("paper") ? "night" : "paper";
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+
+  /* ---- 支持 :has 时可用纯 CSS 方案，此处仅做键盘可达性 ---- */
+  sw.setAttribute("tabindex", "0");
+  sw.setAttribute("role", "switch");
+  sw.addEventListener("keydown", function (e) {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); sw.click(); }
+  });
+})();
+</script>
+</body>
+</html>

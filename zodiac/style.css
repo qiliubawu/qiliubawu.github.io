@@ -1,0 +1,796 @@
+/* ============================================================
+   十二生肖 · 非遗图鉴  —  样式表
+   暗夜星象（默认）/ 白昼宣纸 双主题
+   ============================================================ */
+
+/* ---------- 主题变量 ---------- */
+:root{
+  /* 暗夜星象（默认） */
+  --bg:            #141824;
+  --bg-2:          #1b2030;
+  --panel:         rgba(30,36,54,.74);
+  --panel-solid:   #1e2436;
+  --border:        rgba(212,175,55,.16);
+  --border-hi:     rgba(212,175,55,.42);
+  --ink:           #EDE6D6;   /* 主文字：宣纸白 */
+  --ink-2:         #A9A493;
+  --ink-3:         #6E6A5E;
+  --cinnabar:      #B83B2A;   /* 朱砂 */
+  --cinnabar-lit:  #D6503C;
+  --gold:          #D4AF37;   /* 琉璃金 */
+  --gold-lit:      #E8C860;
+  --seal-bg:       #B83B2A;
+  --seal-ink:      #F7F4ED;
+  --star:          rgba(232,200,96,.55);
+  --shadow:        0 18px 48px rgba(0,0,0,.46);
+  --grain-op:      .5;
+  --fold:          rgba(255,255,255,.04);
+  --font-serif:    "Noto Serif SC","Songti SC","STSong",serif;
+  --font-kaishu:   "Kaiti SC","STKaiti","KaiTi","Noto Serif SC",serif;
+  --font-sans:     "Noto Sans SC",-apple-system,"Segoe UI",sans-serif;
+}
+
+/* 白昼宣纸 */
+html.paper{
+  --bg:            #F7F4ED;
+  --bg-2:          #F1EBDE;
+  --panel:         rgba(255,253,247,.82);
+  --panel-solid:   #FFFDF7;
+  --border:        rgba(44,44,44,.14);
+  --border-hi:     rgba(184,59,42,.42);
+  --ink:           #2C2C2C;
+  --ink-2:         #5A554C;
+  --ink-3:         #918A7C;
+  --cinnabar:      #B83B2A;
+  --cinnabar-lit:  #A32E1F;
+  --gold:          #B8912A;
+  --gold-lit:      #D4AF37;
+  --seal-bg:       #B83B2A;
+  --seal-ink:      #F7F4ED;
+  --star:          rgba(44,44,44,.30);
+  --shadow:        0 16px 40px rgba(90,70,40,.14);
+  --grain-op:      .38;
+  --fold:          rgba(0,0,0,.03);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{
+  font-family:var(--font-serif);
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.75;
+  overflow-x:hidden;
+  transition:background .6s ease,color .6s ease;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 背景肌理：星图 / 宣纸 ---------- */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:1;transition:opacity .6s ease;
+  background:
+    radial-gradient(680px 460px at 14% 6%,  rgba(212,175,55,.14), transparent 62%),
+    radial-gradient(560px 420px at 88% 12%, rgba(184,59,42,.13),  transparent 60%),
+    radial-gradient(900px 620px at 50% 108%,rgba(212,175,55,.09), transparent 64%);
+}
+/* 星点 / 纸纹 */
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:var(--grain-op);transition:opacity .6s ease;
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 22%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 62%,     var(--star) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 62% 18%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 74%,     var(--star) 50%, transparent 51%),
+    radial-gradient(1.1px 1.1px at 52% 44%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 22% 84%,     var(--star) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 90% 42%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 44% 8%,      var(--star) 50%, transparent 51%);
+  background-size:100% 100%;
+}
+html.paper body::after{
+  background-image:
+    repeating-linear-gradient(94deg, transparent 0 3px, rgba(150,130,90,.05) 3px 4px),
+    repeating-linear-gradient(4deg,  transparent 0 5px, rgba(150,130,90,.04) 5px 6px);
+}
+
+.page{position:relative;z-index:1}
+
+/* ---------- 顶部导航 ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;gap:22px;
+  padding:14px 40px;
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(14px) saturate(1.2);
+  border-bottom:1px solid var(--border);
+  transition:background .6s ease,border-color .6s ease;
+}
+.nav .brand{
+  display:flex;align-items:center;gap:11px;
+  font-family:var(--font-kaishu);font-weight:700;font-size:17px;
+  letter-spacing:.16em;white-space:nowrap;
+}
+.nav .brand .seal-sm{
+  width:28px;height:28px;flex:none;border-radius:5px;
+  background:var(--seal-bg);color:var(--seal-ink);
+  display:grid;place-items:center;
+  font-size:13px;font-weight:700;line-height:1;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28);
+}
+.nav .links{
+  display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;
+}
+.nav .links a{
+  color:var(--ink-2);text-decoration:none;font-size:13.5px;
+  padding:7px 13px;border-radius:7px;letter-spacing:.06em;
+  transition:color .25s,background .25s;
+  font-family:var(--font-serif);
+}
+.nav .links a:hover{color:var(--gold);background:var(--fold)}
+
+/* 主题开关：日月太极 */
+.theme-sw{
+  position:relative;flex:none;
+  width:50px;height:27px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--border-hi);
+  background:linear-gradient(90deg, var(--bg-2), var(--panel-solid));
+  display:grid;place-items:center;
+  transition:background .5s ease,border-color .5s ease;
+  user-select:none;
+}
+.theme-sw .knob{
+  position:absolute;top:2.5px;left:3px;
+  width:20px;height:20px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, var(--gold-lit), var(--gold) 62%);
+  box-shadow:0 0 12px rgba(212,175,55,.5);
+  transition:transform .45s cubic-bezier(.34,1.4,.5,1),background .5s;
+  display:grid;place-items:center;
+  font-size:10px;color:#2a1e00;line-height:1;
+}
+.theme-sw .ico{
+  position:absolute;font-size:11px;line-height:1;
+  top:50%;transform:translateY(-50%);
+  color:var(--ink-3);transition:opacity .35s,color .35s;
+}
+.theme-sw .ico.moon{right:7px}
+.theme-sw .ico.sun{left:7px;opacity:0}
+html.paper .theme-sw .knob{transform:translateX(22px)}
+html.paper .theme-sw .ico.moon{opacity:0}
+html.paper .theme-sw .ico.sun{opacity:1;color:var(--cinnabar)}
+
+/* ---------- 通用：印章 / 回纹 / 竖排 ---------- */
+.seal{
+  display:inline-grid;place-items:center;
+  width:34px;height:34px;flex:none;
+  background:var(--seal-bg);color:var(--seal-ink);
+  border-radius:6px;font-weight:700;font-size:16px;line-height:1;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25), 0 3px 10px rgba(184,59,42,.28);
+  font-family:var(--font-kaishu);
+}
+/* 回纹边角 */
+.meander{position:relative}
+.meander::before,.meander::after{
+  content:"";position:absolute;width:20px;height:20px;pointer-events:none;
+  border-color:var(--gold);opacity:.55;
+}
+.meander::before{
+  top:9px;left:9px;
+  border-top:1.5px solid;border-left:1.5px solid;
+  box-shadow:-4px -4px 0 -2.5px var(--gold) inset;
+}
+.meander::after{
+  bottom:9px;right:9px;
+  border-bottom:1.5px solid;border-right:1.5px solid;
+}
+/* 竖排 */
+.vertical{
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  letter-spacing:.34em;
+}
+
+.sec-title{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:14px;
+}
+.sec-title .cn{
+  font-family:var(--font-kaishu);
+  font-size:clamp(26px,3.4vw,38px);
+  font-weight:700;letter-spacing:.14em;
+  color:var(--ink);
+}
+.sec-title .line{
+  flex:1;height:1px;
+  background:linear-gradient(90deg,var(--border-hi),transparent);
+}
+.sec-sub{
+  color:var(--ink-2);font-size:14.5px;letter-spacing:.05em;
+  margin-bottom:48px;max-width:660px;
+}
+.wrap{max-width:1220px;margin:0 auto;padding:0 40px}
+section{padding:104px 0;position:relative}
+
+/* ============================================================
+   首屏：天干地支星盘
+   ============================================================ */
+.hero{
+  min-height:100vh;display:grid;place-items:center;
+  padding:120px 40px 80px;position:relative;
+}
+.hero-stage{
+  position:relative;display:grid;place-items:center;
+  width:min(620px,92vw);height:min(620px,92vw);
+  /* 星盘半径随容器尺寸自动缩放：节点恰好落在刻度环带之上 */
+  --radius:calc(min(620px,92vw) * -0.40);
+}
+/* 外层刻度环 */
+.ring-outer{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px solid var(--border-hi);
+  box-shadow:
+    inset 0 0 0 12px transparent,
+    inset 0 0 0 13px var(--border),
+    inset 0 0 60px rgba(212,175,55,.1);
+  animation:spin 96s linear infinite;
+}
+/* 刻度 */
+.ring-outer::before{
+  content:"";position:absolute;inset:-1px;border-radius:50%;
+  background:
+    repeating-conic-gradient(from 0deg,
+      var(--gold) 0deg .5deg, transparent .5deg 6deg);
+  mask:radial-gradient(circle, transparent 0 88%, #000 88.4% 92%, transparent 92.6%);
+  -webkit-mask:radial-gradient(circle, transparent 0 88%, #000 88.4% 92%, transparent 92.6%);
+  opacity:.42;
+}
+/* 内圈地支环 */
+.ring-inner{
+  position:absolute;inset:23%;border-radius:50%;
+  border:1px dashed var(--border-hi);
+  animation:spin 130s linear infinite reverse;
+}
+.ring-inner::before{
+  content:"";position:absolute;inset:14%;border-radius:50%;
+  border:1px solid var(--border);
+}
+/* 中心 */
+.hero-core{
+  position:relative;z-index:3;text-align:center;
+  width:47%;aspect-ratio:1;border-radius:50%;
+  display:grid;place-content:center;gap:6px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(212,175,55,.20), transparent 64%),
+    var(--panel);
+  border:1px solid var(--border-hi);
+  box-shadow:inset 0 0 42px rgba(212,175,55,.14), var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.hero-core .ttl{
+  font-family:var(--font-kaishu);
+  font-size:clamp(30px,5.2vw,48px);font-weight:700;
+  letter-spacing:.2em;line-height:1.15;text-indent:.2em;
+  background:linear-gradient(120deg,var(--gold-lit),var(--gold) 48%,var(--cinnabar-lit));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-core .sub{
+  font-size:12px;letter-spacing:.42em;color:var(--ink-3);
+  text-transform:uppercase;font-family:var(--font-sans);
+  text-indent:.42em;
+}
+.hero-core .en{
+  font-size:10.5px;letter-spacing:.24em;color:var(--ink-3);
+  font-family:var(--font-sans);margin-top:2px;text-indent:.24em;
+}
+
+/* 生肖节点
+   关键：环形定位（静态 transform）与反向自转（animation）必须分置于两层，
+   否则 animation 的 transform 会把定位 transform 整个覆盖掉，
+   12 个节点就会全部塌缩到圆心。故用 .zodiac-slot 定位、.zodiac-node 自转。 */
+.compass{
+  position:absolute;inset:0;border-radius:50%;
+  animation:spin 96s linear infinite;
+}
+.compass:hover,
+.compass:hover .ring-outer,
+.compass:hover .ring-inner,
+.compass:hover .zodiac-node{animation-play-state:paused}
+
+/* 第一层：只负责环形排布（旋转->外推半径->转正），无动画 */
+.zodiac-slot{
+  position:absolute;top:50%;left:50%;
+  width:68px;height:68px;margin:-34px 0 0 -34px;
+  transform:
+    rotate(calc(var(--i) * 30deg))
+    translateY(var(--radius,-236px))
+    rotate(calc(var(--i) * -30deg));
+}
+/* 第二层：只负责反向自转，抵消 .compass 的旋转，使图文始终正立 */
+.zodiac-node{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:1px;
+  border-radius:50%;
+  background:var(--panel-solid);
+  border:1px solid var(--border);
+  box-shadow:0 4px 14px rgba(0,0,0,.3);
+  cursor:pointer;
+  animation:spin-counter 96s linear infinite;
+  transition:box-shadow .3s, border-color .3s, background .3s;
+}
+.zodiac-node .glyph{
+  font-family:var(--font-kaishu);
+  font-size:25px;font-weight:700;line-height:1;
+  color:var(--gold-lit);
+  transition:color .28s,transform .28s;
+}
+.zodiac-node .branch{
+  font-size:11.5px;line-height:1;
+  color:var(--cinnabar-lit);letter-spacing:.02em;
+  font-family:var(--font-kaishu);
+  transition:color .28s;
+}
+.zodiac-node:hover{
+  border-color:var(--gold);
+  background:linear-gradient(140deg,rgba(212,175,55,.2),var(--panel-solid));
+  box-shadow:0 0 0 3px rgba(212,175,55,.16), 0 8px 26px rgba(212,175,55,.34);
+  z-index:5;
+}
+.zodiac-node:hover .glyph{
+  color:var(--gold-lit);
+  transform:scale(1.18);
+}
+.zodiac-node:hover .branch{color:var(--gold-lit)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+/* 节点反向自转，抵消环的旋转，让图文保持正立 */
+@keyframes spin-counter{to{transform:rotate(-360deg)}}
+
+/* 首屏竖排诗句：每行一列，行内不折行 */
+.hero-poem{
+  position:absolute;right:clamp(12px,4vw,64px);top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:row-reverse;gap:20px;
+  font-family:var(--font-kaishu);
+  font-size:14px;line-height:1.9;color:var(--ink-2);
+  letter-spacing:.22em;
+  border-right:1px solid var(--border-hi);
+  padding-right:18px;
+  max-height:64vh;
+  opacity:.92;
+}
+.hero-poem span{
+  writing-mode:vertical-rl;text-orientation:upright;
+  white-space:nowrap;
+}
+.hero-poem .em{color:var(--cinnabar-lit)}
+
+.hero-scroll{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:.3em;color:var(--ink-3);
+  font-family:var(--font-sans);
+  display:grid;justify-items:center;gap:8px;
+}
+.hero-scroll .bar{
+  width:1px;height:34px;
+  background:linear-gradient(180deg,var(--gold),transparent);
+  animation:drop 2.1s ease-in-out infinite;
+}
+@keyframes drop{
+  0%,100%{opacity:.3;transform:scaleY(.6)}
+  50%{opacity:1;transform:scaleY(1)}
+}
+
+/* ============================================================
+   模块一：十二兽图鉴（3D 翻转卡）
+   ============================================================ */
+.zodiac-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(248px,1fr));
+  gap:20px;
+}
+.card-wrap{
+  perspective:1200px;
+  height:340px;
+  cursor:pointer;
+}
+.card-inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform .85s cubic-bezier(.34,1.2,.4,1);
+}
+.card-wrap:hover .card-inner,
+.card-wrap:focus-within .card-inner{transform:rotateY(180deg)}
+
+.card-face{
+  position:absolute;inset:0;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  backdrop-filter:blur(10px);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+/* 正面 */
+.card-front{padding:22px 20px;align-items:center;justify-content:center;text-align:center;gap:4px}
+.card-front::after{
+  content:"";position:absolute;inset:9px;border-radius:11px;
+  border:1px solid var(--border);pointer-events:none;
+}
+.card-front .idx{
+  position:absolute;top:13px;left:15px;
+  font-family:var(--font-sans);font-size:10px;letter-spacing:.16em;
+  color:var(--ink-3);
+}
+.card-front .beast{
+  font-family:var(--font-kaishu);
+  font-size:74px;line-height:1;font-weight:700;
+  color:var(--gold);
+  margin-bottom:12px;
+  filter:drop-shadow(0 6px 18px rgba(212,175,55,.34));
+  transition:transform .45s cubic-bezier(.34,1.4,.5,1),filter .45s;
+}
+.card-wrap:hover .card-front .beast{
+  transform:translateY(-4px) scale(1.06);
+  filter:drop-shadow(0 10px 26px rgba(212,175,55,.6));
+}
+.card-front .name{
+  font-family:var(--font-kaishu);
+  font-size:24px;font-weight:700;letter-spacing:.16em;text-indent:.16em;
+  color:var(--ink);
+}
+.card-front .meta{
+  font-size:11.5px;letter-spacing:.08em;color:var(--ink-3);
+  font-family:var(--font-sans);
+}
+.card-front .seal{
+  position:absolute;top:14px;right:14px;
+  width:30px;height:30px;font-size:15px;border-radius:5px;
+}
+.card-front .elem{
+  margin-top:11px;
+  font-size:11px;letter-spacing:.18em;color:var(--gold);
+  border:1px solid var(--border-hi);border-radius:99px;
+  padding:3px 12px;font-family:var(--font-sans);
+}
+/* 背面 */
+.card-back{
+  transform:rotateY(180deg);
+  padding:24px 22px;
+  background:
+    radial-gradient(120% 90% at 88% 6%, rgba(184,59,42,.20), transparent 58%),
+    var(--panel-solid);
+  border-color:var(--border-hi);
+  justify-content:flex-start;gap:11px;
+}
+.card-back .bk-ttl{
+  font-family:var(--font-kaishu);font-size:19px;font-weight:700;
+  letter-spacing:.12em;color:var(--gold);
+  display:flex;align-items:center;gap:9px;
+}
+.card-back .bk-ttl::before{
+  content:"";width:3px;height:17px;border-radius:2px;
+  background:linear-gradient(180deg,var(--gold),var(--cinnabar));
+}
+.card-back .bk-time{
+  font-size:12px;font-family:var(--font-sans);letter-spacing:.08em;
+  color:var(--cinnabar-lit);
+  padding-bottom:11px;border-bottom:1px dashed var(--border);
+}
+.card-back .bk-desc{
+  font-size:13px;line-height:1.9;color:var(--ink-2);
+}
+.card-back .bk-traits{
+  margin-top:auto;display:flex;flex-wrap:wrap;gap:7px;
+}
+.card-back .bk-traits span{
+  font-size:11px;padding:3px 10px;border-radius:99px;
+  background:var(--fold);border:1px solid var(--border);
+  color:var(--ink-2);font-family:var(--font-sans);letter-spacing:.05em;
+}
+.card-back .bk-motif{
+  position:absolute;right:-14px;bottom:-22px;
+  font-family:var(--font-kaishu);font-size:120px;line-height:1;
+  color:var(--gold);opacity:.07;pointer-events:none;
+}
+
+/* ============================================================
+   模块二：十二时辰昼夜长卷
+   ============================================================ */
+.shichen-scroll{
+  display:flex;gap:0;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  padding:26px 0 40px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border-hi) transparent;
+  /* 画卷卷轴感 */
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:
+    linear-gradient(90deg,var(--fold),transparent 8%,transparent 92%,var(--fold));
+}
+.shichen-scroll::-webkit-scrollbar{height:5px}
+.shichen-scroll::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:5px}
+
+.shichen-item{
+  flex:0 0 clamp(230px,26vw,290px);
+  scroll-snap-align:center;
+  padding:22px 24px 26px;
+  position:relative;
+  border-right:1px solid var(--border);
+  transition:background .35s;
+}
+.shichen-item:last-child{border-right:0}
+.shichen-item:hover{background:var(--fold)}
+/* 时辰圆点（时间轴节点） */
+.shichen-item .dot{
+  width:11px;height:11px;border-radius:50%;
+  background:var(--panel-solid);
+  border:2px solid var(--gold);
+  margin-bottom:20px;
+  position:relative;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.shichen-item .dot::before{
+  content:"";position:absolute;top:50%;left:-100vw;width:200vw;height:1px;
+  background:var(--border);z-index:-1;
+}
+.shichen-item .hr{
+  font-family:var(--font-sans);font-size:11.5px;letter-spacing:.1em;
+  color:var(--cinnabar-lit);margin-bottom:5px;
+}
+.shichen-item .br{
+  font-family:var(--font-kaishu);font-size:31px;font-weight:700;
+  letter-spacing:.06em;color:var(--ink);line-height:1.2;
+  display:flex;align-items:baseline;gap:10px;
+}
+.shichen-item .br small{
+  font-size:12.5px;color:var(--gold);letter-spacing:.1em;
+  font-weight:400;
+  padding:2px 9px;border-radius:99px;
+  border:1px solid var(--border-hi);
+  font-family:var(--font-sans);
+  transform:translateY(-3px);
+}
+.shichen-item .nm{
+  font-size:11.5px;color:var(--ink-3);letter-spacing:.16em;
+  font-family:var(--font-sans);margin-bottom:14px;
+}
+.shichen-item .txt{
+  font-size:13px;line-height:1.9;color:var(--ink-2);
+}
+
+/* ============================================================
+   模块三：非遗展厅（手风琴）
+   ============================================================ */
+.gallery-accordion{
+  display:flex;gap:12px;height:min(520px,64vh);
+}
+.art-panel{
+  position:relative;flex:1;min-width:66px;
+  border-radius:16px;overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--panel-solid);
+  cursor:pointer;
+  transition:flex .62s cubic-bezier(.4,1.1,.4,1),border-color .4s;
+}
+.art-panel:hover{flex:4;border-color:var(--border-hi)}
+.art-panel .veil{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(80% 60% at 50% 12%, rgba(212,175,55,.16), transparent 62%),
+    linear-gradient(180deg,transparent 34%,rgba(8,10,16,.86));
+}
+html.paper .art-panel .veil{
+  background:
+    radial-gradient(80% 60% at 50% 12%, rgba(184,59,42,.10), transparent 62%),
+    linear-gradient(180deg,transparent 34%,rgba(250,246,236,.9));
+}
+.art-panel .glyph{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:var(--font-kaishu);font-size:clamp(52px,7vw,84px);
+  font-weight:700;color:var(--gold);opacity:.9;line-height:1;
+  filter:drop-shadow(0 6px 22px rgba(212,175,55,.4));
+  transition:transform .6s cubic-bezier(.34,1.3,.5,1),opacity .5s;
+  white-space:nowrap;
+}
+.art-panel:hover .glyph{transform:translate(-50%,-64%) scale(1.05)}
+/* 收起态只露竖排小字 */
+.art-panel .spine{
+  position:absolute;left:50%;bottom:22px;transform:translateX(-50%);
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:var(--font-kaishu);font-size:15px;
+  letter-spacing:.26em;color:var(--ink-2);
+  white-space:nowrap;
+  transition:opacity .4s;
+}
+.art-panel:hover .spine{opacity:0}
+/* 展开态文字层 */
+.art-panel .cap{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:26px 26px 28px;
+  opacity:0;transform:translateY(14px);
+  transition:opacity .45s .14s,transform .45s .14s;
+}
+.art-panel:hover .cap{opacity:1;transform:translateY(0)}
+.art-panel .cap .t{
+  font-family:var(--font-kaishu);font-size:21px;font-weight:700;
+  letter-spacing:.12em;color:var(--gold-lit);margin-bottom:9px;
+}
+.art-panel .cap .d{
+  font-size:12.5px;line-height:1.85;color:var(--ink-2);
+  max-width:340px;
+}
+.art-panel .cap .tag{
+  display:inline-block;margin-top:11px;
+  font-size:10.5px;letter-spacing:.14em;color:var(--cinnabar-lit);
+  border:1px solid var(--border-hi);border-radius:99px;
+  padding:3px 11px;font-family:var(--font-sans);
+}
+
+/* ============================================================
+   模块四：生辰属相速查（纯 CSS 标签页）
+   ============================================================ */
+.lookup{margin-top:0;position:relative}
+.tabs{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:0;position:relative;z-index:2;
+}
+/* radio 置于 .lookup 下、.tabs 之前，视觉隐藏但保留可聚焦 */
+.lookup > input[type="radio"]{
+  position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;
+}
+.tabs label{
+  cursor:pointer;padding:10px 20px;
+  border:1px solid var(--border);border-bottom:0 none;
+  border-radius:11px 11px 0 0;
+  font-size:13.5px;letter-spacing:.08em;color:var(--ink-2);
+  background:var(--fold);
+  transition:color .28s,background .28s,border-color .28s;
+  font-family:var(--font-serif);
+}
+.tabs label:hover{color:var(--gold)}
+/* 选中态：radio 与 label 为隔层兄弟，用 :checked ~ .tabs label 定位 */
+#tab-a:checked ~ .tabs label[for="tab-a"],
+#tab-b:checked ~ .tabs label[for="tab-b"],
+#tab-c:checked ~ .tabs label[for="tab-c"]{
+  color:var(--gold-lit);
+  background:var(--panel-solid);
+  border-color:var(--border-hi);
+  box-shadow:0 -2px 0 var(--gold) inset;
+}
+.tab-body{
+  border:1px solid var(--border);border-radius:0 14px 14px 14px;
+  background:var(--panel);backdrop-filter:blur(10px);
+  padding:32px;position:relative;overflow:hidden;
+}
+.tab-body::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-hi),transparent);
+}
+.tab-panel{display:none}
+/* 纯 CSS 切换 */
+#tab-a:checked ~ .tab-body .p-a,
+#tab-b:checked ~ .tab-body .p-b,
+#tab-c:checked ~ .tab-body .p-c{display:block;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+/* 对照表 */
+.year-grid{
+  display:grid;gap:9px;
+  grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+}
+.year-cell{
+  border:1px solid var(--border);border-radius:10px;
+  padding:11px 13px;display:flex;align-items:center;gap:10px;
+  background:var(--panel-solid);
+  transition:border-color .28s,transform .28s;
+}
+.year-cell:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+.year-cell .y{
+  font-family:var(--font-sans);font-size:13px;color:var(--ink-2);
+}
+.year-cell .z{
+  margin-left:auto;font-family:var(--font-kaishu);
+  font-size:19px;font-weight:700;color:var(--gold);
+}
+.year-cell .gz{
+  font-size:10.5px;color:var(--ink-3);
+  font-family:var(--font-sans);
+}
+
+/* 祈福签 */
+.fortune{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fit,minmax(216px,1fr));
+}
+.slip{
+  position:relative;
+  border:1px solid var(--border);border-radius:13px;
+  padding:26px 22px;text-align:center;
+  background:
+    radial-gradient(90% 70% at 50% 0%, rgba(184,59,42,.14), transparent 66%),
+    var(--panel-solid);
+  transition:transform .35s,border-color .35s,box-shadow .35s;
+  cursor:pointer;overflow:hidden;
+}
+.slip::after{
+  content:"";position:absolute;inset:6px;border-radius:9px;
+  border:1px dashed var(--border);pointer-events:none;
+}
+.slip:hover{
+  transform:translateY(-5px);
+  border-color:var(--border-hi);
+  box-shadow:0 14px 34px rgba(184,59,42,.24);
+}
+.slip .luck{
+  font-family:var(--font-sans);font-size:10.5px;letter-spacing:.2em;
+  color:var(--cinnabar-lit);margin-bottom:12px;
+}
+.slip .char{
+  font-family:var(--font-kaishu);
+  font-size:56px;font-weight:700;line-height:1;
+  color:var(--gold);
+  filter:drop-shadow(0 5px 18px rgba(212,175,55,.34));
+  margin-bottom:14px;
+}
+.slip .verse{
+  font-size:13px;line-height:1.85;color:var(--ink-2);
+  font-family:var(--font-kaishu);letter-spacing:.06em;
+}
+.slip .seal{position:absolute;top:12px;right:12px;width:26px;height:26px;font-size:12px;border-radius:4px}
+
+/* ---------- 页脚 ---------- */
+.foot{
+  padding:56px 40px 64px;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.foot .cz{
+  font-family:var(--font-kaishu);font-size:15px;
+  letter-spacing:.3em;color:var(--ink-3);margin-bottom:12px;
+}
+.foot .meta{
+  font-size:11.5px;color:var(--ink-3);
+  font-family:var(--font-sans);letter-spacing:.06em;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:980px){
+  .nav{padding:12px 20px;gap:12px}
+  .nav .links{display:none}
+  .wrap{padding:0 22px}
+  section{padding:74px 0}
+  .hero-poem{display:none}
+  .gallery-accordion{height:auto;flex-direction:column}
+  .art-panel{flex:none;height:88px;transition:height .55s cubic-bezier(.4,1.1,.4,1)}
+  .art-panel:hover{height:320px;flex:none}
+  .art-panel .spine{
+    writing-mode:horizontal-tb;bottom:auto;top:50%;
+    transform:translate(-50%,-50%);font-size:17px;
+  }
+  .zodiac-slot{width:50px;height:50px;margin:-25px 0 0 -25px}
+  .zodiac-node .glyph{font-size:20px}
+  .zodiac-node .branch{display:none}
+}
+@media (max-width:600px){
+  .hero-stage{--radius:calc(min(420px,94vw) * -0.4)}
+  .zodiac-slot{
+    width:42px;height:42px;margin:-21px 0 0 -21px;
+  }
+  .zodiac-node .glyph{font-size:17px}
+  .tab-body{padding:20px}
+  .tabs label{padding:8px 13px;font-size:12.5px}
+}
+/* 减少动态偏好 */
+@media (prefers-reduced-motion:reduce){
+  .ring-outer,.ring-inner{animation:none}
+  .hero-scroll .bar{animation:none}
+  *{transition-duration:.01ms !important}
+}

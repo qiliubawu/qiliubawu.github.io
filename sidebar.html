@@ -576,9 +576,10 @@ section > p code{
 
   /* ---- 无动画直接吸附 ---- */
   function snap() {
+    /* 正在播放弹跳动画时不打断，等动画自行收尾 */
+    if (rafId !== null) return;
     var toY = targetYFor(activeIndex);
     if (toY === null) return;
-    cancelAnim();
     dot.style.transform = "translate3d(0," + toY + "px,0)";
     prevY = toY;
     if (!ready) {
@@ -587,16 +588,52 @@ section > p code{
     }
   }
 
-  /* ---- 弹跳动画：弧线插值 ---- */
+  /* ---- 弹跳动画：沿弧线插值（对齐 motion 的 arc 语义） ----
+     motion 的 arc({ strength, direction })：
+       strength —— 弧线峰高与「起终点距离」的比值（默认 0.5，1 表示峰高等于距离）
+       direction —— 相对行进方向的顺/逆时针，决定凸向哪一侧
+     组件原式 strength = min(0.8, 14 / distance)：
+       距离越短 → strength 越大（弧度越明显）；距离越长 → 触顶 0.8
+     换算成像素峰高则为 min(0.8·d, 14)，
+     但 6px 的圆点走 40~160px 时 14px 峰高太含蓄，
+     故此处保留公式形态，另乘一个观感系数让弧线可见。
+  */
+  var ARC_GAIN = 2.1;
+
+  /* 从当前 transform 中解析出实时纵向位置，用于动画被打断时衔接 */
+  function readCurrentY() {
+    var m = /translate3d\([-\d.]+px,\s*([-\d.]+)px/.exec(dot.style.transform || "");
+    return m ? parseFloat(m[1]) : null;
+  }
+
   function bounceTo(toY, delta) {
-    var fromY = prevY;
+    /* 起点：动画被打断时以实时位置为准，否则用上一次的基准 */
+    var fromY = rafId !== null ? readCurrentY() : prevY;
+    if (fromY === null) fromY = prevY;
+    /* 以真实起点重算位移，保证打断后续接顺滑 */
+    delta = toY - fromY;
+    if (delta === 0) {
+      cancelAnim();
+      dot.style.transform = "translate3d(0," + toY + "px,0)";
+      prevY = toY;
+      return;
+    }
+
+    /* 纯纵向运动：距离即纵向位移 */
     var distance = Math.abs(delta);
-    /* 弧线强度：距离越短弧度越明显，上限 0.8 */
+
+    /* 与组件一致的强度公式，上限 0.8 */
     var strength = Math.min(0.8, 14 / distance);
-    /* 横向偏移峰值，负值先向左摆出 */
-    var lateral = -26 * strength;
-    /* 向上移动时方向取反，形成左右对称的弧线 */
-    if (delta < 0) lateral = -lateral;
+
+    /* 像素峰高 = strength × distance，再乘观感系数 */
+    var peakHeight = strength * distance * ARC_GAIN;
+
+    /* motion 的 direction 相对行进方向：
+       向下移动取 ccw → 凸向左侧（负 x）
+       向上移动取 cw  → 凸向右侧（正 x）
+       两侧各偏一次，来回切换形成对称的两次弧线 */
+    var bulge = delta > 0 ? -1 : 1;
+    var lateral = bulge * peakHeight;
 
     var start = performance.now();
     var duration = 250;
@@ -604,18 +641,20 @@ section > p code{
     function frame(now) {
       var t = (now - start) / duration;
       if (t >= 1) t = 1;
-      /* easeOut 三次方，观感接近 motion 的 easeOut */
+      /* easeOut，对应组件的 ease:"easeOut" */
       var e = 1 - Math.pow(1 - t, 3);
       var y = fromY + delta * e;
-      /* sin(pi*t)：两端归零，行程中点达峰值 */
-      var x = lateral * Math.sin(Math.PI * t);
+      /* sin(π·e)：随实际进度伸展，两端归零、中点达峰值 */
+      var x = lateral * Math.sin(Math.PI * e);
       dot.style.transform =
         "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0)";
       if (t < 1) {
         rafId = requestAnimationFrame(frame);
       } else {
         rafId = null;
+        /* 收尾：吸附到精确终点，并同步 prevY 基准 */
         dot.style.transform = "translate3d(0," + toY + "px,0)";
+        prevY = toY;
       }
     }
     cancelAnim();
@@ -638,8 +677,8 @@ section > p code{
 
     if (prevY === null) { snap(); return; }
     var delta = toY - prevY;
-    prevY = toY;
     if (delta === 0) return;
+    /* prevY 由动画自行在收尾时更新，切勿在此提前赋值 */
     bounceTo(toY, delta);
   }
 

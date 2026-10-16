@@ -364,8 +364,8 @@ section > p code{
       <h1 class="rise d1">弹跳<em>侧边栏</em></h1>
       <p class="lede rise d2">
         一枚圆点指示器，在分组菜单之间<strong>沿弧线弹跳</strong>滑行。
-        切换选中项时它不会直线平移——向下走逆时针、向上走顺时针，
-        跨度越大弧线越平缓，于是来回切换会画出两条相互对称的轨迹。
+        切换选中项时它不会直线平移——无论向上还是向下，
+        弧线始终朝同一侧鼓出，跨度越大弧线越平缓。
       </p>
       <div class="hintbar rise d3">
         <span class="ic">◉</span>
@@ -400,8 +400,9 @@ section > p code{
         避免轨迹夸张失控。
       </p>
       <p>
-        方向也随之变化——<strong>向下移动时逆时针</strong>，<strong>向上移动时顺时针</strong>，
-        所以一来一回，圆点会走出两条彼此对称的弧线。
+        凸向是固定的——<strong>弧线始终朝左侧鼓出</strong>，不随行进方向翻转，
+        等价于 motion 里永远传入 <strong>direction: "ccw"</strong>，
+        因此上下行看上去是同一套轨迹的镜像复用。
       </p>
       <div class="cards">
         <div class="card">
@@ -592,6 +593,7 @@ section > p code{
      motion 的 arc({ strength, direction })：
        strength —— 弧线峰高与「起终点距离」的比值（默认 0.5，1 表示峰高等于距离）
        direction —— 相对行进方向的顺/逆时针，决定凸向哪一侧
+     本实现固定 direction: "ccw"（恒向左侧鼓出），不随上下行翻转
      组件原式 strength = min(0.8, 14 / distance)：
        距离越短 → strength 越大（弧度越明显）；距离越长 → 触顶 0.8
      换算成像素峰高则为 min(0.8·d, 14)，

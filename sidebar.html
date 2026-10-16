@@ -628,12 +628,9 @@ section > p code{
     /* 像素峰高 = strength × distance，再乘观感系数 */
     var peakHeight = strength * distance * ARC_GAIN;
 
-    /* motion 的 direction 相对行进方向：
-       向下移动取 ccw → 凸向左侧（负 x）
-       向上移动取 cw  → 凸向右侧（正 x）
-       两侧各偏一次，来回切换形成对称的两次弧线 */
-    var bulge = delta > 0 ? -1 : 1;
-    var lateral = bulge * peakHeight;
+    /* 凸向固定为左侧（负 x），上下行不再翻转：
+       与 motion 的 direction:"ccw" 语义一致，弧线始终朝同一侧鼓出 */
+    var lateral = -peakHeight;
 
     var start = performance.now();
     var duration = 250;

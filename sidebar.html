@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>弹跳侧边栏</title>
+<style>
+:root{
+  --bg:#0a0a0f;
+  --card:#12121a;
+  --elevated:#1a1a24;
+  --border:rgba(255,255,255,.06);
+  --border-hi:rgba(255,255,255,.12);
+  --text:#e7e7ee;
+  --muted:#6b7280;
+  --dot:#f59e0b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:radial-gradient(1200px 700px at 12% -10%,rgba(245,158,11,.10),transparent 60%),var(--bg);
+  color:var(--text);
+  font-family:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  display:grid;
+  grid-template-columns:264px 1fr;
+  min-height:100vh;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+/* ---------- 侧边栏容器 ---------- */
+.aside{
+  border-right:1px solid var(--border);
+  padding:56px 20px 56px 28px;
+  position:sticky;
+  top:0;
+  align-self:start;
+  height:100vh;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;margin-bottom:40px;
+}
+.brand .logo{
+  width:30px;height:30px;border-radius:9px;
+  background:linear-gradient(135deg,#fbbf24,#d97706);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#241400;font-size:15px;
+  box-shadow:0 4px 14px rgba(245,158,11,.28);
+}
+.brand .name{font-weight:700;font-size:15px;letter-spacing:.01em}
+.brand .role{font-size:11px;color:var(--muted)}
+
+/* ---------- 弹跳侧边栏本体 ---------- */
+.sidebar{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding-left:24px;
+  list-style:none;
+}
+/* 弹跳圆点指示器 */
+.dot{
+  position:absolute;
+  left:8px;
+  top:0;
+  border-radius:999px;
+  background:var(--dot);
+  pointer-events:none;
+  opacity:0;
+  box-shadow:0 0 0 3px rgba(245,158,11,.14),0 0 12px rgba(245,158,11,.5);
+  will-change:transform;
+}
+.dot.show{opacity:1}
+.sidebar li{list-style:none}
+
+/* 分组标题 */
+.sidebar .heading{
+  padding:28px 4px 4px;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--dot);
+  opacity:.85;
+}
+.sidebar .heading:first-child{padding-top:0}
+
+/* 菜单项 */
+.sidebar .item{
+  display:flex;
+  align-items:center;
+  width:100%;
+  padding:4px;
+  border:0;
+  background:none;
+  font:inherit;
+  font-size:14px;
+  text-align:left;
+  color:rgba(231,231,238,.5);
+  border-radius:8px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:color .2s ease,background .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sidebar .item:hover{color:rgba(231,231,238,.82)}
+.sidebar .item.active{color:var(--text);font-weight:500}
+.sidebar .item .arrow{
+  margin-left:auto;font-size:11px;color:var(--dot);
+  opacity:0;transform:translateX(-4px);
+  transition:opacity .25s ease,transform .25s ease;
+}
+.sidebar .item.active .arrow{opacity:1;transform:translateX(0)}
+
+/* ---------- 主内容区 ---------- */
+.main{padding:64px 56px 96px;min-width:0}
+.kicker{
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dot);margin-bottom:14px;
+}
+h1{
+  font-family:"Outfit","DM Sans",-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:40px;line-height:1.08;letter-spacing:-.03em;font-weight:800;margin-bottom:16px;
+}
+h1 em{
+  font-style:normal;
+  background:linear-gradient(90deg,#fbbf24,#d97706);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lede{color:#9aa0ad;font-size:15px;line-height:1.75;max-width:600px;margin-bottom:44px}
+section{scroll-margin-top:40px;margin-bottom:72px}
+section h2{
+  font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:18px;
+  padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+section p{color:#9aa0ad;font-size:14.5px;line-height:1.85;max-width:640px;margin-bottom:14px}
+section p strong{color:var(--text);font-weight:600}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:6px}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;transition:border-color .25s,transform .25s,background .25s;
+}
+.card:hover{border-color:var(--border-hi);background:var(--elevated);transform:translateY(-2px)}
+.card .t{font-size:14px;font-weight:650;margin-bottom:8px;color:var(--text)}
+.card .d{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+.hint{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);
+  background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.16);
+  padding:8px 14px;border-radius:999px;margin-bottom:8px;
+}
+.hint b{color:var(--dot);font-weight:600}
+
+.foot{
+  border-top:1px solid var(--border);padding-top:22px;
+  font-size:12px;color:#4b5262;
+}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr}
+  .aside{
+    position:static;height:auto;border-right:0;
+    border-bottom:1px solid var(--border);
+    padding:32px 24px;
+  }
+  .main{padding:40px 24px 72px}
+  h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <aside class="aside">
+    <div class="brand">
+      <div class="logo">Z</div>
+      <div>
+        <div class="name">赵紫旭</div>
+        <div class="role">前端开发工程师</div>
+      </div>
+    </div>
+
+    <nav>
+      <ul class="sidebar" id="sidebar">
+        <span class="dot" id="dot" aria-hidden="true"></span>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <p class="kicker">Web 交互 · 组件演示</p>
+    <h1>弹跳<em>侧边栏</em></h1>
+    <p class="lede">
+      一个带圆点指示器的锚点侧边栏。选中项切换时，圆点不会直线平移，而是沿一段弧线
+      <strong>弹跳滑行</strong>到新位置；跨度越大，弧度越平缓。点击左侧菜单即可感受。
+    </p>
+
+    <div class="hint">提示 · <b>点击左侧任意菜单项</b>，观察圆点的弹跳轨迹</div>
+
+    <section id="overview">
+      <h2>概览</h2>
+      <p>
+        组件由三部分组成：<strong>分组标题</strong>、<strong>可点击菜单项</strong>，
+        以及一枚绝对定位的<strong>圆点指示器</strong>。菜单数据以数组描述，
+        每一项可以是纯字符串、带链接的对象，或标记为分组标题的对象。
+      </p>
+      <p>
+        圆点的纵向位置通过读取当前激活项的 <strong>offsetTop 与 offsetHeight</strong> 计算，
+        确保在字体加载完成、窗口尺寸变化后依然精准对齐。
+      </p>
+    </section>
+
+    <section id="bounce">
+      <h2>弹跳动画</h2>
+      <p>
+        位移量决定弧度：代码取 <strong>min(0.8, 14 / 距离)</strong> 作为弧线强度。
+        相邻菜单项之间距离小、弧度明显；跨分组长距离移动时弧度被压平，避免轨迹夸张。
+      </p>
+      <p>
+        方向也随之变化——<strong>向下移动时逆时针</strong>，<strong>向上移动时顺时针</strong>，
+        所以来回切换时圆点会走出相互对称的两条弧线。整个过渡时长 0.25 秒，缓出曲线。
+      </p>
+      <div class="cards">
+        <div class="card"><div class="t">高 DPI 适配</div><div class="d">按 devicePixelRatio 取整计算尺寸与坐标，避免在 2x 屏上出现半像素模糊。</div></div>
+        <div class="card"><div class="t">字体就绪对齐</div><div class="d">监听 document.fonts.ready 后重新吸附一次，解决字体加载导致的行高跳动。</div></div>
+        <div class="card"><div class="t">受控与非受控</div><div class="d">传入 value 即为受控模式，否则内部自行维护选中态，两种方式都能触发 onChange。</div></div>
+      </div>
+    </section>
+
+    <section id="grouping">
+      <h2>分组与选中态</h2>
+      <p>
+        分组标题使用 <strong>role="presentation"</strong> 不参与交互，仅作视觉分隔；
+        标题文本沿用圆点的主题色，与指示器形成呼应。
+      </p>
+      <p>
+        选中项以<strong>文字颜色深浅</strong>区分：未选中为半透明色，选中后恢复为正文色并略微加重字重，
+        在深色背景下既克制又清晰。
+      </p>
+    </section>
+
+    <section id="usage">
+      <h2>使用方式</h2>
+      <p>
+        传入 <strong>items</strong> 数组即可渲染，配合 <strong>dotColor</strong> 自定义指示器颜色。
+        菜单项支持 <strong>href</strong> 时渲染为链接，未提供时渲染为按钮，两种形态共享同一套选中逻辑。
+      </p>
+    </section>
+
+    <section id="notes">
+      <h2>实现说明</h2>
+      <p>
+        本页为 React 组件的<strong>原生复刻版</strong>，使用纯 HTML / CSS / JavaScript 实现，
+        不依赖任何框架或动画库。圆点动画通过 <strong>requestAnimationFrame</strong> 逐帧插值完成，
+        弧线使用二次贝塞尔路径采样。
+      </p>
+    </section>
+
+    <p class="foot">弹跳侧边栏 · 锚点导航组件演示</p>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DOT_COLOR = "#f59e0b";
+
+  /* 菜单数据：字符串 = 普通项，{label,heading} = 分组标题 */
+  var ITEMS = [
+    { label: "导航", heading: true },
+    { label: "概览", href: "#overview" },
+    { label: "弹跳动画", href: "#bounce" },
+    { label: "分组与选中态", href: "#grouping" },
+    { label: "使用方式", href: "#usage" },
+    { label: "实现说明", href: "#notes" }
+  ];
+
+  var list = document.getElementById("sidebar");
+  var dot = document.getElementById("dot");
+  var itemEls = [];
+  var activeIndex = 0;
+  var prevY = null;
+  var dotSize = 6;
+  var ready = false;
+  var rafId = null;
+
+  /* ---- 渲染菜单 ---- */
+  ITEMS.forEach(function (item, i) {
+    var li = document.createElement("li");
+
+    if (item.heading) {
+      li.className = "heading";
+      li.setAttribute("role", "presentation");
+      li.textContent = item.label;
+      li.style.color = DOT_COLOR;
+      list.appendChild(li);
+      itemEls[i] = li;
+      return;
+    }
+
+    if (item.href) {
+      var a = document.createElement("a");
+      a.className = "item";
+      a.href = item.href;
+      a.innerHTML = '<span>' + item.label + "</span>" + '<span class="arrow">→</span>';
+      li.appendChild(a);
+      a.addEventListener("click", function () { select(i); });
+    } else {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "item";
+      b.innerHTML = '<span>' + item.label + "</span>" + '<span class="arrow">→</span>';
+      li.appendChild(b);
+      b.addEventListener("click", function () { select(i); });
+    }
+
+    list.appendChild(li);
+    itemEls[i] = li;
+  });
+
+  /* ---- 尺寸计算（高 DPI 取整） ---- */
+  function measureDotSize() {
+    var dpr = window.devicePixelRatio || 1;
+    return Math.round(6 * dpr) / dpr;
+  }
+
+  function targetYFor(index) {
+    var el = itemEls[index];
+    if (!el) return null;
+    var dpr = window.devicePixelRatio || 1;
+    return Math.round((el.offsetTop + el.offsetHeight / 2 - dotSize / 2) * dpr) / dpr;
+  }
+
+  function paintDot() {
+    dot.style.width = dotSize + "px";
+    dot.style.height = dotSize + "px";
+    dot.style.background = DOT_COLOR;
+  }
+
+  /* ---- 无动画直接吸附 ---- */
+  function snap() {
+    var toY = targetYFor(activeIndex);
+    if (toY === null) return;
+    cancelAnim();
+    dot.style.transform = "translate3d(0," + toY + "px,0)";
+    prevY = toY;
+    if (!ready) {
+      ready = true;
+      dot.classList.add("show");
+    }
+  }
+
+  function cancelAnim() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  /* ---- 弹跳动画：二次贝塞尔弧线 ---- */
+  function bounceTo(toY, delta) {
+    var fromY = prevY;
+    var distance = Math.abs(delta);
+    /* 强度：距离越短弧度越明显，上限 0.8 */
+    var strength = Math.min(0.8, 14 / distance);
+    /* 水平方向偏移峰值（像素） */
+    var lateral = -7 * strength * 3;
+    if (delta < 0) lateral = -lateral; /* 向上：方向取反，形成对称弧线 */
+
+    var start = performance.now();
+    var duration = 250;
+
+    function frame(now) {
+      var t = (now - start) / duration;
+      if (t >= 1) t = 1;
+      /* easeOut */
+      var e = 1 - Math.pow(1 - t, 3);
+      var y = fromY + delta * e;
+      /* 弧线：sin(pi*t) 在 t=0.5 达峰值，两端归零 */
+      var x = lateral * Math.sin(Math.PI * t);
+      dot.style.transform =
+        "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0)";
+      if (t < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        rafId = null;
+        dot.style.transform = "translate3d(0," + toY + "px,0)";
+      }
+    }
+    cancelAnim();
+    rafId = requestAnimationFrame(frame);
+  }
+
+  /* ---- 选中 ---- */
+  function select(index) {
+    if (index === activeIndex) return;
+
+    /* 更新文字状态 */
+    itemEls.forEach(function (el, i) {
+      if (!el || el.classList.contains("heading")) return;
+      var inner = el.querySelector(".item");
+      if (inner) inner.classList.toggle("active", i === index);
+    });
+
+    var old = activeIndex;
+    activeIndex = index;
+    var toY = targetYFor(index);
+    if (toY === null) return;
+
+    if (prevY === null) {
+      snap();
+      return;
+    }
+    var delta = toY - prevY;
+    prevY = toY;
+    if (delta === 0) return;
+    bounceTo(toY, delta);
+  }
+
+  /* ---- 初始化 ---- */
+  function init() {
+    dotSize = measureDotSize();
+    paintDot();
+
+    /* 默认选中第一个非标题项 */
+    for (var i = 0; i < ITEMS.length; i++) {
+      if (!ITEMS[i].heading) { activeIndex = i; break; }
+    }
+    itemEls.forEach(function (el, i) {
+      if (!el || el.classList.contains("heading")) return;
+      var inner = el.querySelector(".item");
+      if (inner) inner.classList.toggle("active", i === activeIndex);
+    });
+
+    snap();
+    requestAnimationFrame(snap);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(snap);
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    dotSize = measureDotSize();
+    paintDot();
+    snap();
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

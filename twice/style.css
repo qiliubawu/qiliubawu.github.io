@@ -485,7 +485,8 @@ body.is-loading .nav{transform:translateY(-102%)}
   position:relative;
 }
 .album-meta{margin-top:16px;display:flex;flex-direction:column;gap:5px}
-.album-meta .dt{font-size:9px;letter-spacing:.3em;color:var(--mute-2);font-variant-numeric:tabular-nums}
+/* 发行日期现在是卡片上唯一的次要信息，比常规弱化文字提亮一档 */
+.album-meta .dt{font-size:9.5px;letter-spacing:.28em;color:rgba(246,244,240,.5);font-variant-numeric:tabular-nums}
 .album-meta h3{
   margin:0;font-family:var(--serif);font-weight:400;
   font-size:clamp(15px,1.34vw,19px);letter-spacing:.02em;color:rgba(246,244,240,.9);

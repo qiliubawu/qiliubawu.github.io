@@ -315,84 +315,155 @@
 
     wrap.innerHTML =
       '<div class="vui-stage" id="vuiStage">' +
+        '<span class="vui-tag">PREVIEW · GLASS KIT</span>' +
         '<span class="vui-blob b1" id="vb1"></span>' +
         '<span class="vui-blob b2" id="vb2"></span>' +
-        '<span class="vui-blob b3" id="vb3"></span>' +
-        '<div class="vui-card" id="vuiCard">' +
-          '<span class="vui-pill">VisionUI · Glass</span>' +
-          "<h3>空间组件沙盒</h3>" +
-          "<p>左侧调色、右侧调参，移动光标改变透视。</p>" +
+        '<span class="vui-disc d1" id="vd1"></span>' +
+        '<span class="vui-disc d2" id="vd2"></span>' +
+        '<span class="vui-disc d3" id="vd3"></span>' +
+
+        '<div class="vk" id="vk">' +
+          '<div class="vk-head">' +
+            '<span class="vk-avatar">Z</span>' +
+            '<span class="vk-id"><b>赵紫旭</b><small>Frontend Developer</small></span>' +
+            '<span class="vk-badge">PRO</span>' +
+          "</div>" +
+
+          '<div class="vk-stats">' +
+            '<div class="vk-stat"><b>6</b><span>Projects</span></div>' +
+            '<div class="vk-stat"><b>3</b><span>Years</span></div>' +
+            '<div class="vk-stat"><b>60</b><span>FPS</span></div>' +
+          "</div>" +
+
+          '<div class="vk-seg" id="vkSeg">' +
+            '<button type="button" data-mode="glass" aria-pressed="true">玻璃</button>' +
+            '<button type="button" data-mode="solid" aria-pressed="false">实体</button>' +
+            '<button type="button" data-mode="line" aria-pressed="false">描边</button>' +
+          "</div>" +
+
+          '<div class="vk-foot">' +
+            '<span class="vk-switch" id="vkSwitch" role="switch" aria-checked="true" tabindex="0"><i></i></span>' +
+            '<span class="vk-switch-label">跟随光标</span>' +
+            '<button class="vk-btn" type="button">查看作品</button>' +
+          "</div>" +
         "</div>" +
       "</div>" +
+
       '<div class="vui-panel">' +
-        '<div class="vui-title">COLOR · 自定义配色</div>' +
+        '<div class="vui-title">COLOR</div>' +
         '<div class="vui-colors">' +
-          '<label class="vui-color"><input type="color" id="vC1" value="#2F7CF6"><span>起始</span></label>' +
-          '<label class="vui-color"><input type="color" id="vC2" value="#7C4DFF"><span>中间</span></label>' +
-          '<label class="vui-color"><input type="color" id="vC3" value="#F04E98"><span>结束</span></label>' +
+          '<label class="vui-color"><input type="color" id="vC1" value="#2F7CF6"><span>主色</span></label>' +
+          '<label class="vui-color"><input type="color" id="vC2" value="#7C4DFF"><span>辅色</span></label>' +
+          '<label class="vui-color"><input type="color" id="vC3" value="#F04E98"><span>点缀</span></label>' +
         "</div>" +
         '<div class="vui-presets" id="vuiPresets">' + swatches + "</div>" +
-        '<div class="vui-title" style="margin-top:4px">PROPERTIES</div>' +
+
+        '<div class="vui-title">MATERIAL</div>' +
         '<div class="vui-row">' +
-          '<label>毛玻璃模糊 <b><span id="vBlurV">12</span>px</b></label>' +
-          '<input id="vBlur" type="range" min="0" max="30" value="12">' +
+          '<label>毛玻璃模糊 <b><span id="vBlurV">18</span>px</b></label>' +
+          '<input id="vBlur" type="range" min="0" max="40" value="18">' +
         "</div>" +
         '<div class="vui-row">' +
-          '<label>圆角 <b><span id="vRadV">26</span>px</b></label>' +
-          '<input id="vRad" type="range" min="0" max="60" value="26">' +
+          '<label>圆角 <b><span id="vRadV">24</span>px</b></label>' +
+          '<input id="vRad" type="range" min="0" max="44" value="24">' +
         "</div>" +
-        '<div class="vui-row">' +
-          '<label>静态倾角 <b><span id="vTiltV">0</span>°</b></label>' +
-          '<input id="vTilt" type="range" min="-20" max="20" value="0">' +
+        '<div class="vui-row vui-row-wide">' +
+          '<label>边缘高光 <b><span id="vEdgeV">55</span>%</b></label>' +
+          '<input id="vEdge" type="range" min="0" max="100" value="55">' +
         "</div>" +
-        '<div class="vui-row">' +
-          '<label>悬停跟随 <b><span id="vFollowV">100</span>%</b></label>' +
+
+        '<div class="vui-title">MOTION</div>' +
+        '<div class="vui-row vui-row-wide">' +
+          '<label>倾角跟随 <b><span id="vFollowV">100</span>%</b></label>' +
           '<input id="vFollow" type="range" min="0" max="100" value="100">' +
         "</div>" +
-        '<div class="vui-note">' +
-          "配色与参数全部走 CSS 自定义属性，无重排；倾角由 pointermove 实时写 " +
-          "<code>rotateX/Y</code>，与桌面主循环共用同一套指针状态。" +
+
+        '<div class="vui-out">' +
+          '<div class="vui-title">OUTPUT</div>' +
+          '<pre class="vui-code" id="vuiCode"></pre>' +
         "</div>" +
+
+        '<div class="vui-actions">' +
+          '<button class="vui-copy" type="button" id="vuiCopy">复制 CSS 变量</button>' +
+        "</div>" +
+        '<div class="vui-toast" id="vuiToast"></div>' +
       "</div>";
+
     el.appendChild(wrap);
 
     var stage = wrap.querySelector("#vuiStage");
-    var card = wrap.querySelector("#vuiCard");
+    var kit = wrap.querySelector("#vk");
     var blobs = [
       wrap.querySelector("#vb1"),
-      wrap.querySelector("#vb2"),
-      wrap.querySelector("#vb3")
+      wrap.querySelector("#vb2")
+    ];
+    var discs = [
+      wrap.querySelector("#vd1"),
+      wrap.querySelector("#vd2"),
+      wrap.querySelector("#vd3")
     ];
 
     var state = {
-      blur: 12, radius: 26, tilt: 0, follow: 1,
+      blur: 18, radius: 24, edge: 0.55, follow: 1,
+      mode: "glass",
       c: ["#2f7cf6", "#7c4dff", "#f04e98"]
     };
 
     function paintColors() {
-      card.style.setProperty("--v-c1", hexToRgba(state.c[0], 0.88));
-      card.style.setProperty("--v-c2", hexToRgba(state.c[1], 0.84));
-      card.style.setProperty("--v-c3", hexToRgba(state.c[2], 0.84));
+      kit.style.setProperty("--v-c1", state.c[0]);
+      kit.style.setProperty("--v-c2", state.c[1]);
+      kit.style.setProperty("--v-c3", state.c[2]);
+      kit.style.setProperty("--v-t1", hexToRgba(state.c[0], 0.14));
+      kit.style.setProperty("--v-t2", hexToRgba(state.c[1], 0.12));
+      kit.style.setProperty("--v-t3", hexToRgba(state.c[2], 0.13));
+      /* 深色背景上同样的透明度会看不见，单独给一组更浓的 */
+      kit.style.setProperty("--v-t1d", hexToRgba(state.c[0], 0.26));
+      kit.style.setProperty("--v-t2d", hexToRgba(state.c[1], 0.24));
+      kit.style.setProperty("--v-t3d", hexToRgba(state.c[2], 0.24));
 
       /* 背景光斑跟着配色走，毛玻璃才有可折射的东西 */
       blobs.forEach(function (b, i) {
         b.style.background =
           "radial-gradient(circle," + state.c[i] + ",transparent 70%)";
       });
+      /* 硬边色盘：模糊滑块拉到 0 时是锐利的圆，拉满就化开，差别一眼可见 */
+      discs.forEach(function (d, i) {
+        d.style.backgroundColor = state.c[i];
+      });
 
       Array.prototype.forEach.call(
         wrap.querySelectorAll(".vui-color input"),
         function (inp, i) { inp.value = state.c[i]; }
       );
+      syncCode();
     }
 
     function apply() {
-      card.style.setProperty("--v-blur", state.blur + "px");
-      card.style.setProperty("--v-radius", state.radius + "px");
+      kit.style.setProperty("--v-blur", state.blur + "px");
+      kit.style.setProperty("--v-radius", state.radius + "px");
+      kit.style.setProperty("--v-edge", state.edge);
       wrap.querySelector("#vBlurV").textContent = state.blur;
       wrap.querySelector("#vRadV").textContent = state.radius;
-      wrap.querySelector("#vTiltV").textContent = state.tilt;
+      wrap.querySelector("#vEdgeV").textContent = Math.round(state.edge * 100);
       wrap.querySelector("#vFollowV").textContent = Math.round(state.follow * 100);
+      syncCode();
+    }
+
+    /* 面板里实时回显当前变量，配完直接抄走 */
+    function syncCode() {
+      var codeEl = wrap.querySelector("#vuiCode");
+      if (!codeEl) return;
+      var rows = [
+        ["--v-c1", state.c[0]],
+        ["--v-c2", state.c[1]],
+        ["--v-c3", state.c[2]],
+        ["--v-blur", state.blur + "px"],
+        ["--v-radius", state.radius + "px"],
+        ["--v-edge", state.edge.toFixed(2)]
+      ];
+      codeEl.innerHTML = rows.map(function (r) {
+        return '<span class="ln"><i>' + r[0] + "</i>: " + r[1] + ";</span>";
+      }).join("");
     }
 
     function bind(id, key, transform) {
@@ -404,10 +475,9 @@
     }
     bind("vBlur", "blur");
     bind("vRad", "radius");
-    bind("vTilt", "tilt");
+    bind("vEdge", "edge", function (v) { return v / 100; });
     bind("vFollow", "follow", function (v) { return v / 100; });
 
-    /* 三色自定义 */
     ["vC1", "vC2", "vC3"].forEach(function (id, i) {
       var inp = wrap.querySelector("#" + id);
       inp.addEventListener("input", function () {
@@ -416,35 +486,86 @@
       });
     });
 
-    /* 预设 */
     wrap.querySelector("#vuiPresets").addEventListener("click", function (e) {
       var b = e.target.closest(".vui-swatch");
       if (!b) return;
-      var p = VUI_PRESETS[+b.getAttribute("data-i")];
-      state.c = p.c.slice();
+      state.c = VUI_PRESETS[+b.getAttribute("data-i")].c.slice();
       paintColors();
       if (window.ZZX && window.ZZX.playNote) window.ZZX.playNote(2);
+    });
+
+    /* 材质三态：玻璃 / 实体 / 描边 */
+    wrap.querySelector("#vkSeg").addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      state.mode = b.getAttribute("data-mode");
+      kit.className = "vk" + (state.mode === "glass" ? "" : " m-" + state.mode);
+      Array.prototype.forEach.call(
+        wrap.querySelectorAll("#vkSeg button"),
+        function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }
+      );
+      if (window.ZZX && window.ZZX.playNote) window.ZZX.playNote(1);
+    });
+
+    /* 开关 */
+    var sw = wrap.querySelector("#vkSwitch");
+    function toggleSw() {
+      var on = sw.getAttribute("aria-checked") !== "true";
+      sw.setAttribute("aria-checked", on ? "true" : "false");
+      state.follow = on ? 1 : 0;
+      wrap.querySelector("#vFollow").value = on ? 100 : 0;
+      wrap.querySelector("#vFollowV").textContent = on ? 100 : 0;
+      if (on) { kit.style.setProperty("--v-rx", "0deg"); kit.style.setProperty("--v-ry", "0deg"); }
+    }
+    sw.addEventListener("click", toggleSw);
+    sw.addEventListener("keydown", function (e) {
+      if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggleSw(); }
+    });
+
+    /* 复制 CSS */
+    var toastEl = wrap.querySelector("#vuiToast");
+    var toastTimer = null;
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("on");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toastEl.classList.remove("on"); }, 1600);
+    }
+
+    wrap.querySelector("#vuiCopy").addEventListener("click", function () {
+      var css =
+        ":root {\n" +
+        "  --v-c1: " + state.c[0] + ";\n" +
+        "  --v-c2: " + state.c[1] + ";\n" +
+        "  --v-c3: " + state.c[2] + ";\n" +
+        "  --v-blur: " + state.blur + "px;\n" +
+        "  --v-radius: " + state.radius + "px;\n" +
+        "  --v-edge: " + state.edge.toFixed(2) + ";\n" +
+        "  --v-tilt: " + Math.round(state.follow * 18) + "deg;\n" +
+        "}";
+      if (window.ZZX && window.ZZX.copy) window.ZZX.copy(css);
+      toast("已复制到剪贴板");
+      if (window.ZZX && window.ZZX.playNote) window.ZZX.playNote(3);
     });
 
     paintColors();
     apply();
 
+    /* 指针透视 */
     stage.addEventListener("pointermove", function (e) {
       var r = stage.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width - 0.5;
       var py = (e.clientY - r.top) / r.height - 0.5;
-      var rx = state.tilt + py * -18 * state.follow;
-      var ry = px * 18 * state.follow;
-      card.style.setProperty("--v-rx", rx.toFixed(2) + "deg");
-      card.style.setProperty("--v-ry", ry.toFixed(2) + "deg");
+      kit.style.setProperty("--v-rx", (py * -14 * state.follow).toFixed(2) + "deg");
+      kit.style.setProperty("--v-ry", (px * 14 * state.follow).toFixed(2) + "deg");
     });
 
     stage.addEventListener("pointerleave", function () {
-      card.style.setProperty("--v-rx", state.tilt + "deg");
-      card.style.setProperty("--v-ry", "0deg");
+      kit.style.setProperty("--v-rx", "0deg");
+      kit.style.setProperty("--v-ry", "0deg");
     });
 
-    card.style.setProperty("--v-rx", "0deg");
+    kit.style.setProperty("--v-rx", "0deg");
   }
 
   /* ============================================================

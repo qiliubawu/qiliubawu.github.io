@@ -250,8 +250,9 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
 .folder-body{
   position:relative;
   width:100%;height:100%;
+  /* 只保留 perspective 给前盖的 3D 掀开用；
+     不加 preserve-3d，避免子元素脱离 z-index 排序、与前盖争层级 */
   perspective:820px;
-  transform-style:preserve-3d;
 }
 
 /* 呼吸起伏（仅休眠态） */
@@ -314,11 +315,14 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   height:164px;
   border-radius:16px;
   z-index:3;
-  overflow:hidden;
   transform-origin:50% 100%;
   transform:rotateX(0deg);
   transition:transform .72s var(--sp);
-  transform-style:preserve-3d;
+  /* 内部元素（高光层、眼睛）都不溢出，无需 overflow:hidden；
+     一旦加上它会强制把 preserve-3d 扁平化，并在 3D 过渡中
+     让圆角裁剪算错，导致回落时整块闪掉一帧。 */
+  backface-visibility:hidden;
+  will-change:transform;
   background:
     linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0) 38%),
     linear-gradient(163deg, var(--folder-a) 0%, var(--folder-b) 48%, var(--folder-c) 100%);
@@ -373,7 +377,22 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   opacity:0;
   transform:scale(.35);
   display:grid;place-items:center;
-  transition:opacity .24s ease, transform .46s var(--sp);
+  /* 基础态为「内切椭圆」= 不裁剪；半睁时把椭圆中心下移、垂直半径缩小，
+     即上眼睑压下来，过渡可平滑插值 */
+  clip-path:ellipse(50% 50% at 50% 50%);
+  transition:opacity .24s ease, transform .46s var(--sp), clip-path .5s var(--sp-soft);
+}
+/* 眼皮投影：贴在眼球上部，随裁剪一起被切，形成眼睑压下来的暗边 */
+.ball::before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(180deg,
+    rgba(14,36,56,.55) 0%,
+    rgba(14,36,56,.38) 58%,
+    rgba(14,36,56,.08) 76%,
+    rgba(14,36,56,0) 100%);
+  opacity:0;
+  transition:opacity .4s ease;
+  pointer-events:none;
 }
 .pupil{
   width:15px;height:15px;border-radius:50%;
@@ -386,6 +405,7 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   content:"";position:absolute;top:2px;left:3px;
   width:5px;height:5px;border-radius:50%;
   background:#fff;opacity:.92;
+  transition:opacity .3s ease;
 }
 
 /* 休眠 → 唤醒：睁眼 */
@@ -394,27 +414,40 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
 .scene[data-state="awake"] .ball,
 .scene[data-state="open"]  .ball{opacity:1;transform:scale(1)}
 
-/* 悬停：眯眼 + 轻颤
-   眯眼只用一个形状表达——眼球压成一条缝、完全不透明；
-   闭眼弧同时隐去，避免「半透眼球 + 弧线」两层叠加出错位黑线。 */
+/* 悬停：被吵醒后困倦地睁开一条缝
+   —— 只用一个形状表达：眼球本身不压扁，改由 clip-path 让「上眼睑」压下来，
+      露出下半只眼，再叠一层眼皮投影，眼白带暖灰、瞳孔下沉，做出没睡醒的钝感。
+      闭眼弧同时隐去，不与眼球叠加。 */
 .scene[data-state="sleep"] .folder:hover .arc{opacity:0;transform:scaleY(.2)}
 .scene[data-state="sleep"] .folder:hover .ball{
   opacity:1;
-  transform:scaleX(1.08) scaleY(.26);
-  /* 过渡比基础态更快、更克制，避免 --sp 的大幅回弹把眼缝弹到翻转 */
-  transition:opacity .16s ease, transform .36s cubic-bezier(.22,1.12,.36,1);
+  background:#EDEAE2;                     /* 困倦时眼白偏暖灰，不刺眼 */
+  transform:scale(1);
+  /* 上边界落在 52%，只露下半只眼 */
+  clip-path:ellipse(56% 38% at 50% 90%);
+  transition:opacity .22s ease,
+             transform .44s var(--sp-soft),
+             clip-path .55s var(--sp-soft),
+             background .4s ease;
+  /* 撑不住似的缓缓再阖上一点，再勉强睁开 */
+  animation:peek 2.8s ease-in-out .55s infinite;
 }
-/* 眼缝里留一颗瞳孔，才看得出是在「眯眼看你」而不是闭着。
-   父级已把纵向压到 .26，故这里反向放大，避免瞳孔被压成一条线；
-   但不宜撑满眼缝，留出上下眼白才像「半阖」。 */
+.scene[data-state="sleep"] .folder:hover .ball::before{opacity:1}
+/* 瞳孔缩小、沉到眼缝下部：上缘被眼皮轻压，但不至于被切成半月形 */
 .scene[data-state="sleep"] .folder:hover .pupil{
-  transform:translate(var(--ex,0px), var(--ey,0px)) scale(.72, 1);
+  transform:translate(var(--ex,0px), calc(var(--ey,0px) + 3.5px)) scale(.75);
 }
-.scene[data-state="sleep"] .folder:hover .face{animation:tremble 1.4s ease-in-out infinite}
-@keyframes tremble{
-  0%,100%{transform:translateX(0)}
-  25%    {transform:translateX(-1.1px)}
-  75%    {transform:translateX(1.1px)}
+.scene[data-state="sleep"] .folder:hover .pupil::after{opacity:.45}
+/* 眼皮沉重地往下坠，而不是轻快的横向颤动 */
+.scene[data-state="sleep"] .folder:hover .face{animation:drowsy 2.8s ease-in-out infinite}
+@keyframes drowsy{
+  0%,100%{transform:translate(0,0)}
+  38%    {transform:translate(-.5px,1px)}
+  72%    {transform:translate(.5px,.5px)}
+}
+@keyframes peek{
+  0%,100%{clip-path:ellipse(56% 38% at 50% 90%)}
+  55%    {clip-path:ellipse(56% 29% at 50% 98%)}
 }
 
 /* 唤醒：前盖斜掀 */
@@ -808,6 +841,9 @@ html[data-theme="dark"] .zzz i{color:#E6E6EA}
 /* ---------- 减少动态偏好 ---------- */
 @media (prefers-reduced-motion:reduce){
   .orb,.file-float,.scene[data-state="sleep"] .folder{animation:none !important}
+  /* 困倦的「阖眼—撑开」循环与眼皮下沉也一并停掉，只留静态半睁 */
+  .scene[data-state="sleep"] .folder:hover .ball,
+  .scene[data-state="sleep"] .folder:hover .face{animation:none !important}
   .zzz i{animation:none;opacity:.7}
   *{transition-duration:.01ms !important}
 }

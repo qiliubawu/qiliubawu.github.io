@@ -352,22 +352,6 @@ section{padding:104px 0;position:relative}
 }
 .hero-poem .em{color:var(--cinnabar-lit)}
 
-.hero-scroll{
-  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
-  font-size:11px;letter-spacing:.3em;color:var(--ink-3);
-  font-family:var(--font-sans);
-  display:grid;justify-items:center;gap:8px;
-}
-.hero-scroll .bar{
-  width:1px;height:34px;
-  background:linear-gradient(180deg,var(--gold),transparent);
-  animation:drop 2.1s ease-in-out infinite;
-}
-@keyframes drop{
-  0%,100%{opacity:.3;transform:scaleY(.6)}
-  50%{opacity:1;transform:scaleY(1)}
-}
-
 /* ============================================================
    模块一：十二兽图鉴（3D 翻转卡）
    ============================================================ */
@@ -782,6 +766,5 @@ html.paper .art-panel .veil{
 /* 减少动态偏好 */
 @media (prefers-reduced-motion:reduce){
   .ring-outer,.ring-inner{animation:none}
-  .hero-scroll .bar{animation:none}
   *{transition-duration:.01ms !important}
 }

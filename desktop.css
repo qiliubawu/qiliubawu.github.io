@@ -394,9 +394,22 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
 .scene[data-state="awake"] .ball,
 .scene[data-state="open"]  .ball{opacity:1;transform:scale(1)}
 
-/* 悬停：半眯（露出一条缝）+ 轻颤 */
-.scene[data-state="sleep"] .folder:hover .arc{transform:scaleY(.55)}
-.scene[data-state="sleep"] .folder:hover .ball{opacity:.34;transform:scale(.62)}
+/* 悬停：眯眼 + 轻颤
+   眯眼只用一个形状表达——眼球压成一条缝、完全不透明；
+   闭眼弧同时隐去，避免「半透眼球 + 弧线」两层叠加出错位黑线。 */
+.scene[data-state="sleep"] .folder:hover .arc{opacity:0;transform:scaleY(.2)}
+.scene[data-state="sleep"] .folder:hover .ball{
+  opacity:1;
+  transform:scaleX(1.08) scaleY(.26);
+  /* 过渡比基础态更快、更克制，避免 --sp 的大幅回弹把眼缝弹到翻转 */
+  transition:opacity .16s ease, transform .36s cubic-bezier(.22,1.12,.36,1);
+}
+/* 眼缝里留一颗瞳孔，才看得出是在「眯眼看你」而不是闭着。
+   父级已把纵向压到 .26，故这里反向放大，避免瞳孔被压成一条线；
+   但不宜撑满眼缝，留出上下眼白才像「半阖」。 */
+.scene[data-state="sleep"] .folder:hover .pupil{
+  transform:translate(var(--ex,0px), var(--ey,0px)) scale(.72, 1);
+}
 .scene[data-state="sleep"] .folder:hover .face{animation:tremble 1.4s ease-in-out infinite}
 @keyframes tremble{
   0%,100%{transform:translateX(0)}

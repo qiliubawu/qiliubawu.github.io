@@ -284,11 +284,12 @@ body.is-loading .nav{transform:translateY(-102%)}
 .muse-art img{
   position:absolute;left:0;top:0;
   display:block;width:100%;height:50%;
-  object-fit:cover;object-position:50% 14%;
+  /* 细条只裁左右，纵向给多少都不影响取景 */
+  object-fit:cover;object-position:50% 50%;
   transition:height 1s var(--ease),object-position 1s var(--ease);
 }
 .muse:hover .muse-art img,.muse:focus-visible .muse-art img,.muse.is-open .muse-art img{
-  height:100%;object-position:50% 22%;
+  height:100%;object-position:50% var(--pos,22%);
 }
 /* 展开时浮起一个巨大的首字母，杂志式的版式重心 */
 .muse::before{
@@ -375,8 +376,8 @@ body.is-loading .nav{transform:translateY(-102%)}
   .muse{height:150px;flex:none;transition:height .8s var(--ease)}
   .muse:hover,.muse:focus-visible,.muse.is-open{flex-grow:0;height:340px}
   /* 触屏是横向长条，照片直接铺满整行 */
-  .muse-art img{height:100%;object-position:50% 48%}
-  .muse:hover .muse-art img,.muse.is-open .muse-art img{object-position:50% 24%}
+  .muse-art img{height:100%;object-position:50% var(--posM,50%)}
+  .muse:hover .muse-art img,.muse.is-open .muse-art img{object-position:50% var(--pos,42%)}
   /* 底部那道光改成左侧竖线，像书脊上的色标 */
   .muse::after{
     left:0;right:auto;top:0;bottom:0;width:2px;height:auto;

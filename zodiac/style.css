@@ -362,7 +362,9 @@ section{padding:104px 0;position:relative}
 }
 .card-wrap{
   perspective:1200px;
-  height:340px;
+  /* 340 是中文文案的高度；换成英文后每行信息量变少，背面要 6~7 行才排得下，
+     留 24px 余量，免得字体回退或窄栏时被 overflow:hidden 裁掉末行 */
+  height:364px;
   cursor:pointer;
 }
 .card-inner{
@@ -407,9 +409,11 @@ section{padding:104px 0;position:relative}
   transform:translateY(-4px) scale(1.06);
   filter:drop-shadow(0 10px 26px rgba(212,175,55,.6));
 }
+/* 卡片文字为英文：Kaiti 的拉丁字形很糟，标题改走衬线；字距也收紧，
+   text-indent 与 letter-spacing 等值，抵消末字后面那段字距造成的偏左 */
 .card-front .name{
-  font-family:var(--font-kaishu);
-  font-size:24px;font-weight:700;letter-spacing:.16em;text-indent:.16em;
+  font-family:var(--font-serif);
+  font-size:24px;font-weight:700;letter-spacing:.1em;text-indent:.1em;
   color:var(--ink);
 }
 .card-front .meta{
@@ -422,7 +426,7 @@ section{padding:104px 0;position:relative}
 }
 .card-front .elem{
   margin-top:11px;
-  font-size:11px;letter-spacing:.18em;color:var(--gold);
+  font-size:11px;letter-spacing:.1em;color:var(--gold);
   border:1px solid var(--border-hi);border-radius:99px;
   padding:3px 12px;font-family:var(--font-sans);
 }
@@ -437,8 +441,8 @@ section{padding:104px 0;position:relative}
   justify-content:flex-start;gap:11px;
 }
 .card-back .bk-ttl{
-  font-family:var(--font-kaishu);font-size:19px;font-weight:700;
-  letter-spacing:.12em;color:var(--gold);
+  font-family:var(--font-serif);font-size:19px;font-weight:700;
+  letter-spacing:.04em;color:var(--gold);
   display:flex;align-items:center;gap:9px;
 }
 .card-back .bk-ttl::before{
@@ -451,7 +455,9 @@ section{padding:104px 0;position:relative}
   padding-bottom:11px;border-bottom:1px dashed var(--border);
 }
 .card-back .bk-desc{
-  font-size:13px;line-height:1.9;color:var(--ink-2);
+  /* 英文比中文占行，行高收到 1.72、字号降到 12.5，才塞得进 340px 的定高卡片 */
+  font-size:12.5px;line-height:1.72;color:var(--ink-2);
+  letter-spacing:.005em;
 }
 .card-back .bk-traits{
   margin-top:auto;display:flex;flex-wrap:wrap;gap:7px;
@@ -459,7 +465,7 @@ section{padding:104px 0;position:relative}
 .card-back .bk-traits span{
   font-size:11px;padding:3px 10px;border-radius:99px;
   background:var(--fold);border:1px solid var(--border);
-  color:var(--ink-2);font-family:var(--font-sans);letter-spacing:.05em;
+  color:var(--ink-2);font-family:var(--font-sans);letter-spacing:.02em;
 }
 .card-back .bk-motif{
   position:absolute;right:-14px;bottom:-22px;
@@ -762,6 +768,10 @@ html.paper .art-panel .veil{
   .zodiac-node .glyph{font-size:17px}
   .tab-body{padding:20px}
   .tabs label{padding:8px 13px;font-size:12.5px}
+  /* 单列时卡片变宽、文案只有四五列，固定高度会在描述和标签之间留一大块空白。
+     背面改成整体垂直居中，空白分到上下两侧，看着是留白而不是漏排 */
+  .card-back{justify-content:center}
+  .card-back .bk-traits{margin-top:0}
 }
 /* 减少动态偏好 */
 @media (prefers-reduced-motion:reduce){

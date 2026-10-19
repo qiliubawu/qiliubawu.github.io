@@ -15,31 +15,31 @@
      数据
      ============================================================ */
   var MUSES = [
-    { n: "NAYEON", rom: "I", role: "Lead Vocalist", c1: "#8FD0F5", c2: "#4E7FB8", c3: "#1B2740",
+    { n: "NAYEON", img: "muses/01.webp", rom: "I", role: "Lead Vocalist", c1: "#8FD0F5", c2: "#4E7FB8", c3: "#1B2740",
       meta: ["Solo · POP! (2022)", "Solo · ABCD (2024)"],
       note: "The first to step out alone — and the stage simply made room." },
-    { n: "JEONGYEON", rom: "II", role: "Lead Vocalist", c1: "#C6DE8E", c2: "#7E9B4E", c3: "#26301A",
+    { n: "JEONGYEON", img: "muses/02.webp", rom: "II", role: "Lead Vocalist", c1: "#C6DE8E", c2: "#7E9B4E", c3: "#26301A",
       meta: ["Melody Project", "Unit · 3Mix"],
       note: "A voice like warm daylight; the calm at the centre of the storm." },
-    { n: "MOMO", rom: "III", role: "Main Dancer", c1: "#FF9EC0", c2: "#C25A84", c3: "#3A1A28",
+    { n: "MOMO", img: "muses/03.webp", rom: "III", role: "Main Dancer", c1: "#FF9EC0", c2: "#C25A84", c3: "#3A1A28",
       meta: ["Unit · MISAMO", "Do not touch (2023)"],
       note: "Every count she keeps is a sentence in a language only bodies speak." },
-    { n: "SANA", rom: "IV", role: "Sub Vocalist", c1: "#C4A8F0", c2: "#7E5CB8", c3: "#2A1F42",
+    { n: "SANA", img: "muses/04.webp", rom: "IV", role: "Sub Vocalist", c1: "#C4A8F0", c2: "#7E5CB8", c3: "#2A1F42",
       meta: ["Unit · MISAMO", "Do not touch (2023)"],
       note: "Effortless charm, engineered with terrifying precision." },
-    { n: "JIHYO", rom: "V", role: "Leader · Main Vocalist", c1: "#FF9A7A", c2: "#C2553C", c3: "#3C1C14",
+    { n: "JIHYO", img: "muses/05.webp", rom: "V", role: "Leader · Main Vocalist", c1: "#FF9A7A", c2: "#C2553C", c3: "#3C1C14",
       meta: ["Solo · Killin' Me Good (2023)", "Leader since 2015"],
       note: "Ten years of leading from the front, never once raising her voice." },
-    { n: "MINA", rom: "VI", role: "Main Dancer", c1: "#8FE8D0", c2: "#3F9E8A", c3: "#123029",
+    { n: "MINA", img: "muses/06.webp", rom: "VI", role: "Main Dancer", c1: "#8FE8D0", c2: "#3F9E8A", c3: "#123029",
       meta: ["Unit · MISAMO", "Do not touch (2023)"],
       note: "Stillness, then a single line of movement that redraws the room." },
-    { n: "DAHYUN", rom: "VII", role: "Lead Rapper", c1: "#EDEDF2", c2: "#8E8EA0", c3: "#22222A",
+    { n: "DAHYUN", img: "muses/07.webp", rom: "VII", role: "Lead Rapper", c1: "#EDEDF2", c2: "#8E8EA0", c3: "#22222A",
       meta: ["Melody Project", "Unit · 3Mix"],
       note: "Brightness as strategy — the wit behind the smile." },
-    { n: "CHAEYOUNG", rom: "VIII", role: "Main Rapper", c1: "#F07A6A", c2: "#A83A2E", c3: "#33120E",
+    { n: "CHAEYOUNG", img: "muses/08.webp", rom: "VIII", role: "Main Rapper", c1: "#F07A6A", c2: "#A83A2E", c3: "#33120E",
       meta: ["Melody Project", "Lyricist · in-house"],
       note: "Ink, rhythm, and a refusal to be anyone's draft." },
-    { n: "TZUYU", rom: "IX", role: "Lead Dancer · Visual", c1: "#7A9CFF", c2: "#3A55B8", c3: "#141C38",
+    { n: "TZUYU", img: "muses/09.webp", rom: "IX", role: "Lead Dancer · Visual", c1: "#7A9CFF", c2: "#3A55B8", c3: "#141C38",
       meta: ["Solo · Run Away (2024)", "Maknae"],
       note: "Poise so complete it looks like silence." }
   ];
@@ -357,7 +357,9 @@
       el.setAttribute("aria-label", m.n + " — " + m.role);
       el.dataset.initial = m.n.charAt(0);
       el.innerHTML =
-        '<div class="muse-art"></div>' +
+        '<div class="muse-art">' +
+          '<img src="' + m.img + '" alt="' + m.n + '" loading="lazy" decoding="async">' +
+        '</div>' +
         '<div class="muse-index">' + m.rom + '</div>' +
         '<div class="muse-name">' + m.n + '</div>' +
         '<div class="muse-info">' +
@@ -385,7 +387,7 @@
       el.addEventListener("blur", function () { glow(false); });
       /* 触屏：点一下展开 */
       el.addEventListener("click", function () {
-        if (matchMedia("(hover:none)").matches) el.classList.toggle("is-open");
+        if (matchMedia("(hover:none),(pointer:coarse)").matches) el.classList.toggle("is-open");
       });
     });
     applyLang(lang);

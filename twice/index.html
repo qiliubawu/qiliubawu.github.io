@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TWICE — ONE IN A MILLION</title>
+<meta name="description" content="An editorial tribute to TWICE — nine voices, a decade on stage, and a world lit up in candy light.">
+<meta name="theme-color" content="#0B0B0E">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body class="is-loading">
+
+<!-- 微噪点 + 环境极光 -->
+<div class="grain" aria-hidden="true"></div>
+<div class="ambient" aria-hidden="true"><i class="a"></i><i class="b"></i></div>
+
+<!-- Candybong 光标 -->
+<canvas class="cursor-trail" id="cursorTrail" aria-hidden="true"></canvas>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<!-- 载入：罗马数字 IX 的线条 -->
+<div class="loader" id="loader" aria-hidden="true">
+  <svg class="loader-ix" viewBox="0 0 120 64" fill="none">
+    <path class="s1" d="M30 8v48"/>
+    <path class="s2" d="M90 8L56 56"/>
+    <path class="s3" d="M56 8L90 56"/>
+  </svg>
+  <div class="loader-bar"><i id="loaderBar"></i></div>
+  <div class="loader-num" id="loaderNum">00</div>
+</div>
+
+<nav class="nav" id="nav">
+  <a class="nav-mark" href="#top">TWICE</a>
+  <div class="nav-links">
+    <a href="#muses" data-i18n="nav.nine">The Nine</a>
+    <a href="#odyssey" data-i18n="nav.disco">Discography</a>
+    <a href="#footprint" data-i18n="nav.world">World</a>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang-btn="cn">CN</button>
+    <button type="button" data-lang-btn="en" class="on">EN</button>
+    <button type="button" data-lang-btn="kr">KR</button>
+    <button type="button" data-lang-btn="jp">JP</button>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ============ 首屏 ============ -->
+  <section class="hero" id="hero">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-vignette"></div>
+    <div class="hero-ix" aria-hidden="true">IX</div>
+    <div class="hero-inner" id="heroInner">
+      <p class="hero-kicker" data-i18n="hero.kicker">Seoul · Since 2015</p>
+      <h1 class="hero-title"><span>One in a</span><span>Million</span></h1>
+      <p class="hero-sub"><i></i><span>TWICE</span><i></i></p>
+    </div>
+    <button class="sound" id="soundBtn" type="button" aria-pressed="false">
+      <span class="bars"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="sound-label" data-i18n="hero.sound">Ambience</span>
+    </button>
+    <div class="scroll-hint"><span data-i18n="hero.scroll">Scroll</span><i></i></div>
+  </section>
+
+  <!-- ============ 九人九色 ============ -->
+  <section class="muses" id="muses">
+    <header class="sec-head">
+      <p class="sec-kicker"><span>I</span> <em data-i18n="muses.kicker">Chapter One</em></p>
+      <h2 class="sec-title" data-i18n="muses.title">The Nine Muses</h2>
+      <p class="sec-lead" data-i18n="muses.lead">Nine silhouettes in the dark. Move across them and the room changes colour.</p>
+    </header>
+    <div class="muses-track" id="musesTrack"></div>
+  </section>
+
+  <!-- ============ 音乐编年史 ============ -->
+  <section class="odyssey" id="odyssey">
+    <div class="ody-sticky">
+      <header class="sec-head ody-head">
+        <p class="sec-kicker"><span>II</span> <em data-i18n="ody.kicker">Chapter Two</em></p>
+        <h2 class="sec-title" data-i18n="ody.title">Sonic Odyssey</h2>
+        <p class="sec-lead" data-i18n="ody.lead">Eight records, one decade. Pull a sleeve and let it spin.</p>
+      </header>
+      <div class="ody-viewport">
+        <div class="ody-track" id="odyTrack"></div>
+      </div>
+      <div class="ody-foot">
+        <div class="ody-progress"><i id="odyBar"></i></div>
+        <p class="ody-now"><span id="odyNow">2015</span> <em data-i18n="ody.now">scroll to travel</em></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 全球足迹 ============ -->
+  <section class="footprint" id="footprint">
+    <header class="sec-head">
+      <p class="sec-kicker"><span>III</span> <em data-i18n="fp.kicker">Chapter Three</em></p>
+      <h2 class="sec-title" data-i18n="fp.title">Global Footprint</h2>
+      <p class="sec-lead" data-i18n="fp.lead">From a Seoul showcase to the biggest stadiums on four continents.</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><b data-count="9" data-suffix="">0</b><span data-i18n="fp.s1">Members</span></div>
+      <div class="stat"><b data-count="20" data-suffix="M+">0</b><span data-i18n="fp.s2">Albums sold</span></div>
+      <div class="stat"><b data-count="120" data-suffix="+">0</b><span data-i18n="fp.s3">Shows played</span></div>
+      <div class="stat"><b data-count="4" data-suffix="">0</b><span data-i18n="fp.s4">Continents</span></div>
+    </div>
+
+    <div class="globe-wrap">
+      <canvas id="globe" role="img" aria-label="Interactive globe of tour stops — drag to rotate, click a city"></canvas>
+      <div class="globe-legend">
+        <span><i class="dot gold"></i><em data-i18n="fp.legend1">Stadium show</em></span>
+        <span><i class="dot pink"></i><em data-i18n="fp.legend2">Arena tour</em></span>
+      </div>
+      <div class="globe-card" id="globeCard" aria-live="polite">
+        <p class="gc-kicker" id="gcKicker">Tokyo</p>
+        <h3 id="gcTitle">Nissan Stadium</h3>
+        <p id="gcDesc">Two nights, 140,000 candy lights.</p>
+        <div class="gc-art" id="gcArt"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-mark">TWICE</div>
+    <p class="foot-note" data-i18n="foot.note">A fan-made concept page. Not affiliated with JYP Entertainment. Figures are illustrative.</p>
+    <div class="foot-ix">IX</div>
+  </footer>
+
+</main>
+
+<script src="./main.js"></script>
+</body>
+</html>

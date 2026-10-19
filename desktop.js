@@ -36,7 +36,7 @@
      ============================================================ */
   var PROJECTS = [
     {
-      id: "zodiac", t: "十二生肖 · 华夏瑞兽", s: "Chinese Zodiac", g: "肖",
+      id: "zodiac", t: "十二生肖 · 华夏瑞兽", s: "Chinese Zodiac", g: "ZODIAC",
       c: "#D4AF37", cat: "国潮 CSS 艺术",
       tags: ["CSS艺术", "国潮", "纯CSS", "3D"],
       path: "十二生肖·华夏瑞兽.html", link: "/zodiac/",
@@ -199,7 +199,7 @@
     b.setAttribute("data-xy", "x:0 y:0");
     b.innerHTML =
       '<span class="file-float">' +
-        '<span class="sheet"><span class="sheet-glyph">' + p.g + "</span></span>" +
+        '<span class="sheet"><span class="sheet-glyph' + (p.g.length > 2 ? " is-word" : "") + '">' + p.g + "</span></span>" +
         '<span class="file-name">' + p.s + "</span>" +
       "</span>";
     filesBox.appendChild(b);
@@ -230,7 +230,7 @@
     /* --- Dock --- */
     var d = document.createElement("button");
     d.type = "button";
-    d.className = "dock-item";
+    d.className = "dock-item" + (p.g.length > 2 ? " is-word" : "");
     d.style.setProperty("--c", p.c);
     d.setAttribute("data-name", p.t);
     d.setAttribute("aria-label", "打开 " + p.t);

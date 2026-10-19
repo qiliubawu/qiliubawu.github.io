@@ -1,5 +1,5 @@
 /* ============================================================
-   ZZX Desktop — 六个内置微型应用
+   ZZX Desktop — 内置微型应用
    由 desktop.js 的 openApp() 调用 ZZXApps.render(id, container, project)
    ============================================================ */
 (function () {
@@ -31,6 +31,16 @@
     var host = document.createElement("div");
     host.className = "zodiac-host";
     host.innerHTML = '<iframe src="/zodiac/" title="十二生肖 · 华夏瑞兽" loading="lazy"></iframe>';
+    el.appendChild(host);
+  }
+
+  /* ============================================================
+     1.5 TWICE · THIS IS FOR（内嵌真实项目）
+     ============================================================ */
+  function renderTwice(el) {
+    var host = document.createElement("div");
+    host.className = "twice-host";
+    host.innerHTML = '<iframe src="/twice/" title="TWICE · THIS IS FOR" loading="lazy"></iframe>';
     el.appendChild(host);
   }
 
@@ -87,7 +97,7 @@
         ["OS", "ZZX Desktop 2.0"],
         ["Shell", "zsh 5.9"],
         ["Stack", "HTML · CSS · JS · TS · GLSL"],
-        ["Projects", "6 个可交互作品"],
+        ["Projects", window.ZZX && window.ZZX.projects ? window.ZZX.projects.length + " 个可交互作品" : "7 个可交互作品"],
         ["Status", "open to work"]
       ].forEach(function (r) {
         line('<span class="term-kv">' +
@@ -330,7 +340,7 @@
           "</div>" +
 
           '<div class="vk-stats">' +
-            '<div class="vk-stat"><b>6</b><span>Projects</span></div>' +
+            '<div class="vk-stat"><b>' + (window.ZZX && window.ZZX.projects ? window.ZZX.projects.length : 7) + '</b><span>Projects</span></div>' +
             '<div class="vk-stat"><b>3</b><span>Years</span></div>' +
             '<div class="vk-stat"><b>60</b><span>FPS</span></div>' +
           "</div>" +
@@ -1080,6 +1090,7 @@
      ============================================================ */
   var RENDERERS = {
     zodiac: renderZodiac,
+    twice: renderTwice,
     terminal: renderTerminal,
     vision: renderVision,
     fluid: renderFluid,

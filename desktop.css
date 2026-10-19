@@ -933,6 +933,11 @@ body:not(.dock-ready) .dock{opacity:0;transform:translateX(-50%) translateY(16px
   width:min(1180px,96vw);
   height:min(880px,94vh);
 }
+/* TWICE 页面是通栏暗色 + 大面积 canvas，给得比生肖更宽更矮一点 */
+.win[data-app="twice"]{
+  width:min(1280px,96vw);
+  height:min(820px,92vh);
+}
 .win[data-app="fluid"]{
   height:min(700px,90vh);
 }

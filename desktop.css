@@ -222,10 +222,6 @@ a{color:inherit}
 }
 html[data-theme="dark"] .mb-btn[aria-pressed="true"]{color:var(--xray)}
 .mb-btn-code{font-family:var(--mono);font-size:10.5px;opacity:.85}
-.mb-kbd{
-  font-size:9.5px;opacity:.55;padding:1px 3px;border-radius:3px;
-  background:var(--fold);font-family:var(--mono);
-}
 
 .mb-icon{
   width:24px;height:20px;border-radius:6px;
@@ -288,8 +284,6 @@ body.xray-active .scene::before{opacity:1}
   transition:opacity .35s ease;
 }
 body.xray-active .xray-canvas{opacity:1}
-/* Spotlight 也复用它，即使没开 X-Ray */
-body.spot-active .xray-canvas{opacity:1}
 
 /* ---------- SVG 琴弦连线 ---------- */
 .tether-svg{
@@ -315,7 +309,6 @@ body.spot-active .xray-canvas{opacity:1}
   stroke:rgba(0,229,255,.75);
   stroke-dasharray:5 4;
 }
-.tether.is-dim{opacity:.16}
 
 /* ---------- 项目文件 ---------- */
 .files{position:absolute;inset:0;z-index:4;pointer-events:none}
@@ -387,7 +380,10 @@ body.spot-active .xray-canvas{opacity:1}
 /* 休眠时文件藏在文件夹里 */
 .scene[data-state="sleeping"] .file{opacity:0;pointer-events:none}
 
-/* 开窗：其余文件与文件夹退居背景层 */
+/* 开窗：其余文件与文件夹退居背景层
+   注意：这里绝对不能用 filter:blur()。
+   filter 属于 grouping property，会让 .folder-body 的 preserve-3d 失效；
+   关窗时 filter 被移除，3D 上下文重建，前盖会在那一帧整块消失。 */
 .scene[data-state="open"] .file:not(.is-active) .file-float{
   opacity:.26;scale:.86;filter:saturate(.4);
 }
@@ -400,19 +396,7 @@ body.spot-active .xray-canvas{opacity:1}
 }
 .scene[data-state="open"] .zzx-folder{
   scale:.92;
-  filter:blur(4px);
-  opacity:.5;
   pointer-events:none;
-}
-
-/* Spotlight 筛选态 */
-.file.is-dimmed .file-float{opacity:.18;scale:.86;filter:saturate(.2)}
-.file.is-match .sheet{
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.65),
-    inset 0 -14px 24px rgba(0,0,0,.18),
-    0 0 0 2px rgba(0,229,255,.55),
-    0 12px 32px rgba(0,229,255,.32);
 }
 
 /* X-Ray 包围盒 + 坐标 */
@@ -444,8 +428,7 @@ body.xray-active .file::before{opacity:.9}
   perspective:900px;
   translate:0 0;
   scale:1;
-  transition:translate .35s var(--sp-soft),scale .5s var(--sp-soft),
-             filter .5s ease,opacity .5s ease;
+  transition:translate .35s var(--sp-soft),scale .5s var(--sp-soft);
 }
 .zzx-folder:hover{translate:0 -6px}
 .zzx-folder:active{translate:0 -2px}
@@ -750,17 +733,6 @@ html[data-theme="dark"] .zzz i{
   z-index:4;
 }
 
-/* ---------- 提示 ---------- */
-.hint{
-  position:absolute;bottom:86px;left:50%;
-  transform:translateX(-50%);
-  font-size:12px;color:var(--text-3);
-  letter-spacing:.04em;
-  white-space:nowrap;
-  transition:opacity .4s ease;
-  pointer-events:none;
-}
-
 /* ---------- Dock ---------- */
 .dock{
   position:fixed;left:50%;bottom:16px;
@@ -861,77 +833,6 @@ body:not(.dock-ready) .dock{opacity:0;transform:translateX(-50%) translateY(16px
 .hud-grid > div{display:flex;justify-content:space-between;gap:6px}
 .hud-grid dt{color:rgba(124,245,208,.5);font-size:9.5px}
 .hud-grid dd{color:#9EF7DA;font-size:10px}
-
-/* ---------- Spotlight 面板 ---------- */
-.spotlight{
-  position:fixed;inset:0;z-index:58;
-  display:grid;place-items:center;
-  padding:20px;
-  background:rgba(0,0,0,.24);
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
-  animation:fadeIn .22s ease;
-}
-.spotlight[hidden]{display:none}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
-.spot-panel{
-  width:min(520px,92vw);
-  padding:20px 22px 18px;
-  border-radius:16px;
-  background:var(--win-bg);
-  backdrop-filter:blur(30px) saturate(180%);
-  -webkit-backdrop-filter:blur(30px) saturate(180%);
-  border:1px solid var(--win-line);
-  box-shadow:var(--shadow-win);
-  animation:spotIn .3s var(--sp-soft);
-}
-@keyframes spotIn{
-  from{opacity:0;transform:translateY(10px) scale(.97)}
-  to  {opacity:1;transform:none}
-}
-.spot-head{position:relative;margin-bottom:14px}
-.spot-eyebrow{
-  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;
-  color:var(--xray-ink);
-}
-html[data-theme="dark"] .spot-eyebrow{color:var(--xray)}
-.spot-head h2{
-  font-size:16px;font-weight:600;margin-top:4px;
-  letter-spacing:.01em;
-}
-.spot-close{
-  position:absolute;top:-4px;right:-6px;
-  width:26px;height:26px;border-radius:50%;
-  display:grid;place-items:center;
-  font-size:12px;color:var(--text-2);
-  transition:background .2s ease,color .2s ease;
-}
-.spot-close:hover{background:var(--fold-hover);color:var(--text)}
-
-.spot-tags{display:flex;flex-wrap:wrap;gap:8px}
-.spot-tag{
-  padding:7px 13px;border-radius:9px;
-  font-size:12.5px;
-  color:var(--text-2);
-  background:var(--fold);
-  border:1px solid transparent;
-  transition:all .2s ease;
-}
-.spot-tag:hover{background:var(--fold-hover);color:var(--text)}
-.spot-tag[aria-pressed="true"]{
-  color:var(--xray-ink);
-  background:rgba(0,229,255,.14);
-  border-color:rgba(0,229,255,.45);
-  box-shadow:0 0 0 3px rgba(0,229,255,.10);
-}
-html[data-theme="dark"] .spot-tag[aria-pressed="true"]{color:var(--xray)}
-
-.spot-foot{
-  margin-top:14px;
-  font-size:11px;line-height:1.6;
-  color:var(--text-3);
-}
 
 /* ---------- 统一应用窗口 ---------- */
 .win-layer{
@@ -1079,7 +980,6 @@ html[data-theme="dark"] .spot-tag[aria-pressed="true"]{color:var(--xray)}
 @media (max-width:900px){
   .mb-role,.mb-sep{display:none}
   .mb-btn-label{display:none}
-  .mb-kbd{display:none}
   .mb-clock{display:none}
   .hud{display:none}
   .win-path{display:none}
@@ -1130,7 +1030,6 @@ html[data-theme="dark"] .spot-tag[aria-pressed="true"]{color:var(--xray)}
   .file{width:66px;height:66px;margin:-33px 0 0 -33px}
   .sheet{width:66px;height:66px;border-radius:15px}
   .sheet-glyph{font-size:23px}
-  .hint{font-size:11px;bottom:74px}
 }
 
 /* ---------- 减少动态偏好 ---------- */

@@ -1,7 +1,7 @@
 /* ============================================================
    ZZX Desktop — 核心引擎
    ─ 单一 requestAnimationFrame 主循环（无零散定时器驱动动画）
-   ─ 集中式 Store：state / expression / xray / spotlight / pointer
+   ─ 集中式 Store：state / expression / xray / pointer
    ─ 弹簧物理 + 拖拽抛掷 + 磁吸 + 圆形碰撞
    ─ 双目 atan2 追踪 + 微表情状态机
    ─ SVG 二次贝塞尔琴弦（阻尼正弦拨弦）
@@ -86,7 +86,6 @@
     state: "sleeping",          /* sleeping | awakened | open */
     expression: "calm",         /* calm | blink | dizzy | pain | proud | focus */
     xray: false,
-    spotlight: null,            /* 标签字符串或 null */
     pointer: { x: 0, y: 0, inside: false },
     mouseSpeed: 0,
     dragging: null,
@@ -101,7 +100,6 @@
   var folder    = document.getElementById("folder");
   var filesBox  = document.getElementById("files");
   var face      = document.getElementById("face");
-  var hint      = document.getElementById("hint");
   var svg       = document.getElementById("tetherSvg");
   var dock      = document.getElementById("dock");
   var hud       = document.getElementById("hud");
@@ -112,8 +110,6 @@
   var hudState  = document.getElementById("hudState");
   var fpsCanvas = document.getElementById("fpsCanvas");
   var xrayCanvas= document.getElementById("xrayCanvas");
-  var spot      = document.getElementById("spotlight");
-  var spotTags  = document.getElementById("spotTags");
   var winLayer  = document.getElementById("winLayer");
   var win       = document.getElementById("win");
   var winTitle  = document.getElementById("winTitle");
@@ -122,7 +118,6 @@
   var winOpen   = document.getElementById("winOpen");
 
   var xrayBtn = document.getElementById("xrayBtn");
-  var spotBtn = document.getElementById("spotBtn");
 
   var eyes = Array.prototype.slice.call(document.querySelectorAll(".eye"));
   var xctx = xrayCanvas.getContext("2d");
@@ -381,10 +376,8 @@
         n.el.style.setProperty("--rx", "0deg");
         n.el.style.setProperty("--ry", "0deg");
       });
-      hint.textContent = "点击文件夹，唤醒 ZZX";
       folder.setAttribute("aria-label", "ZZX 作品文件夹，按下以唤醒并展开全部作品");
       setExpression("calm");
-      clearSpotlight();
     } else if (s === "awakened") {
       computeTargets();
       nodes.forEach(function (n, i) {
@@ -395,12 +388,9 @@
         n.amp = 42;
         n.hot = 1;
       });
-      hint.textContent = "拖拽文件可抛掷 · 点击打开 · ⌘K 按技术筛选";
       folder.setAttribute("aria-label", "ZZX 作品文件夹，按下以收起");
       setExpression("calm");
       sfx.wake();
-    } else {
-      hint.textContent = "";
     }
     updateHudState();
   }
@@ -666,8 +656,7 @@
         " " + tx.toFixed(1) + " " + ty.toFixed(1));
 
       var cls = "tether";
-      if (Store.spotlight && !isMatch(f.p)) cls += " is-dim";
-      else if (f.hot > 0.25) cls += " is-hot";
+      if (f.hot > 0.25) cls += " is-hot";
       if (f.path.getAttribute("class") !== cls) f.path.setAttribute("class", cls);
     }
   }
@@ -688,37 +677,12 @@
   }
 
   function updateXray() {
-    var on = Store.xray || !!Store.spotlight;
-    if (!on) {
+    if (!Store.xray) {
       if (frame % 30 === 0) xctx.clearRect(0, 0, Store.w, Store.h);
       return;
     }
 
     xctx.clearRect(0, 0, Store.w, Store.h);
-
-    /* 聚光灯束：文件夹中心 → 匹配文件 */
-    if (Store.spotlight) {
-      var cx = Store.w / 2, cy = Store.h / 2;
-      for (var i = 0; i < nodes.length; i++) {
-        var f = nodes[i];
-        if (!isMatch(f.p)) continue;
-        var tx = cx + f.x, ty = cy + f.y;
-        var g = xctx.createLinearGradient(cx, cy, tx, ty);
-        g.addColorStop(0, "rgba(0,229,255,.34)");
-        g.addColorStop(1, "rgba(0,229,255,0)");
-        xctx.fillStyle = g;
-        xctx.beginPath();
-        xctx.moveTo(cx, cy);
-        xctx.lineTo(tx - 44, ty - 30);
-        xctx.lineTo(tx + 44, ty - 30);
-        xctx.lineTo(tx + 44, ty + 30);
-        xctx.lineTo(tx - 44, ty + 30);
-        xctx.closePath();
-        xctx.fill();
-      }
-    }
-
-    if (!Store.xray) return;
 
     /* 双眼 → 光标的激光虚线 */
     var mx = Store.pointer.x, my = Store.pointer.y;
@@ -826,7 +790,7 @@
   }
 
   /* ============================================================
-     13. X-Ray / Spotlight 开关
+     13. X-Ray 开关
      ============================================================ */
   function toggleXray(force) {
     var next = typeof force === "boolean" ? force : !Store.xray;
@@ -835,77 +799,6 @@
     xrayBtn.setAttribute("aria-pressed", next ? "true" : "false");
     hud.hidden = !next;
     if (next) updateHudState();
-  }
-
-  function openSpotlight() {
-    spot.hidden = false;
-    spotBtn.setAttribute("aria-pressed", "true");
-    renderSpotTags();
-  }
-
-  function closeSpotlight() {
-    spot.hidden = true;
-    spotBtn.setAttribute("aria-pressed", Store.spotlight ? "true" : "false");
-  }
-
-  function renderSpotTags() {
-    var tags = {};
-    PROJECTS.forEach(function (p) {
-      p.tags.forEach(function (tg) { tags[tg] = (tags[tg] || 0) + 1; });
-    });
-
-    spotTags.innerHTML = "";
-    var all = document.createElement("button");
-    all.type = "button";
-    all.className = "spot-tag";
-    all.textContent = "全部项目";
-    all.setAttribute("aria-pressed", Store.spotlight === null ? "true" : "false");
-    all.addEventListener("click", function () { applySpotlight(null); });
-    spotTags.appendChild(all);
-
-    Object.keys(tags).sort().forEach(function (tg) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "spot-tag";
-      b.textContent = "#" + tg + " · " + tags[tg];
-      b.setAttribute("aria-pressed", Store.spotlight === tg ? "true" : "false");
-      b.addEventListener("click", function () { applySpotlight(tg); });
-      spotTags.appendChild(b);
-    });
-  }
-
-  function applySpotlight(tag) {
-    Store.spotlight = tag;
-    document.body.classList.toggle("spot-active", !!tag);
-
-    nodes.forEach(function (n) {
-      var match = !tag || n.p.tags.indexOf(tag) !== -1;
-      n.el.classList.toggle("is-match", !!tag && match);
-      n.el.classList.toggle("is-dimmed", !!tag && !match);
-    });
-
-    if (tag && Store.state === "sleeping") {
-      /* 筛选需要看到文件，自动唤醒 */
-      setState("awakened");
-    }
-
-    renderSpotTags();
-    if (tag) {
-      setTimeout(closeSpotlight, 180);
-    }
-  }
-
-  function clearSpotlight() {
-    Store.spotlight = null;
-    document.body.classList.remove("spot-active");
-    nodes.forEach(function (n) {
-      n.el.classList.remove("is-match", "is-dimmed");
-    });
-  }
-
-  function isMatch(p) {
-    if (!Store.spotlight) return false;
-    return p.tags.indexOf(Store.spotlight) !== -1;
   }
 
   /* ============================================================
@@ -1093,35 +986,16 @@
     toggleXray();
   });
 
-  spotBtn.addEventListener("click", function () {
-    audio();
-    if (!spot.hidden) closeSpotlight();
-    else openSpotlight();
-  });
-
-  document.getElementById("spotClose").addEventListener("click", closeSpotlight);
-  spot.addEventListener("mousedown", function (e) {
-    if (e.target === spot) closeSpotlight();
-  });
-
   document.addEventListener("keydown", function (e) {
     var mod = e.metaKey || e.ctrlKey;
 
-    if (mod && (e.key === "k" || e.key === "K")) {
-      e.preventDefault();
-      if (!spot.hidden) closeSpotlight();
-      else openSpotlight();
-      return;
-    }
     if (mod && (e.key === "x" || e.key === "X")) {
       e.preventDefault();
       toggleXray();
       return;
     }
     if (e.key === "Escape") {
-      if (!spot.hidden) { closeSpotlight(); return; }
       if (!winLayer.hidden) { closeApp(); return; }
-      if (Store.spotlight) { clearSpotlight(); return; }
       if (Store.state === "awakened") setState("sleeping");
     }
   });

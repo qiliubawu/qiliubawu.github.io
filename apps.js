@@ -288,22 +288,51 @@
   /* ============================================================
      3. VisionUI-Kit.tsx
      ============================================================ */
+  var VUI_PRESETS = [
+    { n: "苹果蓝紫", c: ["#2F7CF6", "#7C4DFF", "#F04E98"] },
+    { n: "极光",     c: ["#00E5C0", "#2F8CFF", "#8B5CF6"] },
+    { n: "日落",     c: ["#FF9A44", "#FF5E7A", "#C44BE0"] },
+    { n: "石墨",     c: ["#7A828E", "#4A5058", "#24272C"] },
+    { n: "薄荷",     c: ["#34D399", "#22A7F0", "#4F6BFF"] }
+  ];
+
+  function hexToRgba(hex, a) {
+    var h = hex.replace("#", "");
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
   function renderVision(el) {
     var wrap = document.createElement("div");
     wrap.className = "vui";
+
+    var swatches = VUI_PRESETS.map(function (p, i) {
+      return '<button class="vui-swatch" type="button" data-i="' + i + '" ' +
+             'title="' + p.n + '" aria-label="' + p.n + '" ' +
+             'style="--s1:' + p.c[0] + ";--s2:" + p.c[1] + ";--s3:" + p.c[2] + '"></button>';
+    }).join("");
+
     wrap.innerHTML =
       '<div class="vui-stage" id="vuiStage">' +
-        '<span class="vui-blob b1"></span>' +
-        '<span class="vui-blob b2"></span>' +
-        '<span class="vui-blob b3"></span>' +
+        '<span class="vui-blob b1" id="vb1"></span>' +
+        '<span class="vui-blob b2" id="vb2"></span>' +
+        '<span class="vui-blob b3" id="vb3"></span>' +
         '<div class="vui-card" id="vuiCard">' +
           '<span class="vui-pill">VisionUI · Glass</span>' +
           "<h3>空间组件沙盒</h3>" +
-          "<p>拖动右侧滑块调节折射与倾角，移动光标改变透视。</p>" +
+          "<p>左侧调色、右侧调参，移动光标改变透视。</p>" +
         "</div>" +
       "</div>" +
       '<div class="vui-panel">' +
-        '<div class="vui-title">PROPERTIES</div>' +
+        '<div class="vui-title">COLOR · 自定义配色</div>' +
+        '<div class="vui-colors">' +
+          '<label class="vui-color"><input type="color" id="vC1" value="#2F7CF6"><span>起始</span></label>' +
+          '<label class="vui-color"><input type="color" id="vC2" value="#7C4DFF"><span>中间</span></label>' +
+          '<label class="vui-color"><input type="color" id="vC3" value="#F04E98"><span>结束</span></label>' +
+        "</div>" +
+        '<div class="vui-presets" id="vuiPresets">' + swatches + "</div>" +
+        '<div class="vui-title" style="margin-top:4px">PROPERTIES</div>' +
         '<div class="vui-row">' +
           '<label>毛玻璃模糊 <b><span id="vBlurV">12</span>px</b></label>' +
           '<input id="vBlur" type="range" min="0" max="30" value="12">' +
@@ -321,7 +350,7 @@
           '<input id="vFollow" type="range" min="0" max="100" value="100">' +
         "</div>" +
         '<div class="vui-note">' +
-          "全部参数走 CSS 自定义属性，无重排；倾角由 pointermove 实时写 " +
+          "配色与参数全部走 CSS 自定义属性，无重排；倾角由 pointermove 实时写 " +
           "<code>rotateX/Y</code>，与桌面主循环共用同一套指针状态。" +
         "</div>" +
       "</div>";
@@ -329,8 +358,33 @@
 
     var stage = wrap.querySelector("#vuiStage");
     var card = wrap.querySelector("#vuiCard");
+    var blobs = [
+      wrap.querySelector("#vb1"),
+      wrap.querySelector("#vb2"),
+      wrap.querySelector("#vb3")
+    ];
 
-    var state = { blur: 12, radius: 26, tilt: 0, follow: 1 };
+    var state = {
+      blur: 12, radius: 26, tilt: 0, follow: 1,
+      c: ["#2f7cf6", "#7c4dff", "#f04e98"]
+    };
+
+    function paintColors() {
+      card.style.setProperty("--v-c1", hexToRgba(state.c[0], 0.88));
+      card.style.setProperty("--v-c2", hexToRgba(state.c[1], 0.84));
+      card.style.setProperty("--v-c3", hexToRgba(state.c[2], 0.84));
+
+      /* 背景光斑跟着配色走，毛玻璃才有可折射的东西 */
+      blobs.forEach(function (b, i) {
+        b.style.background =
+          "radial-gradient(circle," + state.c[i] + ",transparent 70%)";
+      });
+
+      Array.prototype.forEach.call(
+        wrap.querySelectorAll(".vui-color input"),
+        function (inp, i) { inp.value = state.c[i]; }
+      );
+    }
 
     function apply() {
       card.style.setProperty("--v-blur", state.blur + "px");
@@ -353,6 +407,26 @@
     bind("vTilt", "tilt");
     bind("vFollow", "follow", function (v) { return v / 100; });
 
+    /* 三色自定义 */
+    ["vC1", "vC2", "vC3"].forEach(function (id, i) {
+      var inp = wrap.querySelector("#" + id);
+      inp.addEventListener("input", function () {
+        state.c[i] = inp.value;
+        paintColors();
+      });
+    });
+
+    /* 预设 */
+    wrap.querySelector("#vuiPresets").addEventListener("click", function (e) {
+      var b = e.target.closest(".vui-swatch");
+      if (!b) return;
+      var p = VUI_PRESETS[+b.getAttribute("data-i")];
+      state.c = p.c.slice();
+      paintColors();
+      if (window.ZZX && window.ZZX.playNote) window.ZZX.playNote(2);
+    });
+
+    paintColors();
     apply();
 
     stage.addEventListener("pointermove", function (e) {
@@ -376,6 +450,29 @@
   /* ============================================================
      4. FluidField.glsl
      ============================================================ */
+  /* 参考图的配色：薄荷 → 青 → 天蓝 → 靛蓝 → 紫 */
+  var FLUID_PALETTE = [
+    "#5FF3C8", "#49E0E8", "#4CB4F5",
+    "#6E86F7", "#9B7CF8", "#C77CF2"
+  ];
+
+  /* 预渲染光点精灵：比每帧 createRadialGradient 快一个数量级 */
+  function makeSprite(hex) {
+    var S = 64;
+    var c = document.createElement("canvas");
+    c.width = c.height = S;
+    var g = c.getContext("2d");
+    var grd = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+    grd.addColorStop(0,    hexToRgba(hex, 1));
+    grd.addColorStop(0.26, hexToRgba(hex, 0.96));
+    grd.addColorStop(0.50, hexToRgba(hex, 0.40));
+    grd.addColorStop(0.76, hexToRgba(hex, 0.10));
+    grd.addColorStop(1,    hexToRgba(hex, 0));
+    g.fillStyle = grd;
+    g.fillRect(0, 0, S, S);
+    return c;
+  }
+
   function renderFluid(el) {
     var wrap = document.createElement("div");
     wrap.className = "fluid";
@@ -383,11 +480,12 @@
       '<canvas></canvas>' +
       '<div class="fluid-hud">' +
         '<span>PARTICLES <b>240</b></span>' +
-        '<span>MODE <b id="fluidMode">ATTRACT</b></span>' +
+        '<span>MODE <b id="fluidMode">DRIFT</b></span>' +
         '<span>FPS <b id="fluidFps">--</b></span>' +
       "</div>" +
       '<div class="fluid-modes">' +
-        '<button class="fluid-mode" type="button" data-mode="attract" aria-pressed="true">引力</button>' +
+        '<button class="fluid-mode" type="button" data-mode="drift" aria-pressed="true">漂浮</button>' +
+        '<button class="fluid-mode" type="button" data-mode="attract" aria-pressed="false">引力</button>' +
         '<button class="fluid-mode" type="button" data-mode="repel" aria-pressed="false">斥力</button>' +
         '<button class="fluid-mode" type="button" data-mode="orbit" aria-pressed="false">星轨</button>' +
       "</div>" +
@@ -399,15 +497,16 @@
     var modeEl = wrap.querySelector("#fluidMode");
     var fpsEl = wrap.querySelector("#fluidFps");
 
+    var sprites = FLUID_PALETTE.map(makeSprite);
+
     var dpr = Math.min(2, window.devicePixelRatio || 1);
     var W = 0, H = 0;
     var N = 240;
     var parts = [];
-    var mode = "attract";
+    var mode = "drift";
     var pointer = { x: 0, y: 0, active: false };
     var last = 0, fpsAcc = 0, fpsFrames = 0;
 
-    /* 位图尺寸必须跟 CSS 盒一致，否则浏览器会拉伸导致粒子糊成一片 */
     function resize() {
       var w = Math.max(1, Math.round(wrap.clientWidth));
       var h = Math.max(1, Math.round(wrap.clientHeight));
@@ -421,34 +520,28 @@
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      /* 已存在的粒子按比例迁移，避免 resize 时整体重排 */
       for (var i = 0; i < parts.length; i++) {
         parts[i].x *= sx;
         parts[i].y *= sy;
-        parts[i].orbit *= (sx + sy) / 2;
       }
     }
 
     function seed() {
       parts = [];
-      var cx = W / 2, cy = H / 2;
-      var base = Math.min(W, H);
       for (var i = 0; i < N; i++) {
-        var a = Math.random() * Math.PI * 2;
-        var r = base * (0.08 + Math.random() * 0.34);
         parts.push({
-          x: cx + Math.cos(a) * r,
-          y: cy + Math.sin(a) * r * 0.78,
-          vx: 0, vy: 0,
-          r: 0.7 + Math.random() * 1.8,
-          hue: 172 + Math.random() * 66,
-          orbit: r,
-          angle: a
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          r: 1.8 + Math.random() * 3.2,
+          c: (Math.random() * sprites.length) | 0,
+          phase: Math.random() * Math.PI * 2,
+          spin: 0.5 + Math.random()
         });
       }
     }
 
-    /* 先量一次；布局稳定后再量一次并播种（窗口有 FLIP 入场动画） */
     resize();
     seed();
     requestAnimationFrame(function () {
@@ -476,7 +569,7 @@
         wrap.querySelectorAll(".fluid-mode"),
         function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }
       );
-      window.ZZX.playNote(mode === "orbit" ? 3 : mode === "repel" ? 1 : 0);
+      if (window.ZZX && window.ZZX.playNote) window.ZZX.playNote(2);
     });
 
     var onResize = function () { resize(); };
@@ -499,47 +592,43 @@
         fpsFrames = 0; fpsAcc = 0;
       }
 
-      /* 拖尾：用半透明底色覆盖，而不是 clearRect，粒子才留得住光迹 */
+      /* 参考图是干净的深底 + 独立光点，不做拖尾 */
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(5,7,12,.30)";
-      ctx.fillRect(0, 0, W, H);
+      ctx.clearRect(0, 0, W, H);
 
       var cx = W / 2, cy = H / 2;
       var tx = pointer.active ? pointer.x : cx;
       var ty = pointer.active ? pointer.y : cy;
 
-      /* 帧率无关阻尼：60fps 下每帧 ×0.90 */
-      var damp = Math.pow(0.90, dt * 60);
+      /* 帧率无关阻尼：60fps 下每帧 ×0.955，漂浮得慢而稳 */
+      var damp = Math.pow(0.955, dt * 60);
 
       ctx.globalCompositeOperation = "lighter";
 
       for (var i = 0; i < N; i++) {
         var p = parts[i];
-        var dx = tx - p.x, dy = ty - p.y;
-        var d = Math.sqrt(dx * dx + dy * dy) || 1;
-        var ux = dx / d, uy = dy / d;
 
-        if (mode === "orbit") {
-          /* 星轨：极坐标目标点 + 切向速度，形成椭圆进动 */
-          p.angle += dt * (0.30 + (p.orbit % 70) / 200);
-          var wob = Math.sin(now / 1500 + p.angle * 2.2) * 14;
-          var tr = p.orbit + wob;
-          var ox = cx + Math.cos(p.angle) * tr;
-          var oy = cy + Math.sin(p.angle) * tr * 0.70;
-          p.vx += (ox - p.x) * 7.5 * dt;
-          p.vy += (oy - p.y) * 7.5 * dt;
-        } else {
-          var sign = mode === "repel" ? -1 : 1;
-          /* 近处强、远处弱，但永不为零 */
-          var accel = sign * (1500 / (1 + d / 240));
-          p.vx += ux * accel * dt;
-          p.vy += uy * accel * dt;
-          /* 切向分量：绕着力场中心转，而不是直线撞上去 */
-          p.vx += -uy * 110 * dt * sign;
-          p.vy += ux * 110 * dt * sign;
-          /* 中心弱回拉，防止粒子被甩出画布 */
-          p.vx += (cx - p.x) * 1.1 * dt;
-          p.vy += (cy - p.y) * 1.1 * dt;
+        /* 基础漂浮：慢速正弦扰动，无指针时也一直活着 */
+        p.vx += Math.sin(now / 2100 + p.phase) * 7 * dt;
+        p.vy += Math.cos(now / 2400 + p.phase * 1.3) * 7 * dt;
+
+        if (mode !== "drift") {
+          var dx = tx - p.x, dy = ty - p.y;
+          var d = Math.sqrt(dx * dx + dy * dy) || 1;
+          var ux = dx / d, uy = dy / d;
+
+          if (mode === "orbit") {
+            var tangent = 34 * p.spin;
+            p.vx += -uy * tangent * dt;
+            p.vy += ux * tangent * dt;
+            p.vx += (cx - p.x) * 0.55 * dt;
+            p.vy += (cy - p.y) * 0.55 * dt;
+          } else {
+            var sign = mode === "repel" ? -1 : 1;
+            var accel = sign * (300 / (1 + d / 260));
+            p.vx += ux * accel * dt;
+            p.vy += uy * accel * dt;
+          }
         }
 
         p.vx *= damp;
@@ -547,34 +636,30 @@
         p.x += p.vx * dt;
         p.y += p.vy * dt;
 
-        /* 边界软回弹 */
-        if (p.x < 8) { p.x = 8; p.vx = Math.abs(p.vx) * 0.6; }
-        if (p.x > W - 8) { p.x = W - 8; p.vx = -Math.abs(p.vx) * 0.6; }
-        if (p.y < 8) { p.y = 8; p.vy = Math.abs(p.vy) * 0.6; }
-        if (p.y > H - 8) { p.y = H - 8; p.vy = -Math.abs(p.vy) * 0.6; }
+        /* 边界环绕：从一侧出去，从另一侧回来 */
+        var pad = 12;
+        if (p.x < -pad) p.x = W + pad;
+        if (p.x > W + pad) p.x = -pad;
+        if (p.y < -pad) p.y = H + pad;
+        if (p.y > H + pad) p.y = -pad;
 
         var sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        var glow = Math.min(1, 0.30 + sp / 200);
-        var alpha = 0.30 + glow * 0.55;
-        var rad = p.r * (0.9 + glow * 1.1);
+        var alpha = Math.min(1, 0.68 + sp / 80);
+        var size = p.r * (4.6 + Math.min(1.4, sp / 70));
 
-        /* 外发光 */
-        ctx.beginPath();
-        ctx.fillStyle = "hsla(" + p.hue + ", 95%, 62%, " + (alpha * 0.16) + ")";
-        ctx.arc(p.x, p.y, rad * 4.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        /* 核心 */
-        ctx.beginPath();
-        ctx.fillStyle = "hsla(" + p.hue + ", 96%, " + (66 + glow * 16) + "%, " + alpha + ")";
-        ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.globalAlpha = alpha;
+        ctx.drawImage(
+          sprites[p.c],
+          p.x - size / 2, p.y - size / 2, size, size
+        );
       }
 
+      ctx.globalAlpha = 1;
+
       /* 光标处力场指示 */
-      if (pointer.active) {
+      if (pointer.active && mode !== "drift") {
         var g = ctx.createRadialGradient(tx, ty, 0, tx, ty, 130);
-        g.addColorStop(0, "rgba(120,220,255,.13)");
+        g.addColorStop(0, "rgba(120,220,255,.10)");
         g.addColorStop(1, "rgba(120,220,255,0)");
         ctx.fillStyle = g;
         ctx.beginPath();
@@ -586,7 +671,6 @@
       return true;
     });
 
-    /* 应用关闭时移除 resize 监听 */
     observers.push({
       disconnect: function () { window.removeEventListener("resize", onResize); }
     });

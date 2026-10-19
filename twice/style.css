@@ -403,7 +403,7 @@ body.is-loading .nav{transform:translateY(-102%)}
 /* ============================================================
    音乐编年史：横向黑胶墙
    ============================================================ */
-.odyssey{position:relative;height:420vh;z-index:1}
+.odyssey{position:relative;height:760vh;z-index:1}
 .ody-sticky{
   position:sticky;top:0;height:100svh;overflow:hidden;
   display:flex;flex-direction:column;justify-content:center;
@@ -416,7 +416,7 @@ body.is-loading .nav{transform:translateY(-102%)}
   padding:0 var(--pad);
   will-change:transform;
 }
-.album{flex:0 0 auto;width:clamp(210px,19vw,286px);cursor:pointer;outline:none}
+.album{flex:0 0 auto;width:clamp(200px,18vw,270px)}
 .sleeve{position:relative;width:100%;aspect-ratio:1;perspective:900px}
 .vinyl{
   position:absolute;top:3%;left:3%;width:94%;height:94%;border-radius:50%;
@@ -437,8 +437,6 @@ body.is-loading .nav{transform:translateY(-102%)}
   box-shadow:0 0 0 1px rgba(255,255,255,.12);
 }
 .album:hover .vinyl{transform:translateX(30%) rotate(0deg)}
-.album.is-playing .vinyl{animation:spin 6s linear infinite}
-@keyframes spin{from{transform:translateX(30%) rotate(0deg)}to{transform:translateX(30%) rotate(360deg)}}
 
 .cover{
   position:absolute;inset:0;overflow:hidden;
@@ -487,28 +485,11 @@ body.is-loading .nav{transform:translateY(-102%)}
   position:relative;
 }
 .album-meta{margin-top:16px;display:flex;flex-direction:column;gap:5px}
-.album-meta .yr{font-size:9px;letter-spacing:.32em;color:var(--mute-2)}
+.album-meta .dt{font-size:9px;letter-spacing:.3em;color:var(--mute-2);font-variant-numeric:tabular-nums}
 .album-meta h3{
   margin:0;font-family:var(--serif);font-weight:400;
   font-size:clamp(15px,1.34vw,19px);letter-spacing:.02em;color:rgba(246,244,240,.9);
 }
-.album-meta .pl{
-  margin:7px 0 0;display:flex;align-items:center;gap:8px;
-  font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute-2);
-  transition:color .4s var(--ease);
-}
-.album-meta .pl i{
-  display:block;width:0;height:0;
-  border-left:5px solid currentColor;
-  border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;
-  transition:transform .4s var(--ease);
-}
-.album:hover .album-meta .pl,.album:focus-visible .album-meta .pl{color:var(--apricot)}
-.album:hover .album-meta .pl i{transform:translateX(2px)}
-.album.is-playing .album-meta .pl{color:var(--magenta)}
-.album.is-playing .album-meta .pl i{animation:blink 1.1s steps(2) infinite}
-@keyframes blink{50%{opacity:.15}}
-
 .ody-foot{
   margin-top:auto;padding:clamp(26px,4vh,46px) var(--pad) 0;
   display:flex;align-items:center;gap:26px;

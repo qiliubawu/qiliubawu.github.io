@@ -44,18 +44,29 @@
       note: "Poise so complete it looks like silence." }
   ];
 
+  /* 21 首韩专主打，按发行时间排列（不含日专、单曲、小分队与个人作） */
   var ALBUMS = [
-    { id: "oohahh", t: "Like OOH-AHH", al: "The Story Begins", y: 2015, c: "#F0A98C", root: 261.63 },
-    { id: "cheerup", t: "CHEER UP", al: "Page Two", y: 2016, c: "#FF7BA9", root: 293.66 },
-    { id: "tt", t: "TT", al: "Twicecoaster: LANE 1", y: 2016, c: "#8FB8F0", root: 329.63 },
-    { id: "fancy", t: "FANCY", al: "FANCY YOU", y: 2019, c: "#FF5FA2", root: 349.23 },
-    { id: "feelspecial", t: "Feel Special", al: "Feel Special", y: 2019, c: "#C9A7F5", root: 392.00 },
-    { id: "cantstopme", t: "I CAN'T STOP ME", al: "Eyes wide open", y: 2020, c: "#5FD3C4", root: 440.00 },
-    { id: "talkthattalk", t: "Talk that Talk", al: "BETWEEN 1&2", y: 2022, c: "#FCC89B", root: 466.16 },
-    { id: "onespark", t: "ONE SPARK", al: "With YOU-th", y: 2024, c: "#FF9A5C", root: 523.25 },
-    { id: "thisisfor", t: "THIS IS FOR", al: "THIS IS FOR", y: 2025, c: "#FF7AA2", root: 587.33 },
-    { id: "meyou", t: "ME+YOU", al: "TEN: The Story Goes On", y: 2025, c: "#B9A0FF", root: 659.25 },
-    { id: "byebye", t: "Bye Bye Inhibitions", al: "Alok × NAYEON", y: 2026, c: "#7FE0B0", root: 698.46 }
+    { id: "oohahh",       t: "Like OOH-AHH",       al: "The Story Begins",            d: "2015.10.20", y: 2015, c: "#F0A98C" },
+    { id: "cheerup",      t: "CHEER UP",           al: "Page Two",                    d: "2016.04.25", y: 2016, c: "#FF7BA9" },
+    { id: "tt",           t: "TT",                 al: "Twicecoaster: LANE 1",        d: "2016.10.24", y: 2016, c: "#8FB8F0" },
+    { id: "signal",       t: "SIGNAL",             al: "Signal",                      d: "2017.05.15", y: 2017, c: "#A8D8B9" },
+    { id: "likey",        t: "LIKEY",              al: "Twicetagram",                 d: "2017.10.30", y: 2017, c: "#FFC978" },
+    { id: "heartshaker",  t: "Heart Shaker",       al: "Merry & Happy",               d: "2017.12.11", y: 2017, c: "#9FD6E8" },
+    { id: "whatislove",   t: "What is Love?",      al: "What is Love?",               d: "2018.04.09", y: 2018, c: "#F5B7D0" },
+    { id: "dancethenight",t: "Dance the Night Away", al: "Summer Nights",             d: "2018.07.09", y: 2018, c: "#7FD8C8" },
+    { id: "yesoryes",     t: "YES or YES",         al: "YES or YES",                  d: "2018.11.05", y: 2018, c: "#E8A0C8" },
+    { id: "fancy",        t: "FANCY",              al: "Fancy You",                   d: "2019.04.22", y: 2019, c: "#FF5FA2" },
+    { id: "feelspecial",  t: "Feel Special",       al: "Feel Special",                d: "2019.09.23", y: 2019, c: "#C9A7F5" },
+    { id: "moreandmore",  t: "MORE & MORE",        al: "More & More",                 d: "2020.06.01", y: 2020, c: "#8FB0E8" },
+    { id: "cantstopme",   t: "I CAN'T STOP ME",    al: "Eyes wide open",              d: "2020.10.26", y: 2020, c: "#5FD3C4" },
+    { id: "alcoholfree",  t: "Alcohol-Free",       al: "Taste of Love",               d: "2021.06.11", y: 2021, c: "#FFD79A" },
+    { id: "scientist",    t: "SCIENTIST",          al: "Formula of Love: O+T=<3",     d: "2021.11.12", y: 2021, c: "#B9A0FF" },
+    { id: "talkthattalk", t: "Talk that Talk",     al: "BETWEEN 1&2",                 d: "2022.08.26", y: 2022, c: "#FCC89B" },
+    { id: "setmefree",    t: "SET ME FREE",        al: "Ready to Be",                 d: "2023.03.10", y: 2023, c: "#8AD8A8" },
+    { id: "onespark",     t: "ONE SPARK",          al: "With YOU-th",                 d: "2024.02.23", y: 2024, c: "#FF9A5C" },
+    { id: "strategy",     t: "Strategy",           al: "Strategy",                    d: "2024.12.06", y: 2024, c: "#7FB8F5" },
+    { id: "thisisfor",    t: "THIS IS FOR",        al: "THIS IS FOR",                 d: "2025.07.11", y: 2025, c: "#FF7AA2" },
+    { id: "meyou",        t: "ME+YOU",             al: "TEN: The Story Goes On",      d: "2025.10.10", y: 2025, c: "#D9A0FF" }
   ];
 
   /* 经纬度 —— THIS IS FOR 世巡全程：2025 年段 26 场 / 14 城 + 2026 年段 55 场 / 31 城 = 81 场 45 城，按时间先后 */
@@ -125,12 +136,11 @@
                     jp: "暗がりに浮かぶ九つのシルエット。なぞるたび、部屋の色が変わります。" },
     "ody.kicker": { en: "Chapter Two", cn: "第二章", kr: "챕터 투", jp: "第二章" },
     "ody.title":  { en: "Sonic Odyssey", cn: "音乐编年史", kr: "소닉 오디세이", jp: "ソニック・オデッセイ" },
-    "ody.lead":   { en: "Eleven records, eleven years. Pull a sleeve and let it spin.",
-                    cn: "十一张唱片，十一年。抽出封套，让它转起来。",
-                    kr: "열한 장의 레코드, 십일 년. 슬리브를 빼서 돌려 보세요.",
-                    jp: "十一枚のレコード、十一年。スリーブを引き出して回してください。" },
+    "ody.lead":   { en: "Twenty-one Korean title tracks, eleven years — laid out in the order they were released.",
+                    cn: "二十一首韩专主打，十一年——按发行先后排开。",
+                    kr: "스물한 곡의 한국 타이틀곡, 십일 년 — 발매 순서대로 놓았습니다.",
+                    jp: "二十一の韓国アルバム表題曲、十一年——リリース順に並べました。" },
     "ody.now":    { en: "scroll to travel", cn: "滚动以穿越", kr: "스크롤해서 이동", jp: "スクロールで移動" },
-    "ody.play":   { en: "Preview", cn: "试听", kr: "미리듣기", jp: "試聴" },
     "fp.kicker":  { en: "Chapter Three", cn: "第三章", kr: "챕터 쓰리", jp: "第三章" },
     "fp.title":   { en: "Global Footprint", cn: "全球足迹", kr: "글로벌 풋프린트", jp: "グローバル・フットプリント" },
     "fp.lead":    { en: "Eighty-one shows, four continents — and a National Stadium first in Tokyo.",
@@ -470,10 +480,14 @@
     var sec = $("#odyssey"), track = $("#odyTrack"), bar = $("#odyBar"), now = $("#odyNow");
     if (!sec || !track) return;
 
+    /* 专辑名里有 O+T=<3 这种尖括号，必须转义后再拼进 innerHTML */
+    var esc = function (s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    };
+
     ALBUMS.forEach(function (a, i) {
       var el = document.createElement("article");
       el.className = "album";
-      el.tabIndex = 0;
       el.style.setProperty("--c", a.c);
       el.dataset.id = a.id;
       el.innerHTML =
@@ -481,31 +495,15 @@
           '<div class="vinyl"></div>' +
           '<div class="cover">' +
             '<span class="cn">' + String(i + 1).padStart(2, "0") + " / " + String(ALBUMS.length).padStart(2, "0") + '</span>' +
-            '<span class="ct">' + a.t + '</span>' +
-            '<span class="cy">' + a.y + '</span>' +
+            '<span class="ct">' + esc(a.t) + '</span>' +
+            '<span class="cy">' + esc(a.y) + '</span>' +
           '</div>' +
         '</div>' +
         '<div class="album-meta">' +
-          '<span class="yr">' + a.y + '</span>' +
-          '<h3>' + a.al + '</h3>' +
-          '<p class="pl"><i></i><span data-i18n="ody.play">Preview</span></p>' +
+          '<span class="dt">' + esc(a.d) + '</span>' +
+          '<h3>' + esc(a.al) + '</h3>' +
         '</div>';
       track.appendChild(el);
-
-      function toggle() {
-        var playing = el.classList.contains("is-playing");
-        $$(".album.is-playing", track).forEach(function (x) { x.classList.remove("is-playing"); });
-        if (!playing) {
-          el.classList.add("is-playing");
-          AUDIO.play(a);
-        } else {
-          AUDIO.stop();
-        }
-      }
-      el.addEventListener("click", toggle);
-      el.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
-      });
     });
 
     var lastIdx = -1;
@@ -525,10 +523,10 @@
   })();
 
   /* ============================================================
-     声音：环境音 + 唱片试听
+     声音：只保留环境垫音（唱片墙不做试听）
      ============================================================ */
   var AUDIO = (function () {
-    var ctx = null, ambientGain = null, ambientOn = false, track = null, motifTimer = null;
+    var ctx = null, ambientGain = null, ambientOn = false;
 
     function ac() {
       if (!ctx) {
@@ -570,56 +568,7 @@
       ambientOn = false;
     }
 
-    /* 试听：优先播放 audio/<id>.mp3，没有就合成一段和弦琶音 */
-    var MISSING = {};
-    function play(a) {
-      stop();
-      var c = ac(); if (!c) return;
-      if (MISSING[a.id]) { motif(a); return; }
-      var el = new Audio("audio/" + a.id + ".mp3");
-      el.volume = 0.5;
-      var settled = false;
-      var fallback = function () {
-        if (settled) return;
-        settled = true;
-        MISSING[a.id] = true;   /* 记下来，下次直接合成，不再发一次 404 */
-        motif(a);
-      };
-      el.addEventListener("error", fallback, { once: true });
-      var pr = el.play();
-      if (pr && pr.then) pr.then(function () { settled = true; track = el; }).catch(fallback);
-      setTimeout(fallback, 420);
-    }
-    function motif(a) {
-      var c = ac(); if (!c) return;
-      var base = a.root;
-      var steps = [0, 4, 7, 11, 7, 4];
-      var out = c.createGain(); out.gain.value = 0.0; out.connect(c.destination);
-      var filt = c.createBiquadFilter(); filt.type = "lowpass"; filt.frequency.value = 2600;
-      filt.connect(out);
-      steps.forEach(function (s, i) {
-        var t = c.currentTime + i * 0.26;
-        var o = c.createOscillator(); o.type = "triangle";
-        o.frequency.value = base * Math.pow(2, s / 12);
-        var g = c.createGain();
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.16, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
-        o.connect(g); g.connect(filt);
-        o.start(t); o.stop(t + 1);
-      });
-      out.gain.setValueAtTime(0, c.currentTime);
-      out.gain.linearRampToValueAtTime(0.9, c.currentTime + 0.08);
-      out.gain.setTargetAtTime(0, c.currentTime + steps.length * 0.26, 0.5);
-      motifTimer = setTimeout(function () { try { out.disconnect(); } catch (e) {} }, 4200);
-    }
-    function stop() {
-      if (track) { try { track.pause(); } catch (e) {} track = null; }
-      if (motifTimer) { clearTimeout(motifTimer); motifTimer = null; }
-    }
-
     return {
-      play: play, stop: stop,
       toggleAmbient: function () { ambientOn ? stopAmbient() : startAmbient(); return ambientOn; }
     };
   })();

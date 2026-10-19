@@ -266,6 +266,8 @@
     el.addEventListener("pointerdown", function (e) {
       if (Store.state === "sleeping") return;
       if (Store.state === "open") return;
+      /* 收起途中正在被吸回去，这时不该再被抓起来拖 */
+      if (Store.state === "closing") return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
 
       e.preventDefault();
@@ -473,7 +475,14 @@
   /* ============================================================
      7. 状态机
      ============================================================ */
+  var CLOSE_MS = 760;        /* 收起过程时长，略长于 .folder-front 的 .72s */
+  var closeStateTimer = null;
+  var closeStart = 0;
+
   function setState(s) {
+    clearTimeout(closeStateTimer);
+    closeStateTimer = null;
+
     Store.state = s;
     scene.dataset.state = s;
 
@@ -481,6 +490,10 @@
 
     if (s === "sleeping") {
       nodes.forEach(function (n) {
+        /* 收起结束后六个图标都叠在中心，若继续跑碰撞会被互相弹散，
+           下次展开就从一圈散点上起飞。这里直接钉在中心。 */
+        n.x = 0; n.y = 0;
+        n.vx = 0; n.vy = 0;
         n.tx = 0; n.ty = 0;
         n.amp = 0; n.hot = 0;
         n.el.style.setProperty("--rx", "0deg");
@@ -488,6 +501,23 @@
       });
       folder.setAttribute("aria-label", "ZZX 作品文件夹，按下以唤醒并展开全部作品");
       setExpression("calm");
+    } else if (s === "closing") {
+      /* 收起：文件被吸回文件夹中心，前盖合上，最后才真正进入 sleeping */
+      closeStart = performance.now();
+      nodes.forEach(function (n) {
+        n.fromX = n.x;
+        n.fromY = n.y;
+        n.tx = 0; n.ty = 0;
+        n.hot = 0;
+        n.amp = 0;
+      });
+      folder.setAttribute("aria-label", "ZZX 作品文件夹，正在收起");
+      setExpression("calm");
+      sfx.sleep();
+      closeStateTimer = setTimeout(function () {
+        closeStateTimer = null;
+        if (Store.state === "closing") setState("sleeping");
+      }, CLOSE_MS);
     } else if (s === "awakened") {
       computeTargets();
       nodes.forEach(function (n, i) {
@@ -685,17 +715,32 @@
 
   function updatePhysics(dt) {
     var cx = 0, cy = 0;   /* 文件坐标原点即 scene 中心 */
+    var closing = Store.state === "closing";
 
     for (var i = 0; i < nodes.length; i++) {
       var f = nodes[i];
 
-      if (!f.dragging) {
+      if (closing) {
+        /* 收起：按真实时间插值收向中心（不用帧累积，低帧率也不会滞后），
+           缓动用 smoothstep，起手慢、中间快、末端收住 */
+        var cp = clamp((performance.now() - closeStart) / CLOSE_MS, 0, 1);
+        var ce = cp * cp * (3 - 2 * cp);
+        var keep = 1 - ce;
+        /* 一边收一边微微旋转（最多约 30°），走成螺旋而不是直线平移，
+           看起来像被吸进去；转角随半径一起衰减，终点仍然是正中心 */
+        var ang = ce * 0.52;
+        var cs = Math.cos(ang), sn = Math.sin(ang);
+        var bx = f.fromX || 0, by = f.fromY || 0;
+        f.x = (bx * cs - by * sn) * keep;
+        f.y = (bx * sn + by * cs) * keep;
+        f.vx = 0;
+        f.vy = 0;
+      } else if (!f.dragging) {
         var ax = -SPRING_K * (f.x - f.tx) - SPRING_C * f.vx;
         var ay = -SPRING_K * (f.y - f.ty) - SPRING_C * f.vy;
 
         /* 磁吸：指针靠近时向光标牵引（已固定的不参与，免得被拽走） */
-        if (!f.pinned && Store.pointer.inside &&
-            Store.state !== "sleeping" && Store.state !== "open") {
+        if (!f.pinned && Store.pointer.inside && Store.state === "awakened") {
           var mdx = Store.pointer.x - Store.ox - (Store.w / 2 + f.x);
           var mdy = Store.pointer.y - Store.oy - (Store.h / 2 + f.y);
           var md = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -726,8 +771,8 @@
       f.hot *= Math.pow(0.94, dt * 60);
     }
 
-    /* 圆形碰撞 */
-    resolveCollisions();
+    /* 圆形碰撞（收起时都在往中心挤，别互相顶；睡着时全部叠在中心，也不需要） */
+    if (!closing && Store.state !== "sleeping") resolveCollisions();
 
     /* 写入 DOM */
     for (var j = 0; j < nodes.length; j++) {
@@ -798,7 +843,8 @@
 
     var cx = Store.w / 2;
     var cy = Store.h / 2;
-    var visible = Store.state === "awakened" || Store.state === "open";
+    var visible = Store.state === "awakened" || Store.state === "open" ||
+                  Store.state === "closing";
 
     for (var i = 0; i < nodes.length; i++) {
       var f = nodes[i];
@@ -1146,8 +1192,10 @@
     if (Store.state === "sleeping") {
       setState("awakened");
     } else if (Store.state === "awakened") {
-      setState("sleeping");
-      sfx.sleep();
+      setState("closing");
+    } else if (Store.state === "closing") {
+      /* 收起途中再点一下 = 反悔，重新展开 */
+      setState("awakened");
     }
   });
 
@@ -1176,7 +1224,7 @@
     }
     if (e.key === "Escape") {
       if (!winLayer.hidden) { closeApp(); return; }
-      if (Store.state === "awakened") setState("sleeping");
+      if (Store.state === "awakened") setState("closing");
     }
   });
 
@@ -1232,7 +1280,7 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       measure();
-      if (Store.state !== "sleeping") computeTargets();
+      if (Store.state === "awakened" || Store.state === "open") computeTargets();
     }, 120);
   });
 

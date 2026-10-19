@@ -401,6 +401,32 @@ body.is-grabbing *{cursor:grabbing !important}
 
 /* 休眠时文件藏在文件夹里 */
 .scene[data-state="sleeping"] .file{opacity:0;pointer-events:none}
+/* 收起结束后把缩放/透明度就地复位（此刻不可见，别让它当着用户的面反向长回去）。
+   去掉过渡，否则 0.14→1 会在隐藏状态下慢慢弹回，紧接着展开就会看到一个"放大"的抖动。 */
+.scene[data-state="sleeping"] .file-float{scale:1;opacity:1;transition:none}
+
+/* ---------- 收起过程 ----------
+   位置由 JS 按真实时间插值收向中心（带一点螺旋），这里只负责缩小 + 淡出。
+   层级刻意保持 .files 的基础值 4，低于 .zzx-folder 的 5：
+   图标是"被前盖吞进去"的，抬到上面反而会变成一堆小方块贴在盖子上。 */
+.scene[data-state="closing"] .file-float{
+  scale:.14;
+  opacity:0;
+  /* 时长必须 ≤ JS 里的 CLOSE_MS，否则状态切换时还没淡完，会"啪"地消失 */
+  transition:transform .22s ease-out,
+             opacity .7s cubic-bezier(.45,0,.7,1),
+             scale .7s cubic-bezier(.4,0,.6,1);
+}
+/* 收起途中 Zzz 气泡先别冒出来，等真正睡着再说 */
+.scene[data-state="closing"] .zzz{opacity:0}
+/* 名字比图标先退场：图标缩小后只剩一行字飘在文件夹上，很脏。
+   0.3s 刚好在图标钻进文件夹（约 380ms）之前退干净 */
+.scene[data-state="closing"] .file-name{
+  opacity:0;
+  transition:opacity .3s ease;
+}
+/* 文件夹轻轻吸一口气 */
+.scene[data-state="closing"] .zzx-folder{scale:1.045}
 
 /* 开窗：其余文件与文件夹退居背景层
    注意：这里绝对不能用 filter:blur()。

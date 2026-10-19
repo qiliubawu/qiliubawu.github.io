@@ -203,6 +203,8 @@ section{padding:104px 0;position:relative}
 .hero{
   min-height:100vh;display:grid;place-items:center;
   padding:120px 40px 80px;position:relative;
+  /* 星盘环在旋转，其轴对齐包围盒会周期性变大；不裁掉就会撑出横向滚动 */
+  overflow:hidden;
 }
 .hero-stage{
   position:relative;display:grid;place-items:center;
@@ -268,6 +270,22 @@ section{padding:104px 0;position:relative}
   font-size:10.5px;letter-spacing:.24em;color:var(--ink-3);
   font-family:var(--font-sans);margin-top:2px;text-indent:.24em;
 }
+/* 岁次：由脚本按系统年份写入，不在 HTML 里写死 */
+.hero-core .year-now{
+  justify-self:center;margin-top:10px;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;border-radius:999px;
+  border:1px solid var(--border-hi);
+  background:linear-gradient(180deg, rgba(212,175,55,.18), rgba(212,175,55,.03));
+  font-family:var(--font-sans);
+  font-size:11px;letter-spacing:.14em;color:var(--gold-lit);
+  text-indent:.14em;white-space:nowrap;
+}
+.hero-core .year-now b{
+  font-family:var(--font-kaishu);font-weight:700;
+  font-size:13.5px;letter-spacing:.06em;text-indent:0;
+}
+.hero-core .year-now i{font-style:normal;color:var(--ink-2);letter-spacing:.06em;text-indent:0}
 
 /* 生肖节点
    关键：环形定位（静态 transform）与反向自转（animation）必须分置于两层，
@@ -668,6 +686,25 @@ html.paper .art-panel .veil{
   transition:border-color .28s,transform .28s;
 }
 .year-cell:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+/* 当年：描金 + 左侧朱砂标 */
+.year-cell.is-now{
+  position:relative;
+  border-color:var(--gold);
+  background:
+    linear-gradient(180deg, rgba(212,175,55,.13), transparent 72%),
+    var(--panel-solid);
+  box-shadow:0 0 0 1px rgba(212,175,55,.22), 0 6px 22px rgba(212,175,55,.10);
+}
+.year-cell.is-now::after{
+  content:"今";
+  position:absolute;top:-8px;right:-6px;
+  width:19px;height:19px;border-radius:50%;
+  display:grid;place-content:center;
+  font-family:var(--font-kaishu);font-size:11px;line-height:1;
+  color:var(--seal-ink);background:var(--cinnabar);
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.year-cell.is-now .y{color:var(--gold-lit)}
 .year-cell .y{
   font-family:var(--font-sans);font-size:13px;color:var(--ink-2);
 }
@@ -753,6 +790,11 @@ html.paper .art-panel .veil{
   .zodiac-slot{width:50px;height:50px;margin:-25px 0 0 -25px}
   .zodiac-node .glyph{font-size:20px}
   .zodiac-node .branch{display:none}
+}
+@media (max-width:700px){
+  /* 92vw 比 hero 的内边距盒还宽，星盘会被挤到右侧溢出；这里收进内容区 */
+  .hero{padding:110px 16px 64px}
+  .hero-stage{width:min(620px,90vw);height:min(620px,90vw)}
 }
 @media (max-width:600px){
   .hero-stage{--radius:calc(min(420px,94vw) * -0.4)}

@@ -41,6 +41,8 @@
       <div class="ttl">十二生肖</div>
       <div class="sub">ZODIAC</div>
       <div class="en">十二地支 · 十二时辰</div>
+      <!-- 岁次随系统时间自动更新，不写死 -->
+      <div class="year-now" id="yearNow" aria-live="polite"></div>
     </div>
 
     <!-- 12 个生肖节点：--i 决定环形角度（slot 定位 / node 自转，两层分离） -->
@@ -597,6 +599,47 @@
   sw.addEventListener("keydown", function (e) {
     if (e.key === " " || e.key === "Enter") { e.preventDefault(); sw.click(); }
   });
+
+  /* ---- 岁次与年份对照表：按系统年份推算，避免页面写死后过期 ----
+     天干：年份 - 4 取余 10；地支：年份 - 4 取余 12。
+     2026 → (2026-4)%10=2 丙，(2026-4)%12=6 午 → 丙午马年。 */
+  var GAN = "甲乙丙丁戊己庚辛壬癸";
+  var ZHI = "子丑寅卯辰巳午未申酉戌亥";
+  var BEAST = "鼠牛虎兔龙蛇马羊猴鸡狗猪";
+
+  function gz(y) {
+    var g = ((y - 4) % 10 + 10) % 10;
+    var z = ((y - 4) % 12 + 12) % 12;
+    return { z: ZHI[z], b: BEAST[z], text: GAN[g] + ZHI[z] };
+  }
+
+  var thisYear = new Date().getFullYear();
+  var cur = gz(thisYear);
+
+  var badge = document.getElementById("yearNow");
+  if (badge) {
+    badge.innerHTML = "<b>" + cur.text + "</b><i>" + thisYear + " · " + cur.b + "年</i>";
+    badge.title = "岁次" + cur.text + "，生肖属" + cur.b;
+  }
+
+  /* 年份表重排：本轮十二支（从「子」年起的十二年）+ 上一轮十二年。
+     表是 7 列，两段都按升序排，读起来才是"一轮接一轮"，
+     倒序会让 2031 后面突然跳回 2019。 */
+  var grid = document.querySelector(".tab-panel.p-a .year-grid");
+  if (grid) {
+    var start = thisYear - (((thisYear - 4) % 12 + 12) % 12);
+    var out = "";
+    for (var i = 0; i < 24; i++) {
+      var y = i < 12 ? start + i : start - 12 + (i - 12);
+      var c = gz(y);
+      out += '<div class="year-cell' + (y === thisYear ? " is-now" : "") + '">' +
+               '<span class="y">' + y + '</span>' +
+               '<span class="z">' + c.b + '</span>' +
+               '<span class="gz">' + c.text + '</span>' +
+             '</div>';
+    }
+    grid.innerHTML = out;
+  }
 })();
 </script>
 </body>

@@ -52,28 +52,59 @@
     { id: "feelspecial", t: "Feel Special", al: "Feel Special", y: 2019, c: "#C9A7F5", root: 392.00 },
     { id: "cantstopme", t: "I CAN'T STOP ME", al: "Eyes wide open", y: 2020, c: "#5FD3C4", root: 440.00 },
     { id: "talkthattalk", t: "Talk that Talk", al: "BETWEEN 1&2", y: 2022, c: "#FCC89B", root: 466.16 },
-    { id: "onespark", t: "ONE SPARK", al: "With YOU-th", y: 2024, c: "#FF9A5C", root: 523.25 }
+    { id: "onespark", t: "ONE SPARK", al: "With YOU-th", y: 2024, c: "#FF9A5C", root: 523.25 },
+    { id: "thisisfor", t: "THIS IS FOR", al: "THIS IS FOR", y: 2025, c: "#FF7AA2", root: 587.33 },
+    { id: "meyou", t: "ME+YOU", al: "TEN: The Story Goes On", y: 2025, c: "#B9A0FF", root: 659.25 },
+    { id: "byebye", t: "Bye Bye Inhibitions", al: "Alok × NAYEON", y: 2026, c: "#7FE0B0", root: 698.46 }
   ];
 
-  /* 经纬度 */
+  /* 经纬度 —— THIS IS FOR 世巡全程：2025 年段 26 场 / 14 城 + 2026 年段 55 场 / 31 城 = 81 场 45 城，按时间先后 */
   var CITIES = [
-    { n: "Seoul", v: "KSPO Dome · Olympic Park", lat: 37.52, lon: 126.98, k: "arena", d: "Where it began — six nights under one roof." },
-    { n: "Tokyo", v: "Nissan Stadium", lat: 35.51, lon: 139.62, k: "stadium", d: "Two nights, 140,000 candy lights." },
-    { n: "Osaka", v: "Kyocera Dome", lat: 34.67, lon: 135.50, k: "arena", d: "The dome that sold out in minutes." },
-    { n: "Bangkok", v: "Impact Arena", lat: 13.76, lon: 100.50, k: "arena", d: "Four nights, one continuous roar." },
-    { n: "Singapore", v: "National Stadium", lat: 1.30, lon: 103.87, k: "stadium", d: "A sea of apricot across the bay." },
-    { n: "Manila", v: "Philippine Arena", lat: 14.79, lon: 120.95, k: "arena", d: "The loudest crowd on the tour." },
-    { n: "Sydney", v: "Qudos Bank Arena", lat: -33.85, lon: 151.06, k: "arena", d: "Southern hemisphere, sold out twice." },
-    { n: "Los Angeles", v: "SoFi Stadium", lat: 33.95, lon: -118.34, k: "stadium", d: "A stadium debut under California light." },
-    { n: "New York", v: "MetLife Stadium", lat: 40.81, lon: -74.07, k: "stadium", d: "East coast, 80,000 strong." },
-    { n: "Chicago", v: "United Center", lat: 41.88, lon: -87.67, k: "arena", d: "Midwest, midwinter, sold out." },
-    { n: "Dallas", v: "Globe Life Field", lat: 32.75, lon: -97.08, k: "stadium", d: "Texas, at full volume." },
-    { n: "Mexico City", v: "Foro Sol", lat: 19.40, lon: -99.09, k: "stadium", d: "Altitude, and a wall of sound." },
-    { n: "Toronto", v: "Scotiabank Arena", lat: 43.64, lon: -79.38, k: "arena", d: "Two nights in the north." },
-    { n: "London", v: "The O2", lat: 51.50, lon: 0.00, k: "arena", d: "The Thames, lit in magenta." },
-    { n: "Paris", v: "Accor Arena", lat: 48.83, lon: 2.37, k: "arena", d: "A European first, long overdue." },
-    { n: "Berlin", v: "Mercedes-Benz Arena", lat: 52.50, lon: 13.44, k: "arena", d: "Cold night, warm room." },
-    { n: "Jakarta", v: "Gelora Bung Karno", lat: -6.21, lon: 106.80, k: "stadium", d: "70,000 in the rain, none of them left." }
+    { n: "Incheon", v: "INSPIRE Arena", lat: 37.45, lon: 126.45, k: "arena", d: "Two nights opened the tour, July 2025." },
+    { n: "Osaka", v: "Kyocera Dome", lat: 34.67, lon: 135.48, k: "stadium", d: "Two nights at Kyocera Dome." },
+    { n: "Nagoya", v: "Vantelin Dome", lat: 35.19, lon: 136.95, k: "stadium", d: "Two nights in Aichi." },
+    { n: "Fukuoka", v: "Mizuho PayPay Dome", lat: 33.60, lon: 130.36, k: "stadium", d: "Two nights in Fukuoka." },
+    { n: "Tokyo", v: "Tokyo Dome", lat: 35.71, lon: 139.75, k: "stadium", d: "Two nights at Tokyo Dome." },
+    { n: "Macao", v: "The Venetian Arena", lat: 22.15, lon: 113.56, k: "arena", d: "Two nights in Macao." },
+    { n: "Bulacan", v: "Philippine Arena", lat: 14.79, lon: 120.95, k: "arena", d: "One night at Asia's largest indoor arena." },
+    { n: "Singapore", v: "Singapore Indoor Stadium", lat: 1.30, lon: 103.87, k: "arena", d: "Two nights in the Lion City." },
+    { n: "Kuala Lumpur", v: "National Hockey Stadium", lat: 3.06, lon: 101.69, k: "arena", d: "One night in Kuala Lumpur — the only Malaysian stop." },
+    { n: "Sydney", v: "Qudos Bank Arena", lat: -33.85, lon: 151.06, k: "arena", d: "Two nights — the southern hemisphere debut." },
+    { n: "Melbourne", v: "Rod Laver Arena", lat: -37.82, lon: 144.98, k: "arena", d: "Two nights at Rod Laver." },
+    { n: "Kaohsiung", v: "Kaohsiung National Stadium", lat: 22.70, lon: 120.29, k: "stadium", d: "Two nights in Kaohsiung — TWICE's first ever show in Taiwan." },
+    { n: "Hong Kong", v: "Kai Tak Stadium", lat: 22.30, lon: 114.21, k: "stadium", d: "Two nights at Kai Tak." },
+    { n: "Bangkok", v: "Impact Arena", lat: 13.91, lon: 100.55, k: "arena", d: "Two nights closed 2025." },
+    { n: "Vancouver", v: "Rogers Arena", lat: 49.28, lon: -123.11, k: "arena", d: "Two nights opened the year — Rogers Arena, January." },
+    { n: "Seattle", v: "Climate Pledge Arena", lat: 47.62, lon: -122.35, k: "arena", d: "Two nights at Climate Pledge, the first US stop." },
+    { n: "Oakland", v: "Oakland Arena", lat: 37.75, lon: -122.20, k: "arena", d: "Two nights across the bay." },
+    { n: "Los Angeles", v: "Kia Forum", lat: 33.96, lon: -118.34, k: "arena", d: "Four nights at the Forum — the longest stand of the tour." },
+    { n: "Phoenix", v: "Mortgage Matchup Center", lat: 33.45, lon: -112.07, k: "arena", d: "One night in the desert." },
+    { n: "Dallas", v: "American Airlines Center", lat: 32.79, lon: -96.81, k: "arena", d: "Two nights in Texas, the 360° stage in the round." },
+    { n: "Washington", v: "Capital One Arena", lat: 38.90, lon: -77.02, k: "arena", d: "Two nights in the capital." },
+    { n: "New York", v: "UBS Arena", lat: 40.71, lon: -73.72, k: "arena", d: "Three nights on Long Island." },
+    { n: "Philadelphia", v: "Xfinity Mobile Arena", lat: 39.90, lon: -75.17, k: "arena", d: "One night in Philadelphia." },
+    { n: "Atlanta", v: "State Farm Arena", lat: 33.76, lon: -84.40, k: "arena", d: "One night in Georgia." },
+    { n: "Montreal", v: "Bell Centre", lat: 45.50, lon: -73.57, k: "arena", d: "One night, en français." },
+    { n: "Hamilton", v: "TD Coliseum", lat: 43.26, lon: -79.83, k: "arena", d: "Two nights in Ontario." },
+    { n: "Taipei", v: "Taipei Dome", lat: 25.04, lon: 121.56, k: "stadium", d: "Three nights under the Taipei Dome." },
+    { n: "Orlando", v: "Kia Center", lat: 28.54, lon: -81.38, k: "arena", d: "Two nights in Florida." },
+    { n: "Charlotte", v: "Spectrum Center", lat: 35.23, lon: -80.84, k: "arena", d: "One night in North Carolina." },
+    { n: "Boston", v: "TD Garden", lat: 42.37, lon: -71.06, k: "arena", d: "Two nights at TD Garden." },
+    { n: "Chicago", v: "United Center", lat: 41.88, lon: -87.67, k: "arena", d: "Two nights in the Midwest." },
+    { n: "Detroit", v: "Little Caesars Arena", lat: 42.34, lon: -83.06, k: "arena", d: "One night in Detroit." },
+    { n: "Saint Paul", v: "Grand Casino Arena", lat: 44.94, lon: -93.10, k: "arena", d: "One night in Minnesota." },
+    { n: "Denver", v: "Ball Arena", lat: 39.75, lon: -105.01, k: "arena", d: "One night a mile high." },
+    { n: "Austin", v: "Moody Center", lat: 30.28, lon: -97.73, k: "arena", d: "Two nights in Texas's other city." },
+    { n: "Tokyo", v: "Japan National Stadium", lat: 35.68, lon: 139.71, k: "stadium", d: "Three nights, 240,000 — the first foreign act to headline National Stadium." },
+    { n: "Lisbon", v: "MEO Arena", lat: 38.77, lon: -9.09, k: "arena", d: "The European leg opened here." },
+    { n: "Barcelona", v: "Palau Sant Jordi", lat: 41.36, lon: 2.15, k: "arena", d: "One night at Palau Sant Jordi." },
+    { n: "Paris", v: "Accor Arena", lat: 48.84, lon: 2.38, k: "arena", d: "Two nights at Accor Arena." },
+    { n: "Turin", v: "Inalpi Arena", lat: 45.04, lon: 7.65, k: "arena", d: "One night in Turin." },
+    { n: "Berlin", v: "Uber Arena", lat: 52.51, lon: 13.44, k: "arena", d: "One night at Uber Arena." },
+    { n: "Cologne", v: "LANXESS arena", lat: 50.94, lon: 6.98, k: "arena", d: "One night on the Rhine." },
+    { n: "Amsterdam", v: "Ziggo Dome", lat: 52.31, lon: 4.94, k: "arena", d: "Two nights at Ziggo Dome." },
+    { n: "London", v: "The O2", lat: 51.50, lon: 0.00, k: "arena", d: "Two nights closed Europe at The O2." },
+    { n: "Seoul", v: "KSPO Dome", lat: 37.52, lon: 127.07, k: "arena", d: "Three nights at KSPO Dome — the 81st show, and the last." }
   ];
 
   /* ============================================================
@@ -94,30 +125,30 @@
                     jp: "暗がりに浮かぶ九つのシルエット。なぞるたび、部屋の色が変わります。" },
     "ody.kicker": { en: "Chapter Two", cn: "第二章", kr: "챕터 투", jp: "第二章" },
     "ody.title":  { en: "Sonic Odyssey", cn: "音乐编年史", kr: "소닉 오디세이", jp: "ソニック・オデッセイ" },
-    "ody.lead":   { en: "Eight records, one decade. Pull a sleeve and let it spin.",
-                    cn: "八张唱片，一个十年。抽出封套，让它转起来。",
-                    kr: "여덟 장의 레코드, 십 년. 슬리브를 빼서 돌려 보세요.",
-                    jp: "八枚のレコード、ひとつの十年。スリーブを引き出して回してください。" },
+    "ody.lead":   { en: "Eleven records, eleven years. Pull a sleeve and let it spin.",
+                    cn: "十一张唱片，十一年。抽出封套，让它转起来。",
+                    kr: "열한 장의 레코드, 십일 년. 슬리브를 빼서 돌려 보세요.",
+                    jp: "十一枚のレコード、十一年。スリーブを引き出して回してください。" },
     "ody.now":    { en: "scroll to travel", cn: "滚动以穿越", kr: "스크롤해서 이동", jp: "スクロールで移動" },
     "ody.play":   { en: "Preview", cn: "试听", kr: "미리듣기", jp: "試聴" },
     "fp.kicker":  { en: "Chapter Three", cn: "第三章", kr: "챕터 쓰리", jp: "第三章" },
     "fp.title":   { en: "Global Footprint", cn: "全球足迹", kr: "글로벌 풋프린트", jp: "グローバル・フットプリント" },
-    "fp.lead":    { en: "From a Seoul showcase to the biggest stadiums on four continents.",
-                    cn: "从首尔的一场 showcase，到四大洲最大的体育场。",
-                    kr: "서울의 쇼케이스에서, 4개 대륙의 가장 큰 스타디움까지.",
-                    jp: "ソウルのショーケースから、4大陸の最大級スタジアムへ。" },
+    "fp.lead":    { en: "Eighty-one shows, four continents — and a National Stadium first in Tokyo.",
+                    cn: "八十一场，四大洲——以及在东京国立竞技场创下的第一次。",
+                    kr: "81회 공연, 4개 대륙 — 그리고 도쿄 국립경기장에서의 첫 기록.",
+                    jp: "81公演、4大陸——そして東京・国立競技場での史上初。" },
     "fp.s1":      { en: "Members", cn: "位成员", kr: "멤버", jp: "メンバー" },
-    "fp.s2":      { en: "Albums sold", cn: "专辑销量", kr: "앨범 판매량", jp: "アルバム売上" },
-    "fp.s3":      { en: "Shows played", cn: "场演出", kr: "공연 횟수", jp: "公演数" },
+    "fp.s2":      { en: "Shows on tour", cn: "场巡演", kr: "투어 공연", jp: "ツアー公演" },
+    "fp.s3":      { en: "Cities on tour", cn: "座城市", kr: "도시", jp: "都市" },
     "fp.s4":      { en: "Continents", cn: "个大洲", kr: "대륙", jp: "大陸" },
     "fp.legend1": { en: "Stadium show", cn: "体育场演出", kr: "스타디움 공연", jp: "スタジアム公演" },
     "fp.legend2": { en: "Arena tour", cn: "体育馆巡演", kr: "아레나 투어", jp: "アリーナツアー" },
     "gc.stadium": { en: "Stadium", cn: "体育场", kr: "스타디움", jp: "スタジアム" },
     "gc.arena":   { en: "Arena", cn: "体育馆", kr: "아레나", jp: "アリーナ" },
-    "foot.note":  { en: "A fan-made concept page. Not affiliated with JYP Entertainment. Figures are illustrative.",
-                    cn: "粉丝自制概念页，与 JYP Entertainment 无关；数据仅作示意。",
-                    kr: "팬메이드 콘셉트 페이지. JYP Entertainment와 무관하며 수치는 예시입니다.",
-                    jp: "ファンメイドのコンセプトページ。JYP Entertainment とは無関係で、数値は例示です。" }
+    "foot.note":  { en: "A fan-made concept page. Not affiliated with JYP Entertainment. Tour and release data as of October 2026.",
+                    cn: "粉丝自制概念页，与 JYP Entertainment 无关；巡演与发行数据截至 2026 年 10 月。",
+                    kr: "팬메이드 콘셉트 페이지. JYP Entertainment와 무관하며 투어·발매 데이터는 2026년 10월 기준입니다.",
+                    jp: "ファンメイドのコンセプトページ。JYP Entertainment とは無関係で、ツアー・リリース情報は2026年10月時点のものです。" }
   };
 
   var ROLES = {
@@ -167,35 +198,66 @@
     ]
   };
 
-  /* 巡演城市注解：与 CITIES 顺序一一对应 */
+  /* 巡演城市注解：与 CITIES 顺序一一对应（45 城） */
   var CITY_D = {
     cn: [
-      "一切开始的地方——同一个屋檐下六场。", "两晚，十四万盏糖果灯。", "几分钟就售罄的巨蛋。",
-      "四晚，一片没有断过的欢呼。", "海湾对岸一片杏色的海。", "巡演中最吵的一群观众。",
-      "南半球，两次售罄。", "在加州的光里完成体育场首秀。", "东海岸，八万人。",
-      "中西部，隆冬，售罄。", "得州，音量拉满。", "高原，和一面声音的墙。",
-      "北方的两晚。", "泰晤士河，被染成品红。", "欧洲的第一次，来得太迟。",
-      "寒冷的夜，温暖的厅。", "雨中七万人，一个都没走。"
+      "2025 年 7 月，两晚开场。", "京瓷巨蛋两晚。", "爱知两晚。",
+      "福冈两晚。", "东京巨蛋两晚。", "澳门两晚。",
+      "亚洲最大室内场馆的一晚。", "狮城两晚。", "吉隆坡一晚——全程唯一一场马来西亚。",
+      "南半球首站，两晚。", "罗德·拉沃尔两晚。", "高雄两晚——TWICE 在台湾的第一次开唱。", "启德两晚。",
+      "两晚收官 2025。",
+      "两晚开场，一月的罗杰斯体育馆。", "气候宣言球馆两晚，美国段的第一站。", "海湾对岸的两晚。",
+      "论坛球馆四晚，全程最长的一次驻场。", "沙漠里的一晚。", "得州两晚，360 度环台舞台。",
+      "首都两晚。", "长岛三晚。", "费城一晚。",
+      "佐治亚一晚。", "蒙特利尔一晚，全程法语。", "安大略两晚。",
+      "台北大巨蛋三晚。", "佛州两晚。", "北卡一晚。",
+      "TD 花园两晚。", "中西部两晚。", "底特律一晚。",
+      "明尼苏达一晚。", "一英里高城的一晚。", "得州另一座城的两晚。",
+      "三晚二十四万人——首个在国立竞技场开唱的海外艺人。", "欧洲段从这里开始。", "圣乔治宫一晚。",
+      "雅高体育馆两晚。", "都灵一晚。", "优步球馆一晚。",
+      "莱茵河畔一晚。", "齐戈穹顶两晚。", "O2 两晚，欧洲段收官。",
+      "KSPO 穹顶三晚——第 81 场，也是最后一场。"
     ],
     kr: [
-      "모든 것이 시작된 곳, 한 지붕 아래 여섯 번의 밤.", "두 번의 밤, 십사만 개의 캔디 라이트.", "몇 분 만에 매진된 돔.",
-      "네 번의 밤, 끊이지 않은 함성.", "베이 건너편의 살구빛 물결.", "투어에서 가장 시끄러운 관객.",
-      "남반구에서 두 번 매진.", "캘리포니아의 빛 아래에서 이룬 스타디움 데뷔.", "이스트코스트, 팔만 명.",
-      "중서부, 한겨울, 매진.", "텍사스, 볼륨 최대.", "고도, 그리고 소리의 벽.",
-      "북쪽에서의 두 밤.", "템스강, 마젠타로 물들다.", "유럽에서의 첫 공연, 너무 늦게 찾아온.",
-      "추운 밤, 따뜻한 홀.", "비 속의 칠만 명, 아무도 떠나지 않았다."
+      "2025년 7월, 두 번의 밤으로 투어가 시작됐다.", "교세라 돔에서 두 번의 밤.", "아이치에서 두 번의 밤.",
+      "후쿠오카에서 두 번의 밤.", "도쿄 돔에서 두 번의 밤.", "마카오에서 두 번의 밤.",
+      "아시아 최대 실내 공연장에서의 하룻밤.", "싱가포르에서 두 번의 밤.", "쿠알라룸푸르에서 하룻밤 — 말레이시아 유일의 공연.",
+      "남반구 첫 무대, 두 번의 밤.", "로드 레이버 아레나에서 두 번의 밤.", "가오슝에서 두 번 — 대만에서의 첫 공연.", "카이탁에서 두 번의 밤.",
+      "2025년을 두 번의 밤으로 마무리.",
+      "두 번의 밤으로 한 해를 열었다. 1월의 로저스 아레나.", "클라이밋 플레지 아레나에서 두 번, 미국 첫 무대.", "베이 건너편에서 두 번의 밤.",
+      "포럼에서 네 번, 투어 중 가장 긴 연속 공연.", "사막에서의 하룻밤.", "텍사스에서 두 번, 360도 원형 무대.",
+      "수도에서 두 번의 밤.", "롱아일랜드에서 세 번의 밤.", "필라델피아에서 하룻밤.",
+      "조지아에서 하룻밤.", "몬트리올에서 하룻밤, 프랑스어로.", "온타리오에서 두 번의 밤.",
+      "타이베이 돔에서 세 번의 밤.", "플로리다에서 두 번의 밤.", "노스캐롤라이나에서 하룻밤.",
+      "TD 가든에서 두 번의 밤.", "중서부에서 두 번의 밤.", "디트로이트에서 하룻밤.",
+      "미네소타에서 하룻밤.", "1마일 높은 도시에서의 하룻밤.", "텍사스의 또 다른 도시에서 두 번의 밤.",
+      "세 번의 밤, 24만 명 — 국립경기장 헤드라이너에 오른 첫 해외 아티스트.", "유럽 레그가 여기서 시작됐다.", "팔라우 산 조르디에서 하룻밤.",
+      "아코르 아레나에서 두 번의 밤.", "토리노에서 하룻밤.", "우버 아레나에서 하룻밤.",
+      "라인강변에서 하룻밤.", "지고 돔에서 두 번의 밤.", "O2에서 두 번, 유럽 레그 마무리.",
+      "KSPO 돔에서 세 번 — 81번째 공연이자 마지막."
     ],
     jp: [
-      "すべてが始まった場所。ひとつの屋根の下で六夜。", "二夜、十四万のキャンディライト。", "数分で完売したドーム。",
-      "四夜、途切れない歓声。", "ベイの向こうに広がるアプリコットの海。", "ツアーでいちばん騒がしい観客。",
-      "南半球で二度の完売。", "カリフォルニアの光の下でのスタジアムデビュー。", "イーストコースト、八万人。",
-      "中西部、真冬、完売。", "テキサス、音量は最大で。", "高度、そして音の壁。",
-      "北の地での二夜。", "テムズ川がマゼンタに染まる。", "ヨーロッパで初めて、ずいぶん遅れて。",
-      "寒い夜、暖かいホール。", "雨のなかの七万人、誰ひとり帰らなかった。"
+      "2025年7月、二夜でツアーが始まった。", "京セラドームで二夜。", "愛知で二夜。",
+      "福岡で二夜。", "東京ドームで二夜。", "マカオで二夜。",
+      "アジア最大の屋内会場で一夜。", "シンガポールで二夜。", "クアラルンプールで一夜——マレーシア唯一の公演。",
+      "南半球の初舞台、二夜。", "ロッド・レーバー・アリーナで二夜。", "高雄で二夜——台湾での初公演。", "啓徳で二夜。",
+      "二夜で2025年を締めくくった。",
+      "二夜で一年が始まった。一月のロジャーズ・アリーナ。", "クライメット・プレッジ・アリーナで二夜、アメリカ最初の地。", "ベイの向こう側で二夜。",
+      "フォーラムで四夜、ツアー最長の連続公演。", "砂漠での一夜。", "テキサスで二夜、360度の円形ステージ。",
+      "首都で二夜。", "ロングアイランドで三夜。", "フィラデルフィアで一夜。",
+      "ジョージアで一夜。", "モントリオールで一夜、フランス語で。", "オンタリオで二夜。",
+      "台北ドームで三夜。", "フロリダで二夜。", "ノースカロライナで一夜。",
+      "TDガーデンで二夜。", "中西部で二夜。", "デトロイトで一夜。",
+      "ミネソタで一夜。", "1マイル高地の街で一夜。", "テキサスのもう一つの街で二夜。",
+      "三夜で24万人——国立競技場のヘッドライナーに立った初の海外アーティスト。", "ヨーロッパ公演はここから始まった。", "パラウ・サン・ジョルディで一夜。",
+      "アコー・アレナで二夜。", "トリノで一夜。", "ウーバー・アレナで一夜。",
+      "ライン川沿いで一夜。", "ジッゴ・ドームで二夜。", "O2で二夜、ヨーロッパ公演の締めくくり。",
+      "KSPOドームで三夜——81公演目、そして最後の夜。"
     ]
   };
 
   var lang = "en";
+  var refreshCard = null;   // 由足迹模块注入：语言切换时重绘城市卡片
   function applyLang(next) {
     lang = next;
     document.documentElement.setAttribute("data-lang", next);
@@ -218,6 +280,8 @@
     $$("[data-lang-btn]").forEach(function (b) {
       b.classList.toggle("on", b.getAttribute("data-lang-btn") === next);
     });
+    // 地球卡片若正开着，跟着换语言（否则会停在旧语种）
+    if (refreshCard) refreshCard();
   }
   $$("[data-lang-btn]").forEach(function (b) {
     b.addEventListener("click", function () { applyLang(b.getAttribute("data-lang-btn")); });
@@ -603,7 +667,10 @@
     var ctx = cv.getContext("2d");
     var dpr = Math.min(devicePixelRatio || 1, 2);
     var S = 0, R = 0, cx = 0, cy = 0;
-    var rotY = 0.6, rotX = -0.22, dragging = false, lastX = 0, lastY = 0, spin = 0.0016;
+    /* rotX 是绕 X 轴的倾角：城市的纬度大多在 20°–55°N，
+       把倾角设成 +0.52rad（约 30°）才能让这一带落在球心；
+       原来的负值会把北半球压到球缘，整颗球看起来是空的。 */
+    var rotY = 0.6, rotX = 0.52, dragging = false, lastX = 0, lastY = 0, spin = 0.0016;
     var hits = [];
 
     function size() {
@@ -698,7 +765,12 @@
           ctx.font = '400 12px "Cormorant Garamond",Georgia,serif';
           ctx.fillStyle = "rgba(246,244,240,.92)";
           ctx.textBaseline = "bottom";
-          var nm = hh.city.n.toUpperCase();
+          /* 同一处压着几座城市时标出 "+N"，提示可以再点一次轮换 */
+          var near = 0;
+          for (var q = 0; q < hits.length; q++) {
+            if (Math.hypot(hits[q].x - hh.x, hits[q].y - hh.y) < 11) near++;
+          }
+          var nm = hh.city.n.toUpperCase() + (near > 1 ? " +" + (near - 1) : "");
           ctx.fillText(nm, hh.x + 20, hh.y - 19);
           var nw = ctx.measureText(nm).width;
           ctx.font = '300 9.5px "Inter",system-ui,sans-serif';
@@ -719,7 +791,7 @@
       }
     }
 
-    var active = null, hoverCity = null;
+    var active = null, hoverCity = null, lastPick = null;
     function loop() {
       if (!dragging) rotY += spin;
       draw();
@@ -753,14 +825,28 @@
     cv.addEventListener("click", function (e) {
       var r = cv.getBoundingClientRect();
       var mx = e.clientX - r.left, my = e.clientY - r.top;
-      var best = null, bd = 22;
+      /* 先按宽容差抓住离光标最近的光点 */
+      var best = null, bd = 20;
       hits.forEach(function (h) {
         var d = Math.hypot(h.x - mx, h.y - my);
         if (d < bd) { bd = d; best = h; }
       });
       if (!best) return;
-      active = best.city;
-      showCard(best.city);
+      /* 球面上有压在一起的城市：仁川/首尔、东京巨蛋/国立竞技场、澳门/香港。
+         以最近点为圆心聚成一簇，重复点击在同一簇里依次轮换，
+         这样每座城市都点得到，又不用为了"看得见"去改真实坐标。 */
+      var near = hits.filter(function (h) {
+        return Math.hypot(h.x - best.x, h.y - best.y) < 11;
+      });
+      near.sort(function (a, b) {
+        return Math.hypot(a.x - best.x, a.y - best.y) - Math.hypot(b.x - best.x, b.y - best.y);
+      });
+      var at = -1;
+      for (var i = 0; i < near.length; i++) if (near[i].city === lastPick) { at = i; break; }
+      var pick = near[at >= 0 ? (at + 1) % near.length : 0];
+      lastPick = pick.city;
+      active = pick.city;
+      showCard(pick.city);
     });
 
     function showCard(c) {
@@ -773,6 +859,8 @@
       clearTimeout(showCard._t);
       showCard._t = setTimeout(function () { card.classList.remove("on"); active = null; }, 6000);
     }
+
+    refreshCard = function () { if (active) showCard(active); };
 
     if (reduce) { draw(); return; }
     requestAnimationFrame(loop);

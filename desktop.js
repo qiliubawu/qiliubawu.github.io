@@ -36,7 +36,7 @@
      ============================================================ */
   var PROJECTS = [
     {
-      id: "zodiac", t: "十二生肖 · 华夏瑞兽", s: "十二生肖", g: "肖",
+      id: "zodiac", t: "十二生肖 · 华夏瑞兽", s: "Chinese Zodiac", g: "肖",
       c: "#D4AF37", cat: "国潮 CSS 艺术",
       tags: ["CSS艺术", "国潮", "纯CSS", "3D"],
       path: "十二生肖·华夏瑞兽.html", link: "/zodiac/",

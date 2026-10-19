@@ -8,6 +8,7 @@
     <meta name="description" content="赵紫旭 — 前端开发工程师作品集。macOS 桌面美学 + 拟人化微交互：唤醒 ZZX 文件夹，拆开作品盲盒。" />
     <meta name="theme-color" content="#F5F5F7" />
     <link rel="stylesheet" href="./desktop.css" />
+    <link rel="stylesheet" href="./apps.css" />
   </head>
   <body>
     <!-- 流体微光背景 -->
@@ -16,6 +17,9 @@
       <span class="orb orb-2"></span>
       <span class="orb orb-3"></span>
     </div>
+
+    <!-- X-Ray 透视层：激光向量 / 弧度 / 聚光灯束 -->
+    <canvas class="xray-canvas" id="xrayCanvas" aria-hidden="true"></canvas>
 
     <!-- 顶部状态栏 -->
     <header class="menubar">
@@ -27,6 +31,14 @@
       </div>
       <div class="mb-right">
         <span class="mb-clock" id="clock">--月--日 周- --:--</span>
+        <button class="mb-btn" id="xrayBtn" type="button" aria-pressed="false"
+                title="X-Ray 开发者透视（⌘/Ctrl + X）">
+          <span class="mb-btn-code">&lt;/&gt;</span><span class="mb-btn-label">X-Ray</span>
+        </button>
+        <button class="mb-btn" id="spotBtn" type="button" aria-pressed="false"
+                title="眼神聚光灯筛选（⌘/Ctrl + K）">
+          <span class="mb-btn-label">Spotlight</span><span class="mb-kbd">⌘K</span>
+        </button>
         <a class="mb-icon" href="https://github.com/qiliubawu" target="_blank" rel="noopener" aria-label="GitHub">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-1.94c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.07.78 2.16v3.2c0 .31.21.67.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
         </a>
@@ -41,42 +53,51 @@
 
     <!-- 桌面舞台 -->
     <main class="stage">
-      <div class="scene" id="scene" data-state="sleep">
+      <div class="scene" id="scene" data-state="sleeping">
+
+        <!-- 琴弦连线层：文件夹中心 → 每个项目文件 -->
+        <svg class="tether-svg" id="tetherSvg" aria-hidden="true"></svg>
+
         <!-- 散开的项目文件（JS 注入） -->
         <div class="files" id="files"></div>
 
-        <!-- ZZX 拟人化文件夹 -->
-        <div class="folder" id="folder" role="button" tabindex="0"
+        <!-- 三层夹心 ZZX 文件夹 -->
+        <div class="zzx-folder" id="folder" role="button" tabindex="0"
              aria-label="ZZX 作品文件夹，按下以唤醒并展开全部作品">
           <div class="folder-body">
+            <!-- 第一层：底板 -->
             <div class="folder-back"></div>
 
-            <!-- 夹在背板与前盖之间的彩色文件顶边 -->
-            <div class="peeks" aria-hidden="true">
-              <span class="peek" style="--c:#0891b2"></span>
-              <span class="peek" style="--c:#8b5cf6"></span>
-              <span class="peek" style="--c:#D4AF37"></span>
+            <!-- 第二层：内衬文件（夹在背板与前盖之间） -->
+            <div class="folder-inner-sheets" aria-hidden="true">
+              <span class="inner-sheet" style="--c:#0891b2"></span>
+              <span class="inner-sheet" style="--c:#8b5cf6"></span>
+              <span class="inner-sheet" style="--c:#D4AF37"></span>
             </div>
 
-            <!-- 前盖 -->
+            <!-- 第三层：3D 翻转前盖 -->
             <div class="folder-front">
               <span class="cover-sheen" aria-hidden="true"></span>
 
-              <div class="face" id="face" data-mood="calm" aria-hidden="true">
-                <span class="eye">
+              <div class="face" id="face" data-expression="calm" aria-hidden="true">
+                <span class="eye" data-side="l">
                   <span class="arc"></span>
                   <span class="ball"><i class="pupil"></i></span>
+                  <b class="sym sym-dizzy">@</b>
+                  <b class="sym sym-pain">&gt;</b>
                 </span>
-                <span class="eye">
+                <span class="eye" data-side="r">
                   <span class="arc"></span>
                   <span class="ball"><i class="pupil"></i></span>
+                  <b class="sym sym-dizzy">@</b>
+                  <b class="sym sym-pain">&lt;</b>
                 </span>
               </div>
 
               <div class="badge" aria-hidden="true">ZZX</div>
             </div>
 
-            <!-- Zzz 气泡置于前盖之外，避免被 overflow:hidden 裁切 -->
+            <!-- Zzz 气泡置于前盖之外，避免被裁切 -->
             <div class="zzz" aria-hidden="true"><i>Z</i><i>z</i><i>z</i></div>
           </div>
         </div>
@@ -85,27 +106,50 @@
       </div>
     </main>
 
-    <!-- Quick Look 窗口 -->
-    <div class="ql" id="ql" hidden>
-      <div class="ql-window" id="qlWindow" role="dialog" aria-modal="true" aria-labelledby="qlTitle" tabindex="-1">
-        <div class="ql-bar">
+    <!-- Dock -->
+    <nav class="dock" id="dock" aria-label="应用 Dock"></nav>
+
+    <!-- FPS / 遥测 HUD -->
+    <aside class="hud" id="hud" hidden aria-label="开发者遥测">
+      <div class="hud-head"><span class="hud-dot"></span><span>PERF</span><span class="hud-fps" id="hudFps">--</span></div>
+      <canvas id="fpsCanvas" width="220" height="46"></canvas>
+      <dl class="hud-grid">
+        <div><dt>θL</dt><dd id="hudThetaL">—</dd></div>
+        <div><dt>θR</dt><dd id="hudThetaR">—</dd></div>
+        <div><dt>dist</dt><dd id="hudDist">—</dd></div>
+        <div><dt>state</dt><dd id="hudState">—</dd></div>
+      </dl>
+    </aside>
+
+    <!-- Spotlight 筛选面板 -->
+    <div class="spotlight" id="spotlight" hidden>
+      <div class="spot-panel" role="dialog" aria-modal="true" aria-labelledby="spotTitle">
+        <div class="spot-head">
+          <span class="spot-eyebrow">SPOTLIGHT</span>
+          <h2 id="spotTitle">眼神聚光灯 · 按技术筛选</h2>
+          <button class="spot-close" id="spotClose" type="button" aria-label="关闭">✕</button>
+        </div>
+        <div class="spot-tags" id="spotTags"></div>
+        <p class="spot-foot">不匹配的文件会退到 18% 透明度，文件夹的眼睛会为匹配项打光。</p>
+      </div>
+    </div>
+
+    <!-- 统一应用窗口 -->
+    <div class="win-layer" id="winLayer" hidden>
+      <div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="winTitle" tabindex="-1">
+        <div class="win-bar">
           <div class="lights">
             <button class="light red" type="button" data-act="close" aria-label="关闭" title="关闭"></button>
-            <button class="light yellow" type="button" data-act="reload" aria-label="重新载入预览" title="重新载入预览"></button>
+            <button class="light yellow" type="button" data-act="reload" aria-label="重新载入" title="重新载入"></button>
             <button class="light green" type="button" data-act="open" aria-label="在新标签页打开" title="在新标签页打开"></button>
           </div>
-          <div class="ql-title" id="qlTitle">项目预览</div>
-          <div class="ql-right">
-            <button class="ql-link" id="qlOpen" type="button">在新标签页打开 ↗</button>
+          <div class="win-title" id="winTitle">项目预览</div>
+          <div class="win-right">
+            <span class="win-path" id="winPath">—</span>
+            <button class="win-open" id="winOpen" type="button">在新标签页打开 ↗</button>
           </div>
         </div>
-        <div class="ql-urlbar">
-          <span class="url-pill"><span class="url-dot" aria-hidden="true"></span><span id="qlUrl">—</span></span>
-        </div>
-        <div class="ql-body">
-          <iframe id="qlFrame" title="项目预览" referrerpolicy="no-referrer" loading="lazy"></iframe>
-          <div class="ql-loading" id="qlLoading"><span class="spinner" aria-hidden="true"></span><span>正在载入预览…</span></div>
-        </div>
+        <div class="win-body" id="winBody"></div>
       </div>
     </div>
 
@@ -115,5 +159,6 @@
     </noscript>
 
     <script src="./desktop.js"></script>
+    <script src="./apps.js"></script>
   </body>
 </html>

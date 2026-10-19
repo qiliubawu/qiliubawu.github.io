@@ -1,5 +1,6 @@
 /* ============================================================
    ZZX Desktop — Apple macOS 桌面美学 + 拟人化微交互
+   单一 rAF 主循环驱动：弹簧物理 / 双目追踪 / 琴弦连线 / HUD
    ============================================================ */
 
 /* ---------- 设计令牌 ---------- */
@@ -7,10 +8,15 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
           "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
           system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --bar-h: 28px;
   /* 弹簧感缓动（欠阻尼回弹） */
   --sp: cubic-bezier(.34, 1.56, .64, 1);
   --sp-soft: cubic-bezier(.22, 1.12, .36, 1);
+  /* X-Ray / 聚光灯强调色 */
+  --xray: #00E5FF;
+  --xray-ink: #00A8C0;
+  --glow: rgba(0,229,255,.55);
 }
 
 /* 浅色：晨雾白 */
@@ -39,10 +45,13 @@ html[data-theme="light"]{
   --badge-ink: rgba(4,48,92,.30);
   --badge-hl: rgba(255,255,255,.55);
 
-  --win-bg: rgba(250,250,252,.86);
+  --win-bg: rgba(250,250,252,.90);
   --win-line: rgba(0,0,0,.10);
   --win-head: rgba(246,246,248,.94);
   --shadow-win: 0 40px 100px rgba(0,0,0,.30), 0 8px 24px rgba(0,0,0,.14);
+
+  --dock-bg: rgba(255,255,255,.58);
+  --dock-line: rgba(0,0,0,.08);
 
   --orb-1: rgba(120,190,255,.55);
   --orb-2: rgba(255,175,205,.42);
@@ -51,6 +60,7 @@ html[data-theme="light"]{
   --orb-op: .95;
 
   --file-shadow: 0 10px 22px rgba(0,0,0,.14), 0 2px 5px rgba(0,0,0,.08);
+  --tether: rgba(10,132,255,.30);
 }
 
 /* 深色：暗夜星空灰 */
@@ -80,10 +90,13 @@ html[data-theme="dark"]{
   --badge-ink: rgba(20,22,26,.38);
   --badge-hl: rgba(255,255,255,.34);
 
-  --win-bg: rgba(38,38,41,.88);
+  --win-bg: rgba(38,38,41,.92);
   --win-line: rgba(255,255,255,.12);
   --win-head: rgba(48,48,52,.94);
   --shadow-win: 0 40px 100px rgba(0,0,0,.62), 0 8px 24px rgba(0,0,0,.4);
+
+  --dock-bg: rgba(42,42,46,.64);
+  --dock-line: rgba(255,255,255,.10);
 
   --orb-1: rgba(64,120,220,.42);
   --orb-2: rgba(150,80,200,.32);
@@ -92,6 +105,7 @@ html[data-theme="dark"]{
   --orb-op: .85;
 
   --file-shadow: 0 10px 24px rgba(0,0,0,.42), 0 2px 6px rgba(0,0,0,.3);
+  --tether: rgba(90,170,255,.34);
 }
 
 /* ---------- 基础 ---------- */
@@ -110,6 +124,7 @@ body{
 }
 
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
 
 :focus-visible{outline:2px solid #0A84FF;outline-offset:3px;border-radius:6px}
 
@@ -128,87 +143,103 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 .orb-1{
   width:52vw;height:52vw;min-width:460px;min-height:460px;
-  top:-14vw;left:-8vw;
+  left:-10vw;top:-14vh;
   background:radial-gradient(circle at 40% 40%, var(--orb-1), transparent 68%);
-  animation:drift-1 34s ease-in-out infinite alternate;
+  animation:drift1 38s ease-in-out infinite;
 }
 .orb-2{
   width:46vw;height:46vw;min-width:400px;min-height:400px;
-  right:-10vw;bottom:-12vw;
+  right:-8vw;top:6vh;
   background:radial-gradient(circle at 55% 45%, var(--orb-2), transparent 68%);
-  animation:drift-2 42s ease-in-out infinite alternate;
+  animation:drift2 46s ease-in-out infinite;
 }
 .orb-3{
-  width:38vw;height:38vw;min-width:320px;min-height:320px;
-  left:38vw;top:34vh;
-  background:radial-gradient(circle at 50% 50%, var(--orb-3), transparent 66%);
-  animation:drift-3 50s ease-in-out infinite alternate;
+  width:44vw;height:44vw;min-width:380px;min-height:380px;
+  left:26vw;bottom:-20vh;
+  background:radial-gradient(circle at 50% 50%, var(--orb-3), transparent 70%);
+  animation:drift3 52s ease-in-out infinite;
 }
-@keyframes drift-1{
-  from{transform:translate3d(0,0,0) scale(1)}
-  to  {transform:translate3d(9vw,7vh,0) scale(1.16)}
+@keyframes drift1{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%    {transform:translate3d(6vw,5vh,0) scale(1.08)}
 }
-@keyframes drift-2{
-  from{transform:translate3d(0,0,0) scale(1.08)}
-  to  {transform:translate3d(-8vw,-9vh,0) scale(.92)}
+@keyframes drift2{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%    {transform:translate3d(-5vw,7vh,0) scale(1.12)}
 }
-@keyframes drift-3{
-  from{transform:translate3d(-5vw,4vh,0) scale(.94)}
-  to  {transform:translate3d(7vw,-6vh,0) scale(1.12)}
+@keyframes drift3{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%    {transform:translate3d(4vw,-6vh,0) scale(1.06)}
 }
 
 /* ---------- 顶部状态栏 ---------- */
 .menubar{
-  position:fixed;top:0;left:0;right:0;z-index:120;
-  height:var(--bar-h);
+  position:fixed;top:0;left:0;right:0;
+  height:var(--bar-h);z-index:50;
   display:flex;align-items:center;justify-content:space-between;
-  gap:14px;
-  padding:0 14px;
+  padding:0 12px;
   background:var(--bar-bg);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
   backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
   border-bottom:1px solid var(--bar-line);
   color:var(--bar-text);
   font-size:12px;
-  letter-spacing:.005em;
-  transition:background .5s ease,border-color .5s ease,color .5s ease;
   user-select:none;
 }
-.mb-left{display:flex;align-items:center;gap:7px;min-width:0}
+.mb-left{display:flex;align-items:center;gap:8px;min-width:0}
 .logo-mark{
-  width:16px;height:16px;flex:none;border-radius:4.5px;
+  width:16px;height:16px;border-radius:4px;
   display:grid;place-items:center;
-  font-size:10px;font-weight:800;letter-spacing:0;
-  color:#fff;
-  background:linear-gradient(160deg,#0A84FF,#0055C8);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 1px 2px rgba(0,60,140,.35);
+  font-size:10px;font-weight:800;color:#fff;
+  background:linear-gradient(150deg,#38B6FF,#0A6FD1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  flex:0 0 auto;
 }
-.mb-name{font-weight:600}
+.mb-name{font-weight:600;letter-spacing:.01em}
 .mb-sep{color:var(--text-3)}
-.mb-role{color:var(--text-2);white-space:nowrap}
+.mb-role{color:var(--text-2);font-size:11.5px}
 
 .mb-right{display:flex;align-items:center;gap:4px}
+
 .mb-clock{
-  color:var(--text-2);
+  font-size:11.5px;color:var(--text-2);
   font-variant-numeric:tabular-nums;
-  letter-spacing:.02em;
-  margin-right:4px;
+  margin-right:6px;
+}
+
+.mb-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  height:20px;padding:0 8px;border-radius:6px;
+  font-size:11.5px;color:var(--icon);
+  transition:background .18s ease,color .18s ease,box-shadow .18s ease;
   white-space:nowrap;
 }
+.mb-btn:hover{background:var(--fold-hover);color:var(--icon-hover)}
+.mb-btn[aria-pressed="true"]{
+  background:rgba(0,229,255,.15);
+  color:var(--xray-ink);
+  box-shadow:inset 0 0 0 1px rgba(0,229,255,.38);
+}
+html[data-theme="dark"] .mb-btn[aria-pressed="true"]{color:var(--xray)}
+.mb-btn-code{font-family:var(--mono);font-size:10.5px;opacity:.85}
+.mb-kbd{
+  font-size:9.5px;opacity:.55;padding:1px 3px;border-radius:3px;
+  background:var(--fold);font-family:var(--mono);
+}
+
 .mb-icon{
-  width:22px;height:22px;border-radius:5px;
+  width:24px;height:20px;border-radius:6px;
   display:grid;place-items:center;
   color:var(--icon);
-  transition:background .18s,color .18s,transform .18s;
+  transition:background .18s ease,color .18s ease;
 }
 .mb-icon:hover{background:var(--fold-hover);color:var(--icon-hover)}
-.mb-icon:active{transform:scale(.92)}
 
-/* 主题开关 */
-.theme-sw{padding:3px 4px;border-radius:99px;margin-left:2px}
+/* 深浅色开关 */
+.theme-sw{width:38px;height:20px;border-radius:10px;display:grid;place-items:center;margin-left:2px}
 .sw-track{
-  display:block;position:relative;
-  width:32px;height:18px;border-radius:99px;
+  position:relative;display:block;
+  width:34px;height:18px;border-radius:9px;
   background:var(--track);
   transition:background .3s ease;
 }
@@ -216,16 +247,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   position:absolute;top:2px;left:2px;
   width:14px;height:14px;border-radius:50%;
   background:#fff;
-  box-shadow:0 1px 2.5px rgba(0,0,0,.28);
-  transition:transform .32s var(--sp), background .3s;
+  box-shadow:0 1px 3px rgba(0,0,0,.28);
+  transition:transform .32s var(--sp-soft),background .3s ease;
 }
-html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
+html[data-theme="dark"] .sw-knob{transform:translateX(16px);background:#D8D8DC}
 
-/* ---------- 舞台 ---------- */
+/* ---------- 桌面舞台 ---------- */
 .stage{
-  position:fixed;inset:0;z-index:10;
-  padding-top:var(--bar-h);
-  display:grid;place-items:center;
+  position:fixed;inset:var(--bar-h) 0 0;
+  z-index:1;
+  overflow:hidden;
 }
 .scene{
   position:relative;
@@ -233,30 +264,194 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   display:grid;place-items:center;
 }
 
-/* ============================================================
-   ZZX 文件夹
-   ============================================================ */
-.folder{
+/* X-Ray 工程网格 */
+.scene::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  pointer-events:none;opacity:0;
+  transition:opacity .35s ease;
+  background-image:
+    linear-gradient(rgba(0,229,255,.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.13) 1px, transparent 1px);
+  background-size:40px 40px;
+  -webkit-mask-image:radial-gradient(circle at 50% 48%, #000 26%, transparent 76%);
+  mask-image:radial-gradient(circle at 50% 48%, #000 26%, transparent 76%);
+}
+body.xray-active .scene::before{opacity:1}
+
+/* X-Ray 全屏画布：激光向量 / 十字准星 / 聚光灯束 */
+.xray-canvas{
+  position:fixed;inset:0;
+  width:100%;height:100%;
+  z-index:2;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .35s ease;
+}
+body.xray-active .xray-canvas{opacity:1}
+/* Spotlight 也复用它，即使没开 X-Ray */
+body.spot-active .xray-canvas{opacity:1}
+
+/* ---------- SVG 琴弦连线 ---------- */
+.tether-svg{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  z-index:3;
+  pointer-events:none;
+  overflow:visible;
+  opacity:0;
+  transition:opacity .5s ease;
+}
+.scene[data-state="awakened"] .tether-svg,
+.scene[data-state="open"] .tether-svg{opacity:1}
+.tether{
+  fill:none;
+  stroke:var(--tether);
+  stroke-width:1.25;
+  stroke-dasharray:4 7;
+  stroke-linecap:round;
+  transition:stroke .3s ease,opacity .3s ease;
+}
+.tether.is-hot{
+  stroke:rgba(0,229,255,.75);
+  stroke-dasharray:5 4;
+}
+.tether.is-dim{opacity:.16}
+
+/* ---------- 项目文件 ---------- */
+.files{position:absolute;inset:0;z-index:4;pointer-events:none}
+
+.file{
+  position:absolute;left:50%;top:50%;
+  width:96px;height:96px;margin:-48px 0 0 -48px;
+  pointer-events:auto;
+  cursor:grab;
+  touch-action:none;
+  transform:translate3d(0,0,0);
+  will-change:transform;
+  z-index:4;
+}
+.file.is-dragging{cursor:grabbing;z-index:7}
+.file.is-active{z-index:6}
+
+.file-float{
+  display:block;
+  transform:perspective(760px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .2s ease-out,opacity .38s ease,scale .38s var(--sp-soft);
+  will-change:transform;
+}
+
+.sheet{
+  position:relative;
+  width:96px;height:96px;
+  border-radius:22px;
+  display:grid;place-items:center;
+  overflow:hidden;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.44), rgba(255,255,255,0) 52%),
+    linear-gradient(155deg, var(--c), color-mix(in srgb, var(--c) 60%, #000));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.65),
+    inset 0 -14px 24px rgba(0,0,0,.18),
+    var(--file-shadow);
+  transition:box-shadow .3s ease;
+}
+.sheet-glyph{
+  font-size:34px;font-weight:800;line-height:1;
+  color:rgba(255,255,255,.96);
+  text-shadow:0 1px 4px rgba(0,0,0,.28);
+  transform:translateY(-2px);
+}
+/* 镜面反光：跟随 --glare-x / --glare-y */
+.sheet::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(120px circle at var(--glare-x,50%) var(--glare-y,50%),
+    rgba(255,255,255,.62), rgba(255,255,255,.10) 40%, transparent 64%);
+  opacity:0;
+  transition:opacity .22s ease;
+  pointer-events:none;
+}
+.file:hover .sheet::after,
+.file.is-dragging .sheet::after{opacity:1}
+
+.file-name{
+  position:absolute;top:100%;left:50%;
+  transform:translateX(-50%);
+  margin-top:8px;
+  font-size:11.5px;color:var(--text-2);
+  white-space:nowrap;letter-spacing:.01em;
+  text-shadow:0 1px 3px var(--bg);
+  transition:color .22s ease;
+}
+.file:hover .file-name{color:var(--text)}
+
+/* 休眠时文件藏在文件夹里 */
+.scene[data-state="sleeping"] .file{opacity:0;pointer-events:none}
+
+/* 开窗：其余文件与文件夹退居背景层 */
+.scene[data-state="open"] .file:not(.is-active) .file-float{
+  opacity:.26;scale:.86;filter:saturate(.4);
+}
+.scene[data-state="open"] .file.is-active .sheet{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.65),
+    inset 0 -14px 24px rgba(0,0,0,.18),
+    0 0 0 2px rgba(255,255,255,.5),
+    0 18px 40px rgba(0,0,0,.28);
+}
+.scene[data-state="open"] .zzx-folder{
+  scale:.92;
+  filter:blur(4px);
+  opacity:.5;
+  pointer-events:none;
+}
+
+/* Spotlight 筛选态 */
+.file.is-dimmed .file-float{opacity:.18;scale:.86;filter:saturate(.2)}
+.file.is-match .sheet{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.65),
+    inset 0 -14px 24px rgba(0,0,0,.18),
+    0 0 0 2px rgba(0,229,255,.55),
+    0 12px 32px rgba(0,229,255,.32);
+}
+
+/* X-Ray 包围盒 + 坐标 */
+.file::after{
+  content:"";position:absolute;inset:-7px;
+  border:1px dashed rgba(0,229,255,.72);
+  border-radius:11px;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+body.xray-active .file::after{opacity:1}
+.file::before{
+  content:attr(data-xy);
+  position:absolute;left:-7px;bottom:calc(100% + 12px);
+  font-family:var(--mono);font-size:9.5px;
+  color:var(--xray);
+  white-space:nowrap;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+body.xray-active .file::before{opacity:.9}
+
+/* ---------- 三层夹心 ZZX 文件夹 ---------- */
+.zzx-folder{
   position:relative;
   width:276px;height:222px;
   z-index:5;
   cursor:pointer;
-  transition:filter .5s ease, opacity .5s ease, scale .5s var(--sp-soft);
-  /* 悬停上抬用独立的 translate 属性，避免与呼吸动画的 transform 打架 */
+  perspective:900px;
   translate:0 0;
+  scale:1;
+  transition:translate .35s var(--sp-soft),scale .5s var(--sp-soft),
+             filter .5s ease,opacity .5s ease;
 }
-.folder:hover{translate:0 -6px}
-.folder:active{translate:0 -2px}
-.folder-body{
-  position:relative;
-  width:100%;height:100%;
-  /* 只保留 perspective 给前盖的 3D 掀开用；
-     不加 preserve-3d，避免子元素脱离 z-index 排序、与前盖争层级 */
-  perspective:820px;
-}
+.zzx-folder:hover{translate:0 -6px}
+.zzx-folder:active{translate:0 -2px}
 
-/* 呼吸起伏（仅休眠态） */
-.scene[data-state="sleep"] .folder{
+/* 休眠呼吸（用 transform，与 translate 属性互不干扰） */
+.scene[data-state="sleeping"] .zzx-folder{
   animation:breathe 4s ease-in-out infinite;
 }
 @keyframes breathe{
@@ -264,7 +459,22 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   50%    {transform:translateY(-5px) rotate(-.5deg)}
 }
 
-/* 背板 */
+/* 被撞：弹性后缩 */
+.zzx-folder.is-hit{animation:folderHit .44s var(--sp)}
+@keyframes folderHit{
+  0%  {scale:1}
+  28% {scale:.93}
+  62% {scale:1.035}
+  100%{scale:1}
+}
+
+.folder-body{
+  position:relative;
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+}
+
+/* 第一层：底板 */
 .folder-back{
   position:absolute;inset:0;
   border-radius:15px 15px 17px 17px;
@@ -277,7 +487,6 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
     0 14px 28px rgba(8,50,100,.20);
   z-index:1;
 }
-/* 文件夹页签 */
 .folder-back::before{
   content:"";
   position:absolute;top:-12px;left:3px;
@@ -287,40 +496,49 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
 }
 
-/* 彩色文件顶边 */
-.peeks{
-  position:absolute;left:26px;right:26px;top:0;height:80px;
+/* 第二层：内衬文件（从前盖顶端露出彩色顶边）
+   注意：preserve-3d 下 z-index 失效，元素按 3D 位置排序。
+   这里绝不能给 translateZ(正值)，否则内衬会整体盖到前盖之上。 */
+.folder-inner-sheets{
+  position:absolute;inset:0;
   z-index:2;
-  transition:opacity .4s ease, transform .5s var(--sp-soft);
+  transition:opacity .4s ease,transform .5s var(--sp-soft);
 }
-.peek{
+.inner-sheet{
   position:absolute;
-  width:72px;height:68px;
-  border-radius:9px 9px 4px 4px;
+  width:74px;height:70px;
+  border-radius:9px 9px 3px 3px;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 46%),
-    linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 72%, #000));
+    linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,0) 48%),
+    linear-gradient(180deg, var(--c), color-mix(in srgb, var(--c) 68%, #000));
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.7),
-    0 2px 5px rgba(0,0,0,.16);
-  transition:transform .55s var(--sp), opacity .35s;
+    inset 0 1px 0 rgba(255,255,255,.62),
+    0 2px 5px rgba(0,0,0,.15);
+  transition:transform .55s var(--sp),opacity .35s ease;
 }
-.peek:nth-child(1){left:8px;  top:32px; transform:rotate(-4.5deg)}
-.peek:nth-child(2){left:76px; top:21px; transform:rotate(2.5deg)}
-.peek:nth-child(3){left:144px;top:35px; transform:rotate(-1.5deg)}
+.inner-sheet:nth-child(1){left:16px; bottom:108px; transform:rotate(-4.5deg)}
+.inner-sheet:nth-child(2){left:100px;bottom:103px; transform:rotate(2.5deg)}
+.inner-sheet:nth-child(3){left:182px;bottom:110px; transform:rotate(-1.5deg)}
 
-/* 前盖 */
+/* 唤醒后文件已飞出，内衬收起 */
+.scene[data-state="awakened"] .folder-inner-sheets,
+.scene[data-state="open"]     .folder-inner-sheets{
+  opacity:0;transform:translateY(14px);
+}
+.scene[data-state="awakened"] .inner-sheet,
+.scene[data-state="open"]     .inner-sheet{transform:rotate(0deg) translateY(8px)}
+
+/* 第三层：3D 翻转前盖 */
 .folder-front{
   position:absolute;left:0;right:0;bottom:0;
   height:164px;
   border-radius:16px;
   z-index:3;
-  transform-origin:50% 100%;
+  transform-origin:bottom center;
   transform:rotateX(0deg);
   transition:transform .72s var(--sp);
-  /* 内部元素（高光层、眼睛）都不溢出，无需 overflow:hidden；
-     一旦加上它会强制把 preserve-3d 扁平化，并在 3D 过渡中
-     让圆角裁剪算错，导致回落时整块闪掉一帧。 */
+  /* 内部元素（高光层、眼睛）都不溢出，切勿加 overflow:hidden，
+     否则会强制扁平化 preserve-3d 并在 3D 过渡中让圆角裁剪算错 */
   backface-visibility:hidden;
   will-change:transform;
   background:
@@ -333,7 +551,10 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
     inset 0 0 0 1px rgba(255,255,255,.10),
     0 16px 30px rgba(8,50,100,.24);
 }
-/* 顶部半透明高光边 */
+/* 前盖沿底边前倾 20° */
+.scene[data-state="awakened"] .folder-front,
+.scene[data-state="open"]     .folder-front{transform:rotateX(-20deg)}
+
 .cover-sheen{
   position:absolute;top:0;left:0;right:0;height:44%;
   background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 100%);
@@ -341,7 +562,7 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   border-radius:16px 16px 0 0;
 }
 
-/* 眼睛 */
+/* ---------- 双眼 ---------- */
 .face{
   position:absolute;left:0;right:0;top:44%;
   display:flex;justify-content:center;align-items:center;gap:38px;
@@ -353,6 +574,7 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   width:40px;height:40px;
   display:grid;place-items:center;
 }
+
 /* 闭眼弧：只留底边，形成 ︶ */
 .arc{
   position:absolute;
@@ -363,9 +585,10 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   opacity:1;
   transform:scaleY(1);
   transform-origin:50% 60%;
-  transition:opacity .26s ease, transform .4s var(--sp);
+  transition:opacity .26s ease,transform .4s var(--sp);
 }
-/* 睁眼：眼球 + 瞳孔 */
+
+/* 眼球 */
 .ball{
   position:absolute;
   width:35px;height:35px;border-radius:50%;
@@ -377,12 +600,12 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   opacity:0;
   transform:scale(.35);
   display:grid;place-items:center;
-  /* 基础态为「内切椭圆」= 不裁剪；半睁时把椭圆中心下移、垂直半径缩小，
-     即上眼睑压下来，过渡可平滑插值 */
+  /* 基础态为内切椭圆 = 不裁剪；半睁时椭圆中心下移、垂直半径缩小 */
   clip-path:ellipse(50% 50% at 50% 50%);
-  transition:opacity .24s ease, transform .46s var(--sp), clip-path .5s var(--sp-soft);
+  transition:opacity .24s ease,transform .46s var(--sp),
+             clip-path .5s var(--sp-soft),background .4s ease;
 }
-/* 眼皮投影：贴在眼球上部，随裁剪一起被切，形成眼睑压下来的暗边 */
+/* 眼皮投影：随裁剪被切，形成眼睑压下来的暗边 */
 .ball::before{
   content:"";position:absolute;inset:0;border-radius:50%;
   background:linear-gradient(180deg,
@@ -394,12 +617,14 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   transition:opacity .4s ease;
   pointer-events:none;
 }
+
+/* 瞳孔：位移由 JS 逐帧写入 --ex / --ey（左右眼各自独立） */
 .pupil{
   width:15px;height:15px;border-radius:50%;
   background:#111318;
   position:relative;
-  transform:translate(var(--ex,0px), var(--ey,0px));
-  transition:transform .14s ease-out;
+  transform:translate3d(var(--ex,0px),var(--ey,0px),0);
+  will-change:transform;
 }
 .pupil::after{
   content:"";position:absolute;top:2px;left:3px;
@@ -408,38 +633,42 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   transition:opacity .3s ease;
 }
 
-/* 休眠 → 唤醒：睁眼 */
-.scene[data-state="awake"] .arc,
-.scene[data-state="open"]  .arc{opacity:0;transform:scaleY(.35)}
-.scene[data-state="awake"] .ball,
-.scene[data-state="open"]  .ball{opacity:1;transform:scale(1)}
+/* 表情符号层（@ 眩晕 / >< 吃痛） */
+.sym{
+  position:absolute;
+  font-size:22px;font-weight:800;line-height:1;
+  color:var(--eye-ink);
+  opacity:0;transform:scale(.55);
+  transition:opacity .18s ease,transform .32s var(--sp);
+  pointer-events:none;
+}
+.eye .sym-pain{font-size:19px;letter-spacing:-1px}
 
-/* 悬停：被吵醒后困倦地睁开一条缝
-   —— 只用一个形状表达：眼球本身不压扁，改由 clip-path 让「上眼睑」压下来，
-      露出下半只眼，再叠一层眼皮投影，眼白带暖灰、瞳孔下沉，做出没睡醒的钝感。
-      闭眼弧同时隐去，不与眼球叠加。 */
-.scene[data-state="sleep"] .folder:hover .arc{opacity:0;transform:scaleY(.2)}
-.scene[data-state="sleep"] .folder:hover .ball{
+/* 睁眼（唤醒 / 开窗） */
+.scene[data-state="awakened"] .arc,
+.scene[data-state="open"]     .arc{opacity:0;transform:scaleY(.35)}
+.scene[data-state="awakened"] .ball,
+.scene[data-state="open"]     .ball{opacity:1;transform:scale(1)}
+
+/* 悬停：被吵醒后困倦地睁开一条缝 */
+.scene[data-state="sleeping"] .zzx-folder:hover .arc{opacity:0;transform:scaleY(.2)}
+.scene[data-state="sleeping"] .zzx-folder:hover .ball{
   opacity:1;
-  background:#EDEAE2;                     /* 困倦时眼白偏暖灰，不刺眼 */
+  background:#EDEAE2;
   transform:scale(1);
-  /* 上边界落在 52%，只露下半只眼 */
   clip-path:ellipse(56% 38% at 50% 90%);
   transition:opacity .22s ease,
              transform .44s var(--sp-soft),
              clip-path .55s var(--sp-soft),
              background .4s ease;
-  /* 撑不住似的缓缓再阖上一点，再勉强睁开 */
   animation:peek 2.8s ease-in-out .55s infinite;
 }
-.scene[data-state="sleep"] .folder:hover .ball::before{opacity:1}
-/* 瞳孔缩小、沉到眼缝下部：上缘被眼皮轻压，但不至于被切成半月形 */
-.scene[data-state="sleep"] .folder:hover .pupil{
-  transform:translate(var(--ex,0px), calc(var(--ey,0px) + 3.5px)) scale(.75);
+.scene[data-state="sleeping"] .zzx-folder:hover .ball::before{opacity:1}
+.scene[data-state="sleeping"] .zzx-folder:hover .pupil{
+  transform:translate3d(var(--ex,0px),calc(var(--ey,0px) + 3.5px),0) scale(.75);
 }
-.scene[data-state="sleep"] .folder:hover .pupil::after{opacity:.45}
-/* 眼皮沉重地往下坠，而不是轻快的横向颤动 */
-.scene[data-state="sleep"] .folder:hover .face{animation:drowsy 2.8s ease-in-out infinite}
+.scene[data-state="sleeping"] .zzx-folder:hover .pupil::after{opacity:.45}
+.scene[data-state="sleeping"] .zzx-folder:hover .face{animation:drowsy 2.8s ease-in-out infinite}
 @keyframes drowsy{
   0%,100%{transform:translate(0,0)}
   38%    {transform:translate(-.5px,1px)}
@@ -450,21 +679,32 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   55%    {clip-path:ellipse(56% 29% at 50% 98%)}
 }
 
-/* 唤醒：前盖斜掀 */
-.scene[data-state="awake"] .folder-front,
-.scene[data-state="open"]  .folder-front{transform:rotateX(-16deg)}
-/* 唤醒后文件已散出，夹层顶边隐去 */
-.scene[data-state="awake"] .peeks,
-.scene[data-state="open"]  .peeks{opacity:0;transform:translateY(12px)}
-.scene[data-state="awake"] .peek,
-.scene[data-state="open"]  .peek{transform:rotate(0deg) translateY(6px)}
+/* 眨眼 */
+.scene[data-state="awakened"] .face[data-expression="blink"] .ball,
+.scene[data-state="open"]     .face[data-expression="blink"] .ball{
+  transform:scaleX(1) scaleY(.07);
+  transition:transform .1s ease;
+}
 
-/* 专注/自豪 微表情 */
-.face[data-mood="proud"]{transform:translateY(-2px)}
-.face[data-mood="proud"] .ball{transform:scale(1.1)}
-.face[data-mood="focus"]{transform:scale(.97)}
+/* 眩晕 @ @ */
+.face[data-expression="dizzy"] .sym-dizzy,
+.face[data-expression="pain"]  .sym-pain{opacity:1;transform:scale(1)}
+.face[data-expression="dizzy"] .ball,
+.face[data-expression="pain"]  .ball,
+.face[data-expression="dizzy"] .arc,
+.face[data-expression="pain"]  .arc{opacity:0}
+/* 眩晕时符号缓慢自转 */
+.face[data-expression="dizzy"] .sym-dizzy{
+  animation:spinSym 1.1s linear infinite;
+}
+@keyframes spinSym{to{transform:scale(1) rotate(360deg)}}
 
-/* Zzz 气泡（位于前盖之外的 folder-body 层） */
+/* 自豪 / 专注 */
+.face[data-expression="proud"]{transform:translateY(-2px)}
+.face[data-expression="proud"] .ball{transform:scale(1.08)}
+.face[data-expression="focus"]{transform:scale(.97)}
+
+/* ---------- Zzz 气泡 ---------- */
 .zzz{
   position:absolute;top:-60px;right:-6px;
   z-index:6;
@@ -476,27 +716,33 @@ html[data-theme="dark"] .sw-knob{transform:translateX(14px);background:#D8D8DC}
   position:absolute;
   font-style:normal;font-weight:800;line-height:1;
   color:var(--text-2);
+  text-shadow:0 1px 3px rgba(255,255,255,.5);
   opacity:0;
   animation:zzz 3.4s ease-in-out infinite;
 }
-html[data-theme="dark"] .zzz i{color:#E6E6EA}
-/* 由小到大沿右上方排开，形成经典的 Zzz 上升轨迹 */
-.zzz i:nth-child(1){font-size:14px;right:0;  bottom:0;  animation-delay:0s}
-.zzz i:nth-child(2){font-size:17px;right:9px;bottom:15px;animation-delay:.5s}
-.zzz i:nth-child(3){font-size:21px;right:20px;bottom:31px;animation-delay:1s}
-@keyframes zzz{
-  0%  {opacity:0;  transform:translate(0,9px) scale(.86)}
-  16% {opacity:1;  transform:translate(0,0) scale(1)}
-  68% {opacity:.9; transform:translate(-2px,-4px) scale(1)}
-  100%{opacity:0;  transform:translate(-7px,-13px) scale(1.06)}
+html[data-theme="dark"] .zzz i{
+  color:#E8E8EC;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);
 }
-.scene[data-state="awake"] .zzz,
-.scene[data-state="open"]  .zzz{opacity:0}
+.zzz i:nth-child(1){font-size:13px;right:2px; bottom:2px; animation-delay:0s}
+.zzz i:nth-child(2){font-size:16px;right:11px;bottom:15px;animation-delay:.55s}
+.zzz i:nth-child(3){font-size:20px;right:22px;bottom:31px;animation-delay:1.1s}
+@keyframes zzz{
+  0%  {opacity:0;   transform:translate(0,8px) scale(.8)}
+  24% {opacity:.92; transform:translate(0,0) scale(1)}
+  72% {opacity:.45; transform:translate(-3px,-6px) scale(1)}
+  100%{opacity:0;   transform:translate(-7px,-14px) scale(1.06)}
+}
+/* 只有休眠态飘 Zzz */
+.scene[data-state="awakened"] .zzz,
+.scene[data-state="open"]     .zzz{opacity:0}
+.scene[data-state="awakened"] .zzz i,
+.scene[data-state="open"]     .zzz i{animation:none}
 
-/* ZZX 压印徽标 */
+/* ---------- ZZX 压印徽标 ---------- */
 .badge{
-  position:absolute;right:18px;bottom:15px;
-  font-size:13px;font-weight:800;
+  position:absolute;right:15px;bottom:12px;
+  font-size:11.5px;font-weight:800;
   letter-spacing:.16em;
   color:var(--badge-ink);
   text-shadow:0 1px 0 var(--badge-hl);
@@ -504,346 +750,397 @@ html[data-theme="dark"] .zzz i{color:#E6E6EA}
   z-index:4;
 }
 
-/* ============================================================
-   散开的项目文件
-   ============================================================ */
-.files{position:absolute;inset:0;z-index:4;pointer-events:none}
-
-.file{
-  position:absolute;left:50%;top:50%;
-  width:92px;height:92px;
-  margin:-46px 0 0 -46px;
-  pointer-events:none;
-  opacity:0;
-  will-change:transform;
-  transition:opacity .34s ease, filter .4s ease, scale .4s var(--sp-soft);
-  scale:1;
-}
-.scene[data-state="awake"] .file,
-.scene[data-state="open"]  .file{pointer-events:auto;opacity:1}
-
-/* 入场延迟，营造逐张弹出的节奏 */
-.scene[data-state="awake"] .file{transition-delay:calc(var(--i) * 26ms), 0s, 0s}
-
-.file-float{
-  display:block;position:relative;
-  width:100%;height:100%;
-  animation:floaty 5.6s ease-in-out infinite;
-  animation-delay:calc(var(--i) * -.62s);
-}
-@keyframes floaty{
-  0%,100%{transform:translateY(0)}
-  50%    {transform:translateY(-7px)}
-}
-
-.sheet{
-  display:grid;place-items:center;
-  width:92px;height:92px;
-  border-radius:21px;
-  position:relative;
-  overflow:hidden;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0) 44%),
-    linear-gradient(158deg, color-mix(in srgb, var(--c) 86%, #fff) 0%, var(--c) 52%, color-mix(in srgb, var(--c) 72%, #000) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -14px 22px rgba(0,0,0,.16),
-    0 0 0 1px rgba(0,0,0,.05),
-    var(--file-shadow);
-  transition:transform .34s var(--sp), box-shadow .34s ease;
-}
-/* 纸角折痕 */
-.sheet::after{
-  content:"";
-  position:absolute;top:0;right:0;
-  width:26px;height:26px;
-  background:linear-gradient(225deg, rgba(255,255,255,.55), rgba(255,255,255,0) 62%);
-  border-radius:0 21px 0 12px;
-  opacity:.7;
-}
-.sheet-glyph{
-  font-size:34px;font-weight:700;line-height:1;
-  color:#fff;
-  text-shadow:0 2px 6px rgba(0,0,0,.28);
-  transform:translateY(-1px);
-}
-.file-name{
-  position:absolute;top:100%;left:50%;
-  transform:translateX(-50%);
-  margin-top:9px;
-  font-size:11.5px;
-  font-weight:500;
-  color:var(--text);
-  white-space:nowrap;
-  padding:2px 8px;
-  border-radius:7px;
-  background:color-mix(in srgb, var(--bg) 74%, transparent);
-  -webkit-backdrop-filter:blur(6px);
-  backdrop-filter:blur(6px);
-  transition:background .25s, color .25s;
-}
-
-.file:hover .sheet,
-.file:focus-visible .sheet{
-  transform:translateY(-4px) scale(1.09);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.8),
-    inset 0 -14px 22px rgba(0,0,0,.16),
-    0 0 0 1px rgba(0,0,0,.05),
-    0 18px 34px rgba(0,0,0,.26);
-}
-.file:hover .file-name{background:var(--text);color:var(--bg)}
-
-/* 打开态：其余文件与文件夹压暗退场 */
-.scene[data-state="open"] .folder{
-  scale:.92;
-  filter:blur(4px) saturate(.7);
-  opacity:.45;
-  animation:none;
-}
-.scene[data-state="open"] .file:not(.is-active){
-  scale:.92;
-  filter:blur(4px) saturate(.7);
-  opacity:.34;
-}
-.scene[data-state="open"] .file.is-active{
-  filter:blur(2px);
-  opacity:.55;
-}
-
-/* ---------- 提示语 ---------- */
+/* ---------- 提示 ---------- */
 .hint{
-  position:absolute;left:50%;bottom:7%;
+  position:absolute;bottom:86px;left:50%;
   transform:translateX(-50%);
-  font-size:12.5px;
-  color:var(--text-3);
-  letter-spacing:.03em;
+  font-size:12px;color:var(--text-3);
+  letter-spacing:.04em;
   white-space:nowrap;
-  transition:opacity .4s ease, transform .4s ease;
+  transition:opacity .4s ease;
   pointer-events:none;
 }
-.scene[data-state="open"] .hint{opacity:0;transform:translate(-50%,6px)}
 
-/* ============================================================
-   Quick Look 窗口
-   ============================================================ */
-.ql{
-  position:fixed;inset:0;z-index:200;
-  display:grid;place-items:center;
-  padding:calc(var(--bar-h) + 16px) 16px 16px;
-  background:rgba(10,10,12,.26);
-  -webkit-backdrop-filter:blur(4px);
-  backdrop-filter:blur(4px);
-  opacity:0;
-  transition:opacity .32s ease;
+/* ---------- Dock ---------- */
+.dock{
+  position:fixed;left:50%;bottom:16px;
+  transform:translateX(-50%);
+  z-index:40;
+  display:flex;align-items:flex-end;gap:7px;
+  padding:8px 10px;
+  border-radius:20px;
+  background:var(--dock-bg);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--dock-line);
+  box-shadow:0 12px 34px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.28);
+  transition:opacity .4s ease,transform .4s var(--sp-soft);
+  max-width:calc(100vw - 24px);
+  overflow-x:auto;
+  scrollbar-width:none;
 }
-.ql[hidden]{display:none}
-.ql[data-open="1"]{opacity:1}
+.dock::-webkit-scrollbar{display:none}
+body:not(.dock-ready) .dock{opacity:0;transform:translateX(-50%) translateY(16px);pointer-events:none}
 
-.ql-window{
-  width:min(880px,90vw);
-  height:min(620px,80vh);
-  border-radius:13px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
+.dock-item{
+  position:relative;
+  width:42px;height:42px;flex:0 0 auto;
+  border-radius:12px;
+  display:grid;place-items:center;
+  font-size:17px;font-weight:800;color:#fff;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.4), rgba(255,255,255,0) 52%),
+    linear-gradient(155deg, var(--c), color-mix(in srgb, var(--c) 58%, #000));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -8px 14px rgba(0,0,0,.16),
+    0 4px 10px rgba(0,0,0,.18);
+  transition:transform .3s var(--sp),box-shadow .3s ease,filter .3s ease;
+}
+.dock-item:hover,
+.dock-item:focus-visible{
+  transform:translateY(-9px) scale(1.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -8px 14px rgba(0,0,0,.16),
+    0 12px 22px rgba(0,0,0,.24);
+}
+.dock-item::after{
+  content:attr(data-name);
+  position:absolute;bottom:calc(100% + 10px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  padding:4px 8px;border-radius:7px;
+  font-size:11px;font-weight:500;white-space:nowrap;
+  color:var(--text);
   background:var(--win-bg);
   border:1px solid var(--win-line);
-  box-shadow:var(--shadow-win);
-  -webkit-backdrop-filter:blur(30px) saturate(180%);
-  backdrop-filter:blur(30px) saturate(180%);
-  will-change:transform,opacity;
+  box-shadow:0 6px 16px rgba(0,0,0,.16);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease;
 }
-.ql-window:focus{outline:none}
+.dock-item:hover::after{
+  opacity:1;transform:translateX(-50%) translateY(0);
+}
 
-/* 标题栏 */
-.ql-bar{
-  position:relative;
-  height:42px;flex:none;
-  display:flex;align-items:center;gap:10px;
-  padding:0 13px;
+/* ---------- FPS / 遥测 HUD ---------- */
+.hud{
+  position:fixed;left:14px;bottom:14px;
+  z-index:45;
+  width:238px;
+  padding:9px 11px 10px;
+  border-radius:12px;
+  background:rgba(8,12,16,.84);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,229,255,.28);
+  box-shadow:0 12px 30px rgba(0,0,0,.36);
+  color:#7CF5D0;
+  font-family:var(--mono);
+  font-size:10.5px;
+  transition:opacity .3s ease,transform .3s var(--sp-soft);
+}
+.hud[hidden]{display:none}
+.hud-head{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:5px;
+  letter-spacing:.14em;font-size:9.5px;color:rgba(124,245,208,.72);
+}
+.hud-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#3EF0A8;
+  box-shadow:0 0 8px #3EF0A8;
+  animation:pulseDot 1.6s ease-in-out infinite;
+}
+@keyframes pulseDot{0%,100%{opacity:.4}50%{opacity:1}}
+.hud-fps{margin-left:auto;font-size:12px;color:#3EF0A8;letter-spacing:0}
+#fpsCanvas{display:block;width:216px;height:46px;border-radius:4px;background:rgba(0,229,255,.05)}
+.hud-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;
+  margin-top:6px;
+}
+.hud-grid > div{display:flex;justify-content:space-between;gap:6px}
+.hud-grid dt{color:rgba(124,245,208,.5);font-size:9.5px}
+.hud-grid dd{color:#9EF7DA;font-size:10px}
+
+/* ---------- Spotlight 面板 ---------- */
+.spotlight{
+  position:fixed;inset:0;z-index:58;
+  display:grid;place-items:center;
+  padding:20px;
+  background:rgba(0,0,0,.24);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  animation:fadeIn .22s ease;
+}
+.spotlight[hidden]{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.spot-panel{
+  width:min(520px,92vw);
+  padding:20px 22px 18px;
+  border-radius:16px;
+  background:var(--win-bg);
+  backdrop-filter:blur(30px) saturate(180%);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--win-line);
+  box-shadow:var(--shadow-win);
+  animation:spotIn .3s var(--sp-soft);
+}
+@keyframes spotIn{
+  from{opacity:0;transform:translateY(10px) scale(.97)}
+  to  {opacity:1;transform:none}
+}
+.spot-head{position:relative;margin-bottom:14px}
+.spot-eyebrow{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;
+  color:var(--xray-ink);
+}
+html[data-theme="dark"] .spot-eyebrow{color:var(--xray)}
+.spot-head h2{
+  font-size:16px;font-weight:600;margin-top:4px;
+  letter-spacing:.01em;
+}
+.spot-close{
+  position:absolute;top:-4px;right:-6px;
+  width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:12px;color:var(--text-2);
+  transition:background .2s ease,color .2s ease;
+}
+.spot-close:hover{background:var(--fold-hover);color:var(--text)}
+
+.spot-tags{display:flex;flex-wrap:wrap;gap:8px}
+.spot-tag{
+  padding:7px 13px;border-radius:9px;
+  font-size:12.5px;
+  color:var(--text-2);
+  background:var(--fold);
+  border:1px solid transparent;
+  transition:all .2s ease;
+}
+.spot-tag:hover{background:var(--fold-hover);color:var(--text)}
+.spot-tag[aria-pressed="true"]{
+  color:var(--xray-ink);
+  background:rgba(0,229,255,.14);
+  border-color:rgba(0,229,255,.45);
+  box-shadow:0 0 0 3px rgba(0,229,255,.10);
+}
+html[data-theme="dark"] .spot-tag[aria-pressed="true"]{color:var(--xray)}
+
+.spot-foot{
+  margin-top:14px;
+  font-size:11px;line-height:1.6;
+  color:var(--text-3);
+}
+
+/* ---------- 统一应用窗口 ---------- */
+.win-layer{
+  position:fixed;inset:0;z-index:60;
+  display:grid;place-items:center;
+  padding:24px;
+  background:rgba(0,0,0,.26);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.win-layer[hidden]{display:none}
+
+.win{
+  width:min(1060px,94vw);
+  height:min(720px,88vh);
+  border-radius:14px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  background:var(--win-bg);
+  backdrop-filter:blur(30px) saturate(180%);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--win-line);
+  box-shadow:var(--shadow-win);
+  transform-origin:center center;
+  will-change:transform,opacity;
+  outline:none;
+}
+.win:focus,
+.win:focus-visible{outline:none}
+
+/* 各应用的内容比例不同，窗口尺寸按需微调 */
+.win[data-app="zodiac"]{
+  width:min(1180px,96vw);
+  height:min(880px,94vh);
+}
+.win[data-app="fluid"]{
+  height:min(700px,90vh);
+}
+.win[data-app="perf"]{
+  height:min(700px,90vh);
+}
+.win[data-app="about"]{
+  width:min(760px,92vw);
+  height:min(620px,86vh);
+}
+.win[data-app="terminal"]{
+  width:min(900px,92vw);
+  height:min(620px,86vh);
+}
+.win[data-app="vision"]{
+  width:min(980px,94vw);
+  height:min(640px,88vh);
+}
+
+.win-bar{
+  flex:0 0 46px;height:46px;
+  display:flex;align-items:center;gap:12px;
+  padding:0 14px;
   background:var(--win-head);
   border-bottom:1px solid var(--win-line);
 }
-.lights{display:flex;gap:8px;flex:none}
+.lights{display:flex;gap:8px;flex:0 0 auto}
 .light{
   width:12px;height:12px;border-radius:50%;
   position:relative;
-  transition:filter .18s ease, transform .18s ease;
+  transition:filter .2s ease,transform .2s ease;
 }
-.light.red   {background:#FF5F57;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12)}
+.light:hover{filter:brightness(1.12);transform:scale(1.1)}
+.light.red{background:#FF5F57;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12)}
 .light.yellow{background:#FEBC2E;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12)}
-.light.green {background:#28C840;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12)}
-.light:hover{filter:brightness(1.12)}
-.light:active{transform:scale(.9)}
-/* 悬停时露出符号 */
-.light::after{
-  position:absolute;inset:0;
-  display:grid;place-items:center;
-  font-size:8px;font-weight:900;line-height:1;
-  color:rgba(0,0,0,.55);
-  opacity:0;
-  transition:opacity .16s;
-}
-.lights:hover .light::after{opacity:1}
-.light.red::after   {content:"×"}
-.light.yellow::after{content:"↻"}
-.light.green::after {content:"⤢"}
+.light.green{background:#28C840;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.12)}
 
-.ql-title{
-  position:absolute;left:50%;transform:translateX(-50%);
+.win-title{
   font-size:12.5px;font-weight:600;
   color:var(--text);
-  max-width:46%;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  pointer-events:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.ql-right{margin-left:auto;flex:none}
-.ql-link{
-  font-size:11.5px;
-  color:var(--text-2);
-  padding:4px 10px;
-  border-radius:7px;
-  transition:background .2s,color .2s;
+.win-right{
+  margin-left:auto;
+  display:flex;align-items:center;gap:10px;
+  min-width:0;
+}
+.win-path{
+  font-family:var(--mono);font-size:10.5px;
+  color:var(--text-3);
+  max-width:280px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.win-open{
+  font-size:11px;color:var(--text-2);
+  padding:4px 9px;border-radius:7px;
+  background:var(--fold);
+  transition:background .2s ease,color .2s ease;
   white-space:nowrap;
 }
-.ql-link:hover{background:var(--fold-hover);color:var(--text)}
+.win-open:hover{background:var(--fold-hover);color:var(--text)}
 
-/* 地址栏 */
-.ql-urlbar{
-  height:30px;flex:none;
-  display:flex;align-items:center;justify-content:center;
-  padding:0 12px;
-  background:var(--win-head);
-  border-bottom:1px solid var(--win-line);
+.win-body{
+  flex:1;min-height:0;
+  position:relative;
+  overflow:auto;
+  overscroll-behavior:contain;
 }
-.url-pill{
-  display:flex;align-items:center;gap:7px;
-  max-width:72%;
-  height:20px;
-  padding:0 11px;
-  border-radius:99px;
-  background:var(--fold);
-  font-size:11px;
-  color:var(--text-2);
-  overflow:hidden;
-}
-.url-pill span:last-child{
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.url-dot{
-  width:6px;height:6px;border-radius:50%;flex:none;
-  background:#28C840;
-  box-shadow:0 0 0 2.5px rgba(40,200,64,.18);
+.win-body > iframe{
+  display:block;width:100%;height:100%;border:0;
 }
 
-/* 预览区 */
-.ql-body{position:relative;flex:1;min-height:0;background:var(--bg-deep)}
-.ql-body iframe{
-  width:100%;height:100%;
-  border:0;
-  display:block;
-  background:#fff;
-  opacity:0;
-  transition:opacity .4s ease;
-}
-.ql-body iframe.loaded{opacity:1}
-
-.ql-loading{
+/* 载入态 */
+.win-loading{
   position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  font-size:12.5px;
-  color:var(--text-3);
-  background:var(--bg-deep);
-  transition:opacity .35s ease;
+  display:grid;place-items:center;gap:12px;
+  grid-auto-flow:row;
+  align-content:center;
+  font-size:12.5px;color:var(--text-3);
+  background:var(--win-bg);
+  z-index:2;
 }
-.ql-loading[hidden]{display:none}
-.ql-fallback{
-  margin-top:4px;
-  padding:7px 16px;
-  border-radius:9px;
-  font-size:12.5px;
-  color:#fff;
-  background:linear-gradient(160deg,#0A84FF,#0060D8);
-  box-shadow:0 4px 12px rgba(10,132,255,.32), inset 0 1px 0 rgba(255,255,255,.35);
-  transition:filter .2s ease, transform .2s ease;
-}
-.ql-fallback:hover{filter:brightness(1.08)}
-.ql-fallback:active{transform:scale(.97)}
+.win-loading[hidden]{display:none}
 .spinner{
-  width:22px;height:22px;border-radius:50%;
-  border:2.2px solid var(--track);
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--fold-hover);
   border-top-color:var(--text-2);
   animation:spin .8s linear infinite;
+  justify-self:center;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ---------- noscript ---------- */
-.noscript{
-  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
-  z-index:300;
-  padding:12px 18px;
-  border-radius:12px;
-  background:var(--text);
-  color:var(--bg);
-  font-size:13px;
+.win-fallback{
+  margin-top:4px;
+  padding:6px 14px;border-radius:8px;
+  font-size:12px;
+  color:#fff;background:#0A84FF;
 }
-.noscript a{color:inherit}
 
-/* ============================================================
-   响应式
-   ============================================================ */
-@media (max-width:820px){
+/* ---------- 无脚本提示 ---------- */
+.noscript{
+  position:fixed;inset:0;z-index:999;
+  display:grid;place-items:center;
+  padding:24px;text-align:center;
+  font-size:14px;line-height:1.8;
+  background:var(--bg);color:var(--text);
+}
+.noscript a{color:#0A84FF;text-decoration:underline}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:900px){
   .mb-role,.mb-sep{display:none}
-  .mb-clock{font-size:11px}
-  .ql-window{width:94vw;height:82vh}
+  .mb-btn-label{display:none}
+  .mb-kbd{display:none}
+  .mb-clock{display:none}
+  .hud{display:none}
+  .win-path{display:none}
+}
+
+@media (max-width:720px){
+  .zzx-folder{width:210px;height:170px}
+  .folder-front{height:126px}
+  .folder-back::before{width:92px;height:24px;top:-10px}
+  .inner-sheet{width:58px;height:54px}
+  .inner-sheet:nth-child(1){left:10px;bottom:84px}
+  .inner-sheet:nth-child(2){left:76px;bottom:80px}
+  .inner-sheet:nth-child(3){left:142px;bottom:86px}
+  .face{top:42%;gap:26px}
+  .eye{width:32px;height:32px}
+  .arc{width:26px;height:14px;border-bottom-width:3.2px}
+  .ball{width:28px;height:28px}
+  .pupil{width:12px;height:12px}
+  .sym{font-size:18px}
+  .badge{font-size:10px;right:11px;bottom:9px}
+
   .file{width:78px;height:78px;margin:-39px 0 0 -39px}
   .sheet{width:78px;height:78px;border-radius:18px}
-  .sheet-glyph{font-size:28px}
-  .file-name{font-size:10.5px;margin-top:7px}
-  .folder{width:216px;height:174px}
-  .folder-front{height:130px}
-  .folder-back::before{width:92px;height:26px;top:-10px}
-  .peeks{left:20px;right:20px;height:64px}
-  .peek{width:56px;height:54px}
-  .peek:nth-child(1){left:2px;top:26px}
-  .peek:nth-child(2){left:56px;top:17px}
-  .peek:nth-child(3){left:112px;top:28px}
-  .face{gap:30px}
-  .eye{width:34px;height:34px}
-  .arc{width:27px;height:14px;border-bottom-width:3.4px}
-  .ball{width:29px;height:29px}
-  .pupil{width:13px;height:13px}
-  .badge{font-size:11.5px;right:14px;bottom:12px}
-  .hint{bottom:5%}
+  .sheet-glyph{font-size:27px}
+  .file-name{font-size:10.5px;margin-top:6px}
+
+  .dock-item{width:36px;height:36px;border-radius:10px;font-size:15px}
+  .dock{bottom:10px;padding:6px 8px;gap:5px}
+
+  .win{width:100%;height:88vh}
+  .win-layer{padding:10px}
+  .win-right .win-open{display:none}
 }
 
 @media (max-width:520px){
-  .mb-clock{display:none}
-  .folder{width:180px;height:146px}
-  .folder-front{height:110px}
-  .folder-back::before{width:80px;height:23px;top:-9px}
-  .peeks{left:16px;right:16px;height:54px}
-  .peek{width:48px;height:46px}
-  .peek:nth-child(1){left:2px;top:22px}
-  .peek:nth-child(2){left:48px;top:15px}
-  .peek:nth-child(3){left:94px;top:24px}
-  .face{top:42%;gap:24px}
-  .eye{width:28px;height:28px}
-  .arc{width:23px;height:12px;border-bottom-width:3px}
-  .ball{width:24px;height:24px}
-  .pupil{width:11px;height:11px}
-  .file{width:64px;height:64px;margin:-32px 0 0 -32px}
-  .sheet{width:64px;height:64px;border-radius:15px}
+  .zzx-folder{width:172px;height:140px}
+  .folder-front{height:104px}
+  .inner-sheet{width:48px;height:44px}
+  .inner-sheet:nth-child(1){left:8px;bottom:70px}
+  .inner-sheet:nth-child(2){left:62px;bottom:66px}
+  .inner-sheet:nth-child(3){left:116px;bottom:72px}
+  .face{top:40%;gap:20px}
+  .eye{width:26px;height:26px}
+  .arc{width:21px;height:11px;border-bottom-width:2.8px}
+  .ball{width:23px;height:23px}
+  .pupil{width:10px;height:10px}
+  .sym{font-size:15px}
+  .file{width:66px;height:66px;margin:-33px 0 0 -33px}
+  .sheet{width:66px;height:66px;border-radius:15px}
   .sheet-glyph{font-size:23px}
-  .ql-link{display:none}
+  .hint{font-size:11px;bottom:74px}
 }
 
 /* ---------- 减少动态偏好 ---------- */
 @media (prefers-reduced-motion:reduce){
-  .orb,.file-float,.scene[data-state="sleep"] .folder{animation:none !important}
-  /* 困倦的「阖眼—撑开」循环与眼皮下沉也一并停掉，只留静态半睁 */
-  .scene[data-state="sleep"] .folder:hover .ball,
-  .scene[data-state="sleep"] .folder:hover .face{animation:none !important}
+  .orb,
+  .file-float,
+  .scene[data-state="sleeping"] .zzx-folder{animation:none !important}
+  .scene[data-state="sleeping"] .zzx-folder:hover .ball,
+  .scene[data-state="sleeping"] .zzx-folder:hover .face{animation:none !important}
+  .face[data-expression="dizzy"] .sym-dizzy{animation:none !important}
   .zzz i{animation:none;opacity:.7}
   *{transition-duration:.01ms !important}
 }

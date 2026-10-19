@@ -1,0 +1,498 @@
+/* ============================================================
+   ZZX Desktop — 六个内置微型应用的样式
+   终端 / VisionUI Kit / FluidField / PerfTelemetry / About / 生肖
+   ============================================================ */
+
+.app{height:100%;display:flex;flex-direction:column;min-height:0}
+
+/* ============================================================
+   1. zzx-terminal.sh
+   ============================================================ */
+.term{
+  position:relative;
+  height:100%;
+  display:flex;flex-direction:column;
+  background:#0B0D11;
+  color:#C7D5E4;
+  font-family:var(--mono);
+  font-size:12.8px;
+  min-height:0;
+}
+.term-out{
+  flex:1;min-height:0;
+  overflow-y:auto;
+  padding:16px 18px 8px;
+  line-height:1.72;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.16) transparent;
+}
+.term-out::-webkit-scrollbar{width:8px}
+.term-out::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:4px}
+
+.term-line{white-space:pre-wrap;word-break:break-word;margin-bottom:2px}
+.term-line.cmd{color:#E8F1F8}
+.term-line.cmd::before{content:"❯ ";color:#4ADE9B}
+.term-dim{color:#5C6B7C}
+.term-ok{color:#4ADE9B}
+.term-warn{color:#FFC46B}
+.term-err{color:#FF6B6B}
+.term-key{color:#79C0FF}
+.term-link{color:#79C0FF;text-decoration:underline;text-underline-offset:2px}
+.term-link:hover{color:#A5D6FF}
+
+.term-ascii{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:16px;font-weight:600;
+  letter-spacing:.30em;
+  color:#7BE8A8;
+  text-shadow:0 0 20px rgba(90,240,170,.32);
+  white-space:pre;
+  margin-bottom:2px;
+}
+.term-ascii b{
+  font-weight:400;font-size:10px;
+  letter-spacing:.18em;
+  color:#3E7A63;
+  margin-left:10px;
+  vertical-align:2px;
+}
+.term-rule{
+  display:block;
+  height:1px;width:230px;
+  margin:5px 0 10px;
+  background:linear-gradient(90deg,rgba(90,240,170,.5),rgba(90,240,170,0));
+}
+.term-kv{
+  display:flex;
+  font-family:var(--mono);
+  font-size:11px;line-height:1.9;
+}
+.term-kv .term-k{flex:0 0 82px;color:#3E7A63}
+.term-kv .term-v{color:#8FA6B4}
+
+.term-chips{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:0 18px 8px;
+}
+.term-chip{
+  padding:4px 10px;border-radius:6px;
+  font-size:11px;
+  color:#9FB3C8;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  transition:all .18s ease;
+}
+.term-chip:hover{background:rgba(94,224,176,.16);color:#5EE0B0;border-color:rgba(94,224,176,.35)}
+
+.term-in{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 18px 14px;
+  border-top:1px solid rgba(255,255,255,.07);
+  flex:0 0 auto;
+}
+.term-prompt{color:#4ADE9B;flex:0 0 auto;user-select:none}
+.term-in input{
+  flex:1;min-width:0;
+  background:none;border:0;outline:none;
+  color:#E8F1F8;
+  font-family:var(--mono);font-size:12.8px;
+  caret-color:#4ADE9B;
+}
+.term-in input::placeholder{color:#40505F}
+
+/* 礼花画布 */
+.term-fx{
+  position:absolute;inset:0;
+  pointer-events:none;
+  z-index:3;
+}
+
+/* ============================================================
+   2. VisionUI-Kit.tsx
+   ============================================================ */
+.vui{
+  height:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 272px;
+  gap:0;
+  min-height:0;
+}
+.vui-stage{
+  position:relative;
+  display:grid;place-items:center;
+  padding:28px;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(120,190,255,.16), transparent 58%),
+    radial-gradient(circle at 72% 78%, rgba(255,150,200,.14), transparent 58%),
+    var(--bg-deep);
+  overflow:hidden;
+  perspective:900px;
+}
+.vui-blob{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(38px);
+  pointer-events:none;
+  opacity:.85;
+}
+.vui-blob.b1{
+  width:300px;height:300px;left:8%;top:12%;
+  background:radial-gradient(circle,#5AC8FA,rgba(90,200,250,0) 70%);
+}
+.vui-blob.b2{
+  width:340px;height:340px;right:6%;bottom:6%;
+  background:radial-gradient(circle,#FF6FA5,rgba(255,111,165,0) 70%);
+}
+.vui-blob.b3{
+  width:220px;height:220px;left:36%;bottom:18%;
+  background:radial-gradient(circle,#7C4DFF,rgba(124,77,255,0) 70%);
+}
+.vui-card{
+  position:relative;z-index:1;
+  width:min(380px,86%);
+  aspect-ratio:1.18/1;
+  border-radius:var(--v-radius,26px);
+  padding:24px;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:6px;
+  color:#fff;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.30), rgba(255,255,255,0) 55%),
+    linear-gradient(140deg, rgba(47,124,246,.88), rgba(124,77,255,.84) 58%, rgba(240,78,152,.84));
+  box-shadow:
+    0 26px 60px rgba(20,40,90,.34),
+    inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter:blur(var(--v-blur,0px));
+  -webkit-backdrop-filter:blur(var(--v-blur,0px));
+  transform:rotateX(var(--v-rx,0deg)) rotateY(var(--v-ry,0deg));
+  transition:transform .18s ease-out,backdrop-filter .2s ease,border-radius .2s ease;
+  will-change:transform;
+}
+.vui-card h3{font-size:19px;font-weight:700;letter-spacing:.01em}
+.vui-card p{font-size:12px;opacity:.82;line-height:1.5}
+.vui-card::after{
+  content:"";
+  position:absolute;inset:auto 0 0 0;height:52%;
+  border-radius:0 0 var(--v-radius,26px) var(--v-radius,26px);
+  background:linear-gradient(180deg,rgba(20,20,40,0),rgba(20,20,40,.30));
+  pointer-events:none;
+  z-index:-1;
+}
+.vui-card .vui-pill{
+  align-self:flex-start;
+  margin-bottom:auto;
+  font-size:10.5px;font-family:var(--mono);
+  padding:4px 9px;border-radius:99px;
+  background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.3);
+}
+
+.vui-panel{
+  border-left:1px solid var(--win-line);
+  padding:20px 18px;
+  display:flex;flex-direction:column;gap:16px;
+  overflow-y:auto;
+  min-height:0;
+}
+.vui-title{
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;
+  color:var(--text-3);
+}
+.vui-row{display:flex;flex-direction:column;gap:6px}
+.vui-row label{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11.5px;color:var(--text-2);
+}
+.vui-row label b{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  color:var(--text);
+}
+.vui-row input[type="range"]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;border-radius:2px;
+  background:var(--track);
+  outline:none;
+}
+.vui-row input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:14px;height:14px;border-radius:50%;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow:0 1px 4px rgba(0,0,0,.26);
+  cursor:grab;
+}
+.vui-row input[type="range"]::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;
+  background:#fff;border:1px solid rgba(0,0,0,.12);
+  box-shadow:0 1px 4px rgba(0,0,0,.26);cursor:grab;
+}
+.vui-note{
+  margin-top:auto;
+  font-size:10.5px;line-height:1.6;color:var(--text-3);
+  border-top:1px solid var(--win-line);
+  padding-top:12px;
+}
+
+/* ============================================================
+   3. FluidField.glsl
+   ============================================================ */
+.fluid{
+  position:relative;
+  height:100%;
+  background:#05070C;
+  overflow:hidden;
+  min-height:0;
+}
+.fluid canvas{display:block;width:100%;height:100%}
+.fluid-hud{
+  position:absolute;left:16px;top:14px;
+  display:flex;gap:14px;
+  font-family:var(--mono);font-size:10px;
+  color:rgba(140,220,255,.62);
+  pointer-events:none;
+}
+.fluid-hud b{color:rgba(180,240,255,.95);font-weight:500}
+.fluid-modes{
+  position:absolute;left:16px;bottom:16px;
+  display:flex;gap:7px;
+}
+.fluid-mode{
+  padding:6px 12px;border-radius:8px;
+  font-size:11px;
+  color:rgba(170,220,255,.7);
+  background:rgba(20,40,60,.6);
+  border:1px solid rgba(120,200,255,.18);
+  backdrop-filter:blur(10px);
+  transition:all .2s ease;
+}
+.fluid-mode:hover{background:rgba(30,60,90,.8);color:#CFEBFF}
+.fluid-mode[aria-pressed="true"]{
+  color:#0A1620;
+  background:rgba(120,220,255,.9);
+  border-color:transparent;
+}
+.fluid-tip{
+  position:absolute;right:16px;bottom:18px;
+  font-family:var(--mono);font-size:10px;
+  color:rgba(140,220,255,.42);
+  pointer-events:none;
+}
+
+/* ============================================================
+   4. PerfTelemetry.ts
+   ============================================================ */
+.perf{
+  height:100%;
+  padding:24px;
+  display:flex;flex-direction:column;gap:18px;
+  overflow-y:auto;
+  min-height:0;
+}
+.perf-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.perf-head h3{font-size:17px;font-weight:600}
+.perf-head span{font-size:11.5px;color:var(--text-3)}
+.perf-badge{
+  margin-left:auto;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  padding:4px 10px;border-radius:99px;
+  color:#0B7A52;background:rgba(52,199,123,.16);
+  border:1px solid rgba(52,199,123,.32);
+}
+html[data-theme="dark"] .perf-badge{color:#5FE3A6}
+
+.perf-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+  gap:12px;
+}
+.perf-card{
+  padding:14px 15px 13px;
+  border-radius:12px;
+  background:var(--fold);
+  border:1px solid var(--win-line);
+}
+.perf-card .k{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:10.5px;letter-spacing:.06em;color:var(--text-3);
+  margin-bottom:5px;
+}
+.perf-card .k .kc{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.13em;color:var(--text-2);
+  white-space:nowrap;
+}
+.perf-card .k em{
+  font-style:normal;font-family:var(--mono);
+  font-size:9px;padding:1px 5px;border-radius:4px;
+  background:rgba(52,199,123,.16);color:#0B7A52;
+  white-space:nowrap;flex:0 0 auto;
+}
+.perf-card .kl{
+  font-size:10.5px;color:var(--text-3);
+  margin-bottom:7px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+html[data-theme="dark"] .perf-card .k em{color:#5FE3A6}
+.perf-card .v{
+  font-family:var(--mono);
+  font-size:24px;font-weight:600;
+  letter-spacing:-.02em;
+  color:var(--text);
+}
+.perf-card .v small{font-size:11px;font-weight:400;color:var(--text-3);margin-left:3px}
+.perf-bar{
+  margin-top:10px;height:4px;border-radius:2px;
+  background:var(--track);overflow:hidden;
+}
+.perf-bar i{
+  display:block;height:100%;width:var(--w,0%);
+  border-radius:2px;
+  background:linear-gradient(90deg,#34C77B,#7CE0A8);
+  transition:width .5s var(--sp-soft);
+}
+.perf-bar.warn i{background:linear-gradient(90deg,#F5A623,#FFCB6B)}
+.perf-bar.bad i{background:linear-gradient(90deg,#FF5F57,#FF8A85)}
+
+.perf-note{
+  font-size:11px;line-height:1.7;color:var(--text-3);
+  border-top:1px solid var(--win-line);
+  padding-top:14px;
+}
+
+/* 帧率波形 */
+.perf-chart{
+  flex:1 1 auto;min-height:150px;
+  display:flex;flex-direction:column;
+  padding:14px 16px 10px;
+  border-radius:12px;
+  background:var(--fold);
+  border:1px solid var(--win-line);
+}
+.perf-chart-h{
+  display:flex;align-items:baseline;gap:8px;
+  margin-bottom:8px;
+}
+.perf-chart-h span{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.14em;color:var(--text-2);
+}
+.perf-chart-h b{
+  margin-left:auto;
+  font-family:var(--mono);font-size:9.5px;font-weight:400;
+  color:var(--text-3);
+}
+.perf-chart canvas{
+  display:block;width:100%;flex:1 1 auto;min-height:110px;
+}
+.perf-note code{
+  font-family:var(--mono);font-size:10.5px;
+  padding:1px 5px;border-radius:4px;
+  background:var(--fold);
+  color:var(--text-2);
+}
+
+/* ============================================================
+   5. About_ZZX.md
+   ============================================================ */
+.about{
+  min-height:100%;
+  display:grid;place-items:center;
+  padding:32px 24px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(120,190,255,.12), transparent 60%),
+    transparent;
+}
+.pass{
+  width:min(430px,100%);
+  border-radius:20px;
+  overflow:hidden;
+  background:var(--win-bg);
+  border:1px solid var(--win-line);
+  box-shadow:0 26px 60px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.pass-top{
+  position:relative;
+  padding:24px 24px 20px;
+  color:#fff;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,.28), rgba(255,255,255,0) 55%),
+    linear-gradient(140deg,#1D6FE0,#6E4BE8 62%,#D6448A);
+  overflow:hidden;
+}
+.pass-top::after{
+  content:"ZZX";
+  position:absolute;right:2px;bottom:-18px;
+  font-size:84px;font-weight:900;
+  color:transparent;
+  -webkit-text-stroke:1.2px rgba(255,255,255,.30);
+  letter-spacing:-.04em;
+  line-height:1;
+  pointer-events:none;
+}
+.pass-avatar{
+  width:56px;height:56px;border-radius:16px;
+  display:grid;place-items:center;
+  font-size:24px;font-weight:800;
+  background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.34);
+  backdrop-filter:blur(8px);
+  margin-bottom:14px;
+}
+.pass-top h2{font-size:21px;font-weight:700;letter-spacing:.01em}
+.pass-top .role{
+  margin-top:3px;
+  font-size:12px;opacity:.84;letter-spacing:.02em;
+}
+.pass-body{padding:18px 24px 20px}
+.pass-row{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:9px 0;
+  border-bottom:1px solid var(--win-line);
+  font-size:12.5px;
+}
+.pass-row:last-of-type{border-bottom:0}
+.pass-row dt{color:var(--text-3);font-size:11.5px}
+.pass-row dd{
+  color:var(--text);
+  font-family:var(--mono);font-size:11.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.pass-actions{display:flex;gap:9px;margin-top:16px}
+.pass-btn{
+  flex:1;
+  padding:9px 12px;border-radius:10px;
+  font-size:12px;font-weight:500;
+  text-align:center;
+  color:#fff;
+  background:#0A84FF;
+  transition:filter .2s ease,transform .2s ease;
+}
+.pass-btn.ghost{
+  color:var(--text-2);
+  background:var(--fold);
+}
+.pass-btn:hover{filter:brightness(1.06)}
+.pass-btn:active{transform:scale(.97)}
+.pass-toast{
+  margin-top:10px;
+  font-size:11px;text-align:center;
+  color:#0B7A52;
+  min-height:16px;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+.pass-toast.on{opacity:1}
+html[data-theme="dark"] .pass-toast{color:#5FE3A6}
+
+/* ============================================================
+   6. 十二生肖（iframe 内嵌）
+   ============================================================ */
+.zodiac-host{
+  position:relative;
+  height:100%;
+  background:#F7F4ED;
+  min-height:0;
+}
+.zodiac-host iframe{
+  display:block;width:100%;height:100%;border:0;
+}

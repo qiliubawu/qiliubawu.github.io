@@ -90,7 +90,8 @@
     mouseSpeed: 0,
     dragging: null,
     activeApp: null,
-    w: 0, h: 0
+    w: 0, h: 0,
+    ox: 0, oy: 0                /* scene 在视口中的原点（顶部有菜单栏，y 不是 0） */
   };
 
   /* ============================================================
@@ -215,6 +216,9 @@
       phase: i * 1.17,
       amp: 0,             /* 拨弦振幅 */
       dragging: false,
+      moving: false,      /* 长按已激活，正在拖 */
+      pinned: false,      /* 被用户放到了固定位置，不再回轨道 */
+      pinX: 0, pinY: 0,
       hover: false,
       hot: 0,             /* 连线高亮衰减 */
       lastT: 0, lastX: 0, lastY: 0
@@ -236,50 +240,100 @@
   });
 
   /* ============================================================
-     6. 文件交互：拖拽 / 磁吸反光 / 碰撞 / 点击
+     6. 文件交互：长按拖动 / 磁吸反光 / 碰撞 / 点击
+     ─ 单击 → 打开应用
+     ─ 按住 HOLD_MS 不动 → 进入移动模式，跟手走
+     ─ 松手 → 停在原地（pinned），不再弹回轨道
+     ─ 双击空白处 → 全部归位
      ============================================================ */
+  var HOLD_MS = 220;        /* 长按判定时长 */
+  var HOLD_SLOP = 9;        /* 长按期间允许的手抖半径 */
+  var MOVE_MIN = 5;         /* 位移超过这个值才算真的移动过 */
+  var LAYOUT_KEY = "zzx-file-pos";
+
   function bindFileEvents(node, i) {
     var el = node.el;
+    var holdTimer = null;
+    var downX = 0, downY = 0, moved = 0;
+    var startX = 0, startY = 0;
+    var suppressClick = false;
+    var rect = null;
+    var pid = -1;
+
+    function clampX(v) { return clamp(v, -Store.w / 2 + 62, Store.w / 2 - 62); }
+    function clampY(v) { return clamp(v, -Store.h / 2 + 66, Store.h / 2 - 78); }
 
     el.addEventListener("pointerdown", function (e) {
       if (Store.state === "sleeping") return;
       if (Store.state === "open") return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+
       e.preventDefault();
       audio();
 
-      el.setPointerCapture(e.pointerId);
-      node.dragging = true;
-      Store.dragging = node;
-      el.classList.add("is-dragging");
+      downX = e.clientX;
+      downY = e.clientY;
+      moved = 0;
+      pid = e.pointerId;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
 
-      node.dragOffX = node.x - (e.clientX - Store.w / 2);
-      node.dragOffY = node.y - (e.clientY - Store.h / 2);
-      node.lastT = performance.now();
-      node.lastX = e.clientX;
-      node.lastY = e.clientY;
-      node.amp = 34;
+      /* 拖拽期间监听挂到 window 上：不能只靠指针捕获，
+         否则一旦指针移出元素范围，move/up 就收不到了 */
+      window.addEventListener("pointermove", onPressMove);
+      window.addEventListener("pointerup", onRelease);
+      window.addEventListener("pointercancel", onRelease);
 
-      el.addEventListener("pointermove", onDrag);
-      el.addEventListener("pointerup", onDrop);
-      el.addEventListener("pointercancel", onDrop);
+      /* 先按住不动：够久才进入移动模式，单击仍然是打开 */
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function () {
+        holdTimer = null;
+        startMove();
+      }, HOLD_MS);
     });
 
-    function onDrag(e) {
-      if (!node.dragging) return;
-      var now = performance.now();
-      var dt = (now - node.lastT) / 1000;
-
-      node.x = (e.clientX - Store.w / 2) + node.dragOffX;
-      node.y = (e.clientY - Store.h / 2) + node.dragOffY;
-
-      if (dt > 0.008) {
-        /* 记录速度（用于抛掷），做一点衰减避免过冲 */
-        node.vx = (e.clientX - node.lastX) / dt * 0.62;
-        node.vy = (e.clientY - node.lastY) / dt * 0.62;
-        node.lastT = now;
-        node.lastX = e.clientX;
-        node.lastY = e.clientY;
+    /* 长按判定期：一旦手先动了就取消长按，避免"轻轻一扫就拖走" */
+    function onPressMove(e) {
+      if (e.pointerId !== pid) return;
+      if (node.moving) return onDrag(e);
+      moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+      if (moved > HOLD_SLOP && holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
       }
+    }
+
+    function startMove() {
+      if (Store.state !== "awakened") return;
+      if (pid === -1) return;           /* 已经松手了，别启动幽灵拖拽 */
+
+      rect = scene.getBoundingClientRect();
+      node.moving = true;
+      node.dragging = true;
+      Store.dragging = node;
+
+      el.classList.add("is-dragging", "is-moving");
+      document.body.classList.add("is-grabbing");
+
+      /* 以按下点为准算偏移，避免长按期间文件先跳一下 */
+      node.dragOffX = node.x - (downX - rect.left - rect.width / 2);
+      node.dragOffY = node.y - (downY - rect.top - rect.height / 2);
+      startX = node.x;
+      startY = node.y;
+      node.amp = 34;
+      node.hot = 1;
+
+      if (window.navigator.vibrate) window.navigator.vibrate(8);
+      sfx.hover();
+    }
+
+    function onDrag(e) {
+      if (!node.moving || !rect) return;
+
+      node.x = clampX((e.clientX - rect.left - rect.width / 2) + node.dragOffX);
+      node.y = clampY((e.clientY - rect.top - rect.height / 2) + node.dragOffY);
+      /* 拖动期间不要残留速度，否则松手会被弹簧甩出去 */
+      node.vx = 0;
+      node.vy = 0;
 
       applyGlare(node, e);
       node.amp = Math.max(node.amp, 26);
@@ -298,14 +352,69 @@
       }
     }
 
-    function onDrop() {
+    /* 落点是否压在文件夹上（用文件夹真实矩形，比圆形半径准） */
+    function dropOnFolder() {
+      if (!rect) return false;
+      var fr = folder.getBoundingClientRect();
+      var cx = fr.left + fr.width / 2 - rect.left - rect.width / 2;
+      var cy = fr.top + fr.height / 2 - rect.top - rect.height / 2;
+      return Math.abs(node.x - cx) < fr.width / 2 + 14 &&
+             Math.abs(node.y - cy) < fr.height / 2 + 14;
+    }
+
+    function onRelease(e) {
+      if (e && e.pointerId !== undefined && e.pointerId !== pid) return;
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      pid = -1;
+
+      window.removeEventListener("pointermove", onPressMove);
+      window.removeEventListener("pointerup", onRelease);
+      window.removeEventListener("pointercancel", onRelease);
+
+      var wasMoving = node.moving;
+      var travelled = Math.hypot(node.x - startX, node.y - startY);
+
+      node.moving = false;
       node.dragging = false;
       Store.dragging = null;
-      node.el.classList.remove("is-dragging");
-      node.el.removeEventListener("pointermove", onDrag);
-      node.el.removeEventListener("pointerup", onDrop);
-      node.el.removeEventListener("pointercancel", onDrop);
-      /* 速度保留，弹簧会带着惯性把它拉回轨道 */
+      el.classList.remove("is-moving");
+      document.body.classList.remove("is-grabbing");
+
+      if (wasMoving) {
+        el.classList.remove("is-dragging");
+
+        /* 真的挪动了才更新固定点；原地长按松手保持原状 */
+        if (travelled > MOVE_MIN) {
+          if (dropOnFolder()) {
+            /* 拖回文件夹 = 收起来，回到轨道 */
+            node.pinned = false;
+            el.classList.remove("is-pinned", "is-landed");
+            node.amp = 40;
+            computeTargets();
+            saveLayout();
+            sfx.wake();
+          } else {
+            node.pinned = true;
+            node.pinX = node.x;
+            node.pinY = node.y;
+            node.tx = node.x;
+            node.ty = node.y;
+            node.vx = 0;
+            node.vy = 0;
+            el.classList.add("is-pinned");
+            el.classList.remove("is-landed");
+            void el.offsetWidth;
+            el.classList.add("is-landed");
+            saveLayout();
+            sfx.pluck(i);
+          }
+        }
+
+        /* 拖完不要顺带触发 click 打开应用 */
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 60);
+      }
     }
 
     el.addEventListener("pointerenter", function (e) {
@@ -338,6 +447,7 @@
     });
 
     el.addEventListener("click", function () {
+      if (suppressClick) return;      /* 刚拖完，别顺带把应用打开 */
       if (Store.state !== "awakened") return;
       openApp(node.p.id, node.el);
     });
@@ -408,11 +518,65 @@
     }
 
     nodes.forEach(function (f, i) {
+      /* 用户手动摆过的位置优先，轨道只负责没被摆过的那些 */
+      if (f.pinned) {
+        f.tx = clamp(f.pinX, -w / 2 + 62, w / 2 - 62);
+        f.ty = clamp(f.pinY, -h / 2 + 66, h / 2 - 78);
+        return;
+      }
       var a = (-90 + i * (360 / n)) * Math.PI / 180;
       var jitter = 1 + ((i % 3) - 1) * 0.05;
       f.tx = Math.cos(a) * rx * jitter;
       f.ty = Math.sin(a) * ry * jitter;
     });
+  }
+
+  /* ============================================================
+     7.5 布局持久化：拖过的位置记在本地，刷新后还在
+     ============================================================ */
+  function saveLayout() {
+    var out = {};
+    nodes.forEach(function (n) {
+      if (n.pinned) out[n.p.id] = [Math.round(n.pinX), Math.round(n.pinY)];
+    });
+    try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(out)); } catch (e) {}
+  }
+
+  function loadLayout() {
+    var raw = null;
+    try { raw = localStorage.getItem(LAYOUT_KEY); } catch (e) {}
+    if (!raw) return;
+    var saved;
+    try { saved = JSON.parse(raw); } catch (e) { return; }
+    if (!saved || typeof saved !== "object") return;
+    nodes.forEach(function (n) {
+      var v = saved[n.p.id];
+      if (!v || v.length !== 2) return;
+      var x = +v[0], y = +v[1];
+      if (!isFinite(x) || !isFinite(y)) return;
+      n.pinned = true;
+      n.pinX = x; n.pinY = y;
+      n.tx = x; n.ty = y;
+      n.el.classList.add("is-pinned");
+    });
+  }
+
+  function resetLayout() {
+    var had = false;
+    nodes.forEach(function (n) {
+      if (n.pinned) had = true;
+      n.pinned = false;
+      n.el.classList.remove("is-pinned", "is-landed");
+      n.vx = 0; n.vy = 0;
+    });
+    try { localStorage.removeItem(LAYOUT_KEY); } catch (e) {}
+    computeTargets();
+    nodes.forEach(function (n) { n.amp = Math.max(n.amp, 18); });
+    if (had) {
+      setExpression("dizzy", 700);
+      sfx.wake();
+    }
+    return had;
   }
 
   /* ============================================================
@@ -529,10 +693,11 @@
         var ax = -SPRING_K * (f.x - f.tx) - SPRING_C * f.vx;
         var ay = -SPRING_K * (f.y - f.ty) - SPRING_C * f.vy;
 
-        /* 磁吸：指针靠近时向光标牵引 */
-        if (Store.pointer.inside && Store.state !== "sleeping" && Store.state !== "open") {
-          var mdx = Store.pointer.x - (Store.w / 2 + f.x);
-          var mdy = Store.pointer.y - (Store.h / 2 + f.y);
+        /* 磁吸：指针靠近时向光标牵引（已固定的不参与，免得被拽走） */
+        if (!f.pinned && Store.pointer.inside &&
+            Store.state !== "sleeping" && Store.state !== "open") {
+          var mdx = Store.pointer.x - Store.ox - (Store.w / 2 + f.x);
+          var mdy = Store.pointer.y - Store.oy - (Store.h / 2 + f.y);
           var md = Math.sqrt(mdx * mdx + mdy * mdy);
           if (md < MAGNET_R && md > 4) {
             var pull = (1 - md / MAGNET_R) * MAGNET_F;
@@ -589,18 +754,26 @@
 
         var d = Math.sqrt(d2);
         var nx = dx / d, ny = dy / d;
-        var overlap = (minD - d) * 0.5;
 
-        if (!a.dragging) { a.x -= nx * overlap; a.y -= ny * overlap; }
-        if (!b.dragging) { b.x += nx * overlap; b.y += ny * overlap; }
+        /* 固定住的文件当作不可推动，让另一块自己让开 */
+        var aFree = !a.dragging && !a.pinned;
+        var bFree = !b.dragging && !b.pinned;
+        if (!aFree && !bFree) continue;
+
+        var overlap = minD - d;
+        var wa = aFree ? (bFree ? 0.5 : 1) : 0;
+        var wb = bFree ? (aFree ? 0.5 : 1) : 0;
+
+        a.x -= nx * overlap * wa; a.y -= ny * overlap * wa;
+        b.x += nx * overlap * wb; b.y += ny * overlap * wb;
 
         /* 沿法线交换速度分量 */
         var va = a.vx * nx + a.vy * ny;
         var vb = b.vx * nx + b.vy * ny;
         if (va - vb > 0) {
           var imp = (va - vb) * 0.62;
-          if (!a.dragging) { a.vx -= imp * nx; a.vy -= imp * ny; }
-          if (!b.dragging) { b.vx += imp * nx; b.vy += imp * ny; }
+          if (aFree) { a.vx -= imp * nx; a.vy -= imp * ny; }
+          if (bFree) { b.vx += imp * nx; b.vy += imp * ny; }
 
           if (Math.abs(imp) > 240) {
             a.amp = Math.max(a.amp, 16);
@@ -961,6 +1134,13 @@
   /* ============================================================
      16. 文件夹交互
      ============================================================ */
+  /* 双击空白处 → 所有手动摆过的文件归位 */
+  scene.addEventListener("dblclick", function (e) {
+    if (Store.state !== "awakened") return;
+    if (e.target.closest && e.target.closest(".file, .zzx-folder")) return;
+    resetLayout();
+  });
+
   folder.addEventListener("click", function () {
     audio();
     if (Store.state === "sleeping") {
@@ -1039,8 +1219,11 @@
   setInterval(tickClock, 1000);
 
   function measure() {
+    var r = scene.getBoundingClientRect();
     Store.w = scene.clientWidth;
     Store.h = scene.clientHeight;
+    Store.ox = r.left;
+    Store.oy = r.top;
     resizeCanvas();
   }
 
@@ -1063,6 +1246,8 @@
     penta: PENTA,
     openApp: openApp,
     closeApp: closeApp,
+    resetLayout: resetLayout,
+    saveLayout: saveLayout,
     toggleXray: toggleXray,
     setExpression: setExpression,
     playNote: function (i) { sfx.pluck(i); },
@@ -1086,6 +1271,7 @@
      20. 初始化
      ============================================================ */
   measure();
+  loadLayout();
   nodes.forEach(function (n) {
     n.el.style.transform = "translate3d(0,0,0)";
   });

@@ -312,6 +312,8 @@ body.xray-active .xray-canvas{opacity:1}
 
 /* ---------- 项目文件 ---------- */
 .files{position:absolute;inset:0;z-index:4;pointer-events:none}
+/* 拖动中把整个文件层抬到文件夹之上，否则拖过文件夹时会被整个盖住 */
+body.is-grabbing .files{z-index:7}
 
 .file{
   position:absolute;left:50%;top:50%;
@@ -325,6 +327,26 @@ body.xray-active .xray-canvas{opacity:1}
 }
 .file.is-dragging{cursor:grabbing;z-index:7}
 .file.is-active{z-index:6}
+/* 手动摆过的压在其他文件上面 —— 是我放的，就该在我看到的这一层 */
+.file.is-pinned{z-index:5}
+
+/* 长按进入移动模式：抬起来、跟手、压暗一圈阴影 */
+.file.is-moving{z-index:9;cursor:grabbing;
+  --file-shadow:0 30px 52px rgba(0,0,0,.30), 0 10px 18px rgba(0,0,0,.16);}
+.file.is-moving .file-float{
+  scale:1.07;
+  transition:transform .18s ease-out,opacity .18s ease,scale .16s ease-out;
+}
+body.is-grabbing,
+body.is-grabbing *{cursor:grabbing !important}
+
+/* 松手落定：一次轻微回弹，确认"就放这儿了" */
+@keyframes file-land{
+  0%{scale:1.12}
+  58%{scale:.975}
+  100%{scale:1}
+}
+.file.is-landed .file-float{animation:file-land .44s var(--sp-soft)}
 
 .file-float{
   display:block;
